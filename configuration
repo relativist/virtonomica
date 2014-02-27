@@ -1,0 +1,62 @@
+#db parameters
+url_ora = jdbc:oracle:thin:@ora.ixtens.local:1521:mars
+username_ora = CONDUIT_CNDT_1278
+pwd_ora = ixtens
+logging = true
+
+#marketplace
+MPO = 700
+MPO2 = 800
+SP1 = 10285
+SP2 = 10286
+SP3 = 10162
+SP4 = 10244
+
+#sftp parameters
+sftphost = 10.0.6.41
+sftphost2 = qa13.ixtens.local
+work_place =  /opt/apache/tomcat/work/fenix/
+catalina_home = /opt/apache/tomcat/
+USER = conduit
+sftpPassword = rjylebN:2012!
+
+#mp parameters
+username = admin
+password = 0000
+supplierXP = xChangePortal
+genericChannel = Generic
+unifiedCatalogChannel = UnifiedCatalog
+logoUrl = http://merchantry.com/wp-content/themes/merchantry/img/merchantry.png
+defaultIxtensCategory = 100000
+MOPCommissionRate = 15.00
+
+#general parameters
+httpPrefix = http://qa13.ixtens.local:8080/
+httpPrefix_adapter = http://qa13.ixtens.local:8080/
+httpPrefix_adapter_manager = http://admin:0000@mp.ixtens.local:8080/manager/
+propertyFile17x = data/mpstate17x.properties
+propertyFile18x = data/mpstate18x.properties
+magento = http://magento151.dodge.ixtens.local
+logging = true
+WAITNG_TIME = 100
+
+#conduit
+conduitLogin = Artem Sitnikov
+conduitPasswd = aeXae8peL5
+conduitUrl = http://10.0.6.41:8080/lr-admin/admin/
+conduitFtpUrl = http://10.0.6.41:8080/lr-supplier-adapter
+conduitSoapRealm1 = 700
+conduitSoapRealm2 = 800
+conduitRealm1 = laredoute.700
+conduitRealm2 = laredoute.800
+conduitSfid1 = 1690
+conduitSfid2 = 7777
+#this param should be the same as cndt -> settings ->  lr.soap.incoming.dir
+conduitRsinFolder = /mnt/conduit/incoming
+
+#conduit sftp
+conduitSftpLogin = conduit
+conduitSftpPasswd = rjylebN:2012!
+conduitHost = 10.0.6.41
+
+conduitSoapUrlFile = http://10.0.6.41:8080/lr-supplier-adapter/FileService
