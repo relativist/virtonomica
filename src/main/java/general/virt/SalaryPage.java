@@ -29,12 +29,12 @@ public class SalaryPage extends Page {
 
         double brilliantQA = calcQualTop1(qaPlayer,pageQtySlave);
         double salary =0.0;
-        logMe("Стремимся к "+ brilliantQA);
+        //logMe("Стремимся к "+ brilliantQA);
 
         //если все ок - уходим, нам нечего тут делать!
         String qaSlave = driver.findElement(By.xpath("//tr[td[text()='Уровень квалификации сотрудников']]/td[2]")).getText().split(" ")[0];
         if(Double.valueOf(qaSlave) == brilliantQA){
-            logMe("OK! Nothing to do here!");
+            //logMe("OK! Nothing to do here!");
             driver.get(localPage);
             return new SalaryPage(driver);
         }
@@ -52,7 +52,7 @@ public class SalaryPage extends Page {
         int counter=0;
         // если текущая квала больше идеальной уменьшаем ЗП
         if(Double.valueOf(slaveQaLocal.getText())>brilliantQA){
-            logMe("Уменьшаем ЗП!");
+            //logMe("Уменьшаем ЗП!");
             while(Double.valueOf(slaveQaLocal.getText())!=brilliantQA){
                 if(!slaveQaLocal.getText().equals("0"))
                     if(Double.valueOf(slaveQaLocal.getText())>brilliantQA){
@@ -60,7 +60,7 @@ public class SalaryPage extends Page {
                         salary-=1.0;
                         salarySlave.clear();
                         salarySlave.sendKeys(String.valueOf(salary));
-                        logMe("(-1) salary: "+salary+" qa: "+slaveQaLocal.getText());
+                        //logMe("(-1) salary: "+salary+" qa: "+slaveQaLocal.getText());
                         anoterElement.click();
                         waitForElement("//*[@class = 'invisible']");
                         counter=0;
@@ -70,22 +70,22 @@ public class SalaryPage extends Page {
                         salary+=0.1;
                         salarySlave.clear();
                         salarySlave.sendKeys(String.valueOf(salary));
-                        logMe("(+0.1) salary: " + salary + " qa: " + slaveQaLocal.getText());
+                        //logMe("(+0.1) salary: " + salary + " qa: " + slaveQaLocal.getText());
                         anoterElement.click();
                         waitForElement("//*[@class = 'invisible']");
                         counter=0;
                     }
                 else {
-                    logMe("Wait because ZERO!");
+                    //logMe("Wait because ZERO!");
                     anoterElement.click();
                     Thread.sleep(1000);
                     counter++;
 
                     if(counter>3){
-                        logMe("FUCK");
+                        //logMe("FUCK");
                         salarySlave.clear();
                         salarySlave.sendKeys(String.valueOf(salary));
-                        logMe("salary: "+salary+" qa: "+slaveQaLocal.getText());
+                        //logMe("salary: "+salary+" qa: "+slaveQaLocal.getText());
                         anoterElement.click();
                         waitForElement("//*[@class = 'invisible']");
                         counter=0;
@@ -95,7 +95,7 @@ public class SalaryPage extends Page {
             driver.findElement(By.xpath("//input[@type='submit']")).click();
         }// если текущая квала меньше идеальной увеличиваем ЗП
         else{
-            logMe("Увеличиваем ЗП!");
+            //logMe("Увеличиваем ЗП!");
             while(Double.valueOf(slaveQaLocal.getText())!=brilliantQA){
                 if(!(slaveQaLocal.getText().equals("0")))
                     if(Double.valueOf(slaveQaLocal.getText())<brilliantQA){
@@ -103,7 +103,7 @@ public class SalaryPage extends Page {
                         salary+=1.0;
                         salarySlave.clear();
                         salarySlave.sendKeys(String.valueOf(salary));
-                        logMe("(+1) salary: "+salary+" qa: "+slaveQaLocal.getText());
+                        //logMe("(+1) salary: "+salary+" qa: "+slaveQaLocal.getText());
                         anoterElement.click();
                         waitForElement("//*[@class = 'invisible']");
                         counter=0;
@@ -113,22 +113,22 @@ public class SalaryPage extends Page {
                         salary-=0.1;
                         salarySlave.clear();
                         salarySlave.sendKeys(String.valueOf(salary));
-                        logMe("(-0.1) salary: " + salary + " qa: " + slaveQaLocal.getText());
+                        //logMe("(-0.1) salary: " + salary + " qa: " + slaveQaLocal.getText());
                         anoterElement.click();
                         waitForElement("//*[@class = 'invisible']");
                         counter=0;
                     }
                 else {
-                    logMe("Wait because ZERO!");
+                    //logMe("Wait because ZERO!");
                     anoterElement.click();
                     Thread.sleep(1000);
                     counter++;
 
                     if(counter>3){
-                        logMe("FUCK");
+                        //logMe("FUCK");
                         salarySlave.clear();
                         salarySlave.sendKeys(String.valueOf(salary));
-                        logMe("salary: "+salary+" qa: "+slaveQaLocal.getText());
+                        //logMe("salary: "+salary+" qa: "+slaveQaLocal.getText());
                         anoterElement.click();
                         waitForElement("//*[@class = 'invisible']");
                         counter=0;

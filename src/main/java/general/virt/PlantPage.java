@@ -25,19 +25,66 @@ public class PlantPage extends Page {
         return new PlantPage(driver);
     }
 
+
+    /*
+    1. если на складе больше в два раза чем требуется. обнуляем оффер. ждем
+    2. если у поставщика меньше чем два моих требования - бить тревогу
+    3. если на складе меньше двух требования и больше одного - перезаказать сумму
+    */
     public PlantPage supply(){
-        driver.findElement(By.xpath("//a[text()='Снабжение']"));
+        driver.findElement(By.xpath("//a[text()='Снабжение']")).click();
+        String title="";
+        String need="";
+        String have="";
+        String offer="";
+        String sklad="";
+        String error = "";
+        boolean change = false;
         for(int i =0; i<driver.findElements(By.xpath("//tr[contains(@id,'product_row')]//a[@title]")).size();i++){
-            logMe("Title: "+driver.findElements(By.xpath("//tr[contains(@id,'product_row')]//a[@title]")).get(i).getAttribute("title"));
-            logMe("Need: " + driver.findElement(By.xpath("//tr[contains(@id,'product_row')]/td//td[2]")).getText().replaceAll(" ", ""));
-            logMe("Have: "+driver.findElement(By.xpath("//tr[contains(@id,'product_row')]/td[2]//td[2]")).getText().replaceAll(" ",""));
 
-            logMe("Offer: "+driver.findElement(By.xpath("//tr[contains(@id,'product_row')]/td[2]//td[2]")).getText().replaceAll(" ",""));
+            if(driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[7]//tr[2]/td[2]")).size()!=
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]")).size()){
+                logMe("Нет Одного из поставщиков!");
+                break;
+            }
 
+            error = "";
+            title = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]//a[@title]")).get(i).getAttribute("title");
+            need = driver.findElements(By.xpath("//tr[td[contains(text(),'Требуется')]]/td[2]")).get(i).getText().replaceAll(" ", "");
+            have = driver.findElements(By.xpath("//tr[td[contains(text(),'Количество')]]/td[2]")).get(i).getText().replaceAll(" ","");
+            offer = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[4]//input")).get(i).getAttribute("value").replaceAll(" ", "");
+            sklad = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[7]//tr[2]/td[2]")).get(i).getText().replaceAll(" ", "");
+
+            if(Integer.valueOf(have)>2*Integer.valueOf(need)){
+                if(!offer.equals("0")){
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[4]//input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[4]//input")).get(i).sendKeys("0");
+                }
+                continue;
+            }
+
+            if(Integer.valueOf(sklad)<2*Integer.valueOf(need))
+                error+=" Поставщик обосрался.";
+
+            if(Integer.valueOf(have)<2*Integer.valueOf(need)){
+                driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[4]//input")).get(i).clear();
+                driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[4]//input")).get(i).sendKeys(need);
+                change=true;
+            }
+
+
+
+            if(!error.equals(""))
+                logMe(title+"\t\t"+error);
 
         }
 
-        driver.findElement(By.xpath("//a[text()='Завод']"));
+        if(change){
+            driver.findElement(By.name("applyChanges")).click();
+            change=false;
+        }
+
+        driver.findElement(By.xpath("//a[text()='Завод']")).click();
         return new PlantPage(driver);
     }
 
@@ -52,8 +99,8 @@ public class PlantPage extends Page {
     private boolean isNeedtoEducate(){
         String salarySlave = driver.findElement(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).getText().split("\\$")[0];
         String salaryTown  = driver.findElement(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).getText().split("городу ")[1].replaceAll("\\$\\)","");
-        logMe(salarySlave);
-        logMe(salaryTown);
+        //logMe(salarySlave);
+        //logMe(salaryTown);
         if (Double.valueOf(salarySlave) > Double.valueOf(salaryTown)*0.3)
             return true;
         else return false;
