@@ -1,4 +1,4 @@
-package autotest;
+package help;
 
 
 import java.sql.Connection;

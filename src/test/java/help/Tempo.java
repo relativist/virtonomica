@@ -1,4 +1,4 @@
-package autotest;
+package help;
 
 
 import general.Page;
