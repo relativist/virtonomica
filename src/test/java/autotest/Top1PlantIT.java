@@ -5,7 +5,6 @@ import general.Page;
 import general.virt.LoginPage;
 import general.virt.PlantPage;
 import org.junit.Test;
-import org.openqa.selenium.WebElement;
 
 import java.util.List;
 

@@ -38,7 +38,20 @@ public class AnalyzemarketIT extends Page {
 
     int session = Integer.valueOf(formattedDate("MMdd"));
     logMe("today session: "+session);
-    new LoginPage(driver).openVirtUrl().login().getAnalyzeMarket("Ликер","Бакалея",session);
+    new LoginPage(driver).openVirtUrl().login()
+            .getAnalyzeMarket("Лекарственные травы","Аптека",session)
+            .getAnalyzeMarket("Природные лекарства","Аптека",session)
+            .getAnalyzeMarket("Натуральный кофе","Бакалея",session)
+            .getAnalyzeMarket("Растворимый кофе","Бакалея",session)
+            .getAnalyzeMarket("Цветы и эфиромасличные культуры","Бакалея",session)
+            .getAnalyzeMarket("Энергетические напитки","Бакалея",session)
+            .getAnalyzeMarket("Ликер","Бакалея",session)
+            .getAnalyzeMarket("Консервированные оливки","Продукты питания",session)
+            .getAnalyzeMarket("Оливковое масло","Продукты питания",session)
+            .getAnalyzeMarket("Специи","Продукты питания",session)
+            .getAnalyzeMarket("Сыр фета","Продукты питания",session)
+            .getAnalyzeMarket("Электроинструмент","Промышленные товары",session)
+    ;
 
 
 
