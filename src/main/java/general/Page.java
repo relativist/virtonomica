@@ -4,17 +4,12 @@ import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-import java.io.*;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Vector;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by a.sitnikov on 18.02.14.
@@ -185,6 +180,26 @@ public class Page extends TestCase {
             Thread.sleep(1000);
         }
     }
+
+    public void waitForElementVisible(String xpath) throws InterruptedException {
+        for(int i=0; i<TIMEOUT_IN_SECONDS; i++){
+            if(driver.findElement(By.xpath(xpath)).isDisplayed()){
+                //logMe("FOUND!");
+                break;
+            }
+            //logMe("WAIT");
+            Thread.sleep(1000);
+        }
+    }
+
+    public String formattedDate(String format) throws IOException {
+        Date aDate = new Date();
+        SimpleDateFormat formatter = new SimpleDateFormat(format);
+        String formattedDate = formatter.format(aDate);
+        return formattedDate;
+    }
+
+
 
 
 
