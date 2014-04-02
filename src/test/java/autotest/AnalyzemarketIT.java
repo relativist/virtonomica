@@ -43,9 +43,8 @@ public class AnalyzemarketIT extends Page {
 
         File file = new File("market.db");
         if(!file.exists()) {
-            //Создаем его.
-            //file.createNewFile();
-            new CreateDB();
+            logMe("creating new database table!");
+            new CreateDB().main();
         }
 
     logMe("today session: "+session);

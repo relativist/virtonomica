@@ -7,7 +7,7 @@ import java.sql.*;
 
 public class CreateDB
 {
-    public static void main( String args[] )
+    public static void main()
     {
         Connection c = null;
         Statement stmt = null;
