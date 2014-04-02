@@ -3,7 +3,10 @@ package autotest;
 
 import general.Page;
 import general.virt.LoginPage;
+import help.CreateDB;
 import org.junit.Test;
+
+import java.io.File;
 
 /**
  * Created by a.sitnikov on 18.02.14.
@@ -37,20 +40,28 @@ public class AnalyzemarketIT extends Page {
     public void test() throws Throwable {
 
     int session = Integer.valueOf(formattedDate("MMdd"));
+
+        File file = new File("market.db");
+        if(!file.exists()) {
+            //Создаем его.
+            //file.createNewFile();
+            new CreateDB();
+        }
+
     logMe("today session: "+session);
     new LoginPage(driver).openVirtUrl().login()
-            .getAnalyzeMarket("Лекарственные травы","Аптека",session)
-            .getAnalyzeMarket("Природные лекарства","Аптека",session)
-            .getAnalyzeMarket("Натуральный кофе","Бакалея",session)
-            .getAnalyzeMarket("Растворимый кофе","Бакалея",session)
-            .getAnalyzeMarket("Цветы и эфиромасличные культуры","Бакалея",session)
-            .getAnalyzeMarket("Энергетические напитки","Бакалея",session)
-            .getAnalyzeMarket("Ликер","Бакалея",session)
-            .getAnalyzeMarket("Консервированные оливки","Продукты питания",session)
-            .getAnalyzeMarket("Оливковое масло","Продукты питания",session)
-            .getAnalyzeMarket("Специи","Продукты питания",session)
-            .getAnalyzeMarket("Сыр фета","Продукты питания",session)
-            .getAnalyzeMarket("Электроинструмент","Промышленные товары",session)
+            .getAnalyzeMarket("Лекарственные травы", "Аптека", session)
+            .getAnalyzeMarket("Природные лекарства", "Аптека", session)
+            .getAnalyzeMarket("Натуральный кофе", "Бакалея", session)
+            .getAnalyzeMarket("Растворимый кофе", "Бакалея", session)
+            .getAnalyzeMarket("Цветы и эфиромасличные культуры", "Бакалея", session)
+            .getAnalyzeMarket("Энергетические напитки", "Бакалея", session)
+            .getAnalyzeMarket("Ликер", "Бакалея", session)
+            .getAnalyzeMarket("Консервированные оливки", "Продукты питания", session)
+            .getAnalyzeMarket("Оливковое масло", "Продукты питания", session)
+            .getAnalyzeMarket("Специи", "Продукты питания", session)
+            .getAnalyzeMarket("Сыр фета", "Продукты питания", session)
+            .getAnalyzeMarket("Электроинструмент", "Промышленные товары", session)
     ;
 
 
