@@ -19,6 +19,7 @@ public class CreateDB
             stmt = c.createStatement();
             String sql = "CREATE TABLE MARKET " +
                     "(SESSION        INT     NOT NULL," +
+                    " PRODUCT           TEXT    NOT NULL, " +
                     " COUNTRY           TEXT    NOT NULL, " +
                     " REGION           TEXT    NOT NULL, " +
                     " CITY           TEXT    NOT NULL, " +

@@ -104,6 +104,10 @@ public class MainPage extends Page {
     //Сначала ставим товар потом перебираем по городам.
     public MainPage getAnalyzeMarket(String productName, String typeProduct,int session) throws InterruptedException {
 
+        logMe("-----------------------------------------------");
+        logMe(productName);
+        logMe("-----------------------------------------------");
+
         String [] countries = {
 //                "Азербайджан",
 //                "Армения",
@@ -137,7 +141,7 @@ public class MainPage extends Page {
         waitForElementVisible("//img[@alt='" + productName + "']");
 
         driver.findElement(By.xpath("//img[@alt='"+productName+"']")).click();
-
+        int counter = 0;
 
 
         // COUNTRY
@@ -152,7 +156,9 @@ public class MainPage extends Page {
                 //CITY
                 for(int k=1; k<c3.getOptions().size();k++){
                     c3.selectByIndex(k);
-                    getMarketData(session);
+                    getMarketData(session,productName);
+                    logMe("Completed: " + counter);
+                    counter++;
                     c3 = new Select(driver.findElements(By.xpath("//*[@id='mainContent']/fieldset/table[2]//select")).get(2));
                 }
                 c2 = new Select(driver.findElements(By.xpath("//*[@id='mainContent']/fieldset/table[2]//select")).get(1));
@@ -164,7 +170,7 @@ public class MainPage extends Page {
         return new MainPage(driver);
     }
 
-    protected void getMarketData(int session){
+    protected void getMarketData(int session,String productName){
         //местные поставцищики
         //tr[td[text()='Местные поставщики']]/td[5]
         String localSales = "";
@@ -185,7 +191,7 @@ public class MainPage extends Page {
         String numSales = driver.findElement(By.xpath("//tr[td[text()='Количество продавцов:']]/td[7]")).getText().trim();
 
         //tr[th[text()='Цена']]/td[2]
-        String price = driver.findElement(By.xpath("//tr[th[text()='Цена']]/td[2]")).getText().replace("$","").replaceAll(" ","");
+        String price = driver.findElement(By.xpath("//tr[th[text()='Цена']]/td[2]")).getText().replace("$","").replaceAll(" ", "");
         //tr[th[text()='Качество']]/td[2]
         String quality = driver.findElement(By.xpath("//tr[th[text()='Качество']]/td[2]")).getText();
         //tr[th[text()='Бренд']]/td[2]
@@ -204,7 +210,7 @@ public class MainPage extends Page {
 
 
 
-
+        logMe(productName);
         logMe(localSales);
         //logMe(marketIndex);
         logMe(marketVolume);
@@ -226,6 +232,7 @@ public class MainPage extends Page {
             String sql = "INSERT INTO MARKET (SESSION,COUNTRY,REGION,CITY,LOCALSALES,VOLUME,NUMSALES,PRICE,QA,BRAND) " +
                     "VALUES (" +
                     session +
+                    ",'"+productName +"'"+
                     ",'"+country +"'"+
                     ",'"+region +"'"+
                     ",'"+city +"'"+
