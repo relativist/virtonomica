@@ -229,7 +229,7 @@ public class MainPage extends Page {
             System.out.println("Opened database successfully");
 
             stmt = c.createStatement();
-            String sql = "INSERT INTO MARKET (SESSION,COUNTRY,REGION,CITY,LOCALSALES,VOLUME,NUMSALES,PRICE,QA,BRAND) " +
+            String sql = "INSERT INTO MARKET (SESSION,PRODUCT,COUNTRY,REGION,CITY,LOCALSALES,VOLUME,NUMSALES,PRICE,QA,BRAND) " +
                     "VALUES (" +
                     session +
                     ",'"+productName +"'"+
