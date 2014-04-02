@@ -185,7 +185,7 @@ public class MainPage extends Page {
         String numSales = driver.findElement(By.xpath("//tr[td[text()='Количество продавцов:']]/td[7]")).getText().trim();
 
         //tr[th[text()='Цена']]/td[2]
-        String price = driver.findElement(By.xpath("//tr[th[text()='Цена']]/td[2]")).getText().replace("$","");
+        String price = driver.findElement(By.xpath("//tr[th[text()='Цена']]/td[2]")).getText().replace("$","").replaceAll(" ","");
         //tr[th[text()='Качество']]/td[2]
         String quality = driver.findElement(By.xpath("//tr[th[text()='Качество']]/td[2]")).getText();
         //tr[th[text()='Бренд']]/td[2]
