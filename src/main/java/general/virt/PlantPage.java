@@ -3,6 +3,7 @@ package general.virt;
 import general.Page;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.Select;
 
 /**
  * Created by rest on 3/7/14.
@@ -88,6 +89,98 @@ public class PlantPage extends Page {
         return new PlantPage(driver);
     }
 
+    public PlantPage sales(){
+
+        driver.findElement(By.xpath("//a[text()='Финансовый отчёт']")).click();
+        String balance = driver.findElement(By.xpath("//tr[td[text()='Прибыль']]//td[2]")).getText().replaceAll(" ", "").replaceAll("\\$", "");
+        logMe("balance = "+balance);
+
+        driver.findElement(By.xpath("//a[text()='Сбыт']")).click();
+        String generalSalePrice = "0";
+        boolean debet = true; //все хорошо. положительный баланс
+        boolean highdebet = false; //все хорошо. положительный баланс , но не на много!
+        boolean changeAnyPrice = true;
+        String settablePrice = "0.0";
+        if(Float.valueOf(balance)>0){
+            debet=true;
+            if(Float.valueOf(balance)>5000000)
+                highdebet=true;
+            else
+                highdebet=false;
+        }
+        else debet = false;
+        if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]")).size()>1)
+            for(int i=0; i<driver.findElements(By.xpath("//table[@class='grid']//tr[@class]")).size(); i ++){
+                settablePrice = "0.0";
+
+                //продаваемая цена
+                if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[5]//tr[3]/td[2]")).get(i).getText().equals("---") ||
+                        driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[5]//tr[3]/td[2]")).get(i).getText().equals("Не известна"))
+                    continue;
+
+                //кому продавать
+                Select s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[9]/select")).get(i));
+                logMe("selected: "+s1.getFirstSelectedOption().getText());
+                if(s1.getFirstSelectedOption().getText().equals("Не продавать"))
+                    s1.selectByVisibleText("Только своей компании");
+                else if(!s1.getFirstSelectedOption().getText().equals("Не продавать"))
+                    changeAnyPrice=false;
+
+
+                generalSalePrice = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).getText().replaceAll(" ","").replaceAll("\\$","");
+                if(debet && highdebet && changeAnyPrice) //уменьшаем на 5%
+                    settablePrice = String.valueOf(Float.valueOf(generalSalePrice)*0.95);
+                else if(!debet) //увеличиваем на 10%
+                    settablePrice = String.valueOf(Float.valueOf(generalSalePrice)*1.10);
+
+                logMe("Recomended Pice to set up is : "+ settablePrice);
+                driver.findElement(By.xpath("//input[@value='Сохранить изменения']")).click();
+            }
+        else{
+            for(int i=0; i<driver.findElements(By.xpath("//table[@class='grid']//tr[@class]")).size(); i ++){
+                settablePrice = "0";
+
+                //продаваемая цена
+                if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[4]//tr[3]/td[2]")).get(i).getText().equals("---") ||
+                        driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[4]//tr[3]/td[2]")).get(i).getText().equals("Не известна"))
+                    continue;
+
+                //кому продавать
+                Select s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/select")).get(i));
+                logMe("selected: "+s1.getFirstSelectedOption().getText());
+                if(s1.getFirstSelectedOption().getText().equals("Не продавать"))
+                    s1.selectByVisibleText("Только своей компании");
+                else if(!s1.getFirstSelectedOption().getText().equals("Не продавать"))
+                    changeAnyPrice=false;
+
+
+                generalSalePrice = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).getAttribute("value").replaceAll(" ","").replaceAll("\\$","");
+                logMe("generalSalePrice = "+generalSalePrice);
+                if(debet && highdebet && changeAnyPrice){ //уменьшаем на 5%
+                    settablePrice = String.valueOf(Float.valueOf(generalSalePrice)*0.95);
+                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).sendKeys(settablePrice);
+                }
+                else if(!debet){ //увеличиваем на 10%
+                    settablePrice = String.valueOf(Float.valueOf(generalSalePrice)*1.10);
+                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).sendKeys(settablePrice);
+                }
+                else{
+                    settablePrice = generalSalePrice;
+                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).sendKeys(settablePrice);
+                }
+
+
+                logMe("Recomended Pice to set up is : "+ settablePrice);
+                driver.findElement(By.xpath("//input[@value='Сохранить изменения']")).click();
+            }
+        }
+
+        driver.findElement(By.xpath("//a[text()='Завод']")).click();
+        return new PlantPage(driver);
+    }
 
     public PlantPage setAutoQaSlave() throws InterruptedException {
         new SalaryPage(driver).autoSetSalaryAndQa();

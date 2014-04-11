@@ -3,7 +3,12 @@ package general.virt;
 import general.Page;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.WebDriverException;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 /**
  * Created by rest on 3/7/14.
@@ -26,160 +31,398 @@ public class StorePage extends Page {
         return new StorePage(driver);
     }
 
+    public StorePage finans(){
+        driver.findElement(By.xpath("//a[text()='Финансовый отчёт']")).click();
 
-    /*
-    1. если на складе больше в два раза чем требуется. обнуляем оффер. ждем
-    2. если у поставщика меньше чем два моих требования - бить тревогу
-    3. если на складе меньше двух требования и больше одного - перезаказать сумму
-    */
-    public StorePage supply(){
-        driver.findElement(By.xpath("//a[text()='Снабжение']")).click();
-        String title="";
-        String need="";
-        String have="";
-        String offer="";
-        String sklad="";
-        String error = "";
-        boolean change = false;
-        for(int i =0; i<driver.findElements(By.xpath("//tr[contains(@id,'product_row')]//a[@title]")).size();i++){
-
-            if(driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[7]//tr[2]/td[2]")).size()!=
-                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]")).size()){
-                logMe("Нет Одного из поставщиков!");
-                break;
-            }
-
-            error = "";
-            title = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]//a[@title]")).get(i).getAttribute("title");
-            need = driver.findElements(By.xpath("//tr[td[contains(text(),'Требуется')]]/td[2]")).get(i).getText().replaceAll(" ", "");
-            have = driver.findElements(By.xpath("//tr[td[contains(text(),'Количество')]]/td[2]")).get(i).getText().replaceAll(" ","");
-            offer = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[4]//input")).get(i).getAttribute("value").replaceAll(" ", "");
-            sklad = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[7]//tr[2]/td[2]")).get(i).getText().replaceAll(" ", "");
-
-            if(Integer.valueOf(have)>2*Integer.valueOf(need)){
-                if(!offer.equals("0")){
-                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[4]//input")).get(i).clear();
-                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[4]//input")).get(i).sendKeys("0");
-                }
-                continue;
-            }
-
-            if(Integer.valueOf(sklad)<2*Integer.valueOf(need))
-                error+=" Поставщик обосрался.";
-
-            if(Integer.valueOf(have)<2*Integer.valueOf(need)){
-                driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[4]//input")).get(i).clear();
-                driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[4]//input")).get(i).sendKeys(need);
-                change=true;
-            }
-
-
-
-            if(!error.equals(""))
-                logMe(title+"\t\t"+error);
-
-        }
-
-        if(change){
-            driver.findElement(By.name("applyChanges")).click();
-            change=false;
-        }
-
-        driver.findElement(By.xpath("//a[text()='Завод']")).click();
+        String profit ="";
+        if(driver.findElements(By.xpath("/tr[td[text()='Прибыль']]/td[2]/span")).size()>0)
+            profit = driver.findElement(By.xpath("//tr[td[text()='Прибыль']]/td[2]/span")).getText().replaceAll(" ", "").replaceAll("\\$", "");
+        else
+            profit = driver.findElement(By.xpath("//tr[td[text()='Прибыль']]/td[2]")).getText().replaceAll(" ", "").replaceAll("\\$", "");
+        String result = "";
+        if(Double.valueOf(profit)>0)
+            result="GOOD";
+        else {result = "BAD";
+            if(Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Прибыль']]/td[3]/span")).getText().replaceAll(" ","").replaceAll("\\$", ""))<0
+                    && Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Прибыль']]/td[4]/span")).getText().replaceAll(" ","").replaceAll("\\$", ""))<0
+                    && Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Прибыль']]/td[5]/span")).getText().replaceAll(" ","").replaceAll("\\$", ""))<0
+                    )
+                result="VERY BAD";
+        } 
+        logMe(result+" profit: "+profit);
+        driver.findElement(By.xpath("//a[text()='Магазин']")).click();
         return new StorePage(driver);
     }
 
-    public StorePage sales(){
 
-        driver.findElement(By.xpath("//a[text()='Финансовый отчёт']")).click();
-        String balance = driver.findElement(By.xpath("//tr[td[text()='Прибыль']]//td[2]")).getText().replaceAll(" ", "").replaceAll("\\$", "");
-        logMe("balance = "+balance);
+    public StorePage advertising(Double fame,Double spentMoney){
+        driver.findElement(By.xpath("//a[text()='Маркетинг и Реклама']")).click();
+        String localFame = driver.findElement(By.xpath("//tr[td[text()='Известность']]/td[2]")).getText();
+        //if(Double.valueOf(localFame)<fame) Условие надо продумать!!!
 
-        driver.findElement(By.xpath("//a[text()='Сбыт']")).click();
-        String generalSalePrice = "0";
-        boolean debet = true; //все хорошо. положительный баланс
-        boolean highdebet = false; //все хорошо. положительный баланс , но не на много!
-        boolean changeAnyPrice = true;
-        String settablePrice = "0.0";
-        if(Float.valueOf(balance)>0){
-            debet=true;
-            if(Float.valueOf(balance)>5000000)
-                highdebet=true;
-            else
-                highdebet=false;
-        }
-        else debet = false;
-        if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]")).size()>1)
-            for(int i=0; i<driver.findElements(By.xpath("//table[@class='grid']//tr[@class]")).size(); i ++){
-                settablePrice = "0.0";
-
-                //продаваемая цена
-                if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[5]//tr[3]/td[2]")).get(i).getText().equals("---") ||
-                        driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[5]//tr[3]/td[2]")).get(i).getText().equals("Не известна"))
-                    continue;
-
-                //кому продавать
-                Select s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[9]/select")).get(i));
-                logMe("selected: "+s1.getFirstSelectedOption().getText());
-                if(s1.getFirstSelectedOption().getText().equals("Не продавать"))
-                    s1.selectByVisibleText("Только своей компании");
-                else if(!s1.getFirstSelectedOption().getText().equals("Не продавать"))
-                    changeAnyPrice=false;
-
-
-                generalSalePrice = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).getText().replaceAll(" ","").replaceAll("\\$","");
-                if(debet && highdebet && changeAnyPrice) //уменьшаем на 5%
-                    settablePrice = String.valueOf(Float.valueOf(generalSalePrice)*0.95);
-                else if(!debet) //увеличиваем на 10%
-                    settablePrice = String.valueOf(Float.valueOf(generalSalePrice)*1.10);
-
-                logMe("Recomended Pice to set up is : "+ settablePrice);
-                driver.findElement(By.xpath("//input[@value='Сохранить изменения']")).click();
-            }
-        else{
-            for(int i=0; i<driver.findElements(By.xpath("//table[@class='grid']//tr[@class]")).size(); i ++){
-                settablePrice = "0";
-
-                //продаваемая цена
-                if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[4]//tr[3]/td[2]")).get(i).getText().equals("---") ||
-                        driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[4]//tr[3]/td[2]")).get(i).getText().equals("Не известна"))
-                    continue;
-
-                //кому продавать
-                Select s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/select")).get(i));
-                logMe("selected: "+s1.getFirstSelectedOption().getText());
-                if(s1.getFirstSelectedOption().getText().equals("Не продавать"))
-                    s1.selectByVisibleText("Только своей компании");
-                else if(!s1.getFirstSelectedOption().getText().equals("Не продавать"))
-                    changeAnyPrice=false;
-
-
-                generalSalePrice = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).getAttribute("value").replaceAll(" ","").replaceAll("\\$","");
-                logMe("generalSalePrice = "+generalSalePrice);
-                if(debet && highdebet && changeAnyPrice){ //уменьшаем на 5%
-                    settablePrice = String.valueOf(Float.valueOf(generalSalePrice)*0.95);
-                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
-                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).sendKeys(settablePrice);
-                }
-                else if(!debet){ //увеличиваем на 10%
-                    settablePrice = String.valueOf(Float.valueOf(generalSalePrice)*1.10);
-                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
-                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).sendKeys(settablePrice);
-                }
-                else{
-                    settablePrice = generalSalePrice;
-                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
-                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).sendKeys(settablePrice);
-                }
-
-
-                logMe("Recomended Pice to set up is : "+ settablePrice);
-                driver.findElement(By.xpath("//input[@value='Сохранить изменения']")).click();
-            }
-        }
-
-        driver.findElement(By.xpath("//a[text()='Завод']")).click();
+        driver.findElement(By.xpath("//a[text()='Магазин']")).click();
         return new StorePage(driver);
+    }
+
+    private void deselectAllAdvetising(){
+
+        driver.findElement(By.xpath("//tr[td/label[text()='Интернет']]/td/input")).click();
+        driver.findElement(By.xpath("//tr[td/label[text()='Печатные издания']]/td/input")).click();
+        driver.findElement(By.xpath("//tr[td/label[text()='Наружная реклама']]/td/input")).click();
+        driver.findElement(By.xpath("//tr[td/label[text()='Радио']]/td/input")).click();
+        driver.findElement(By.xpath("//tr[td/label[text()='Телевидение']]/td/input")).click();
+
+    }
+
+//    1. store==0
+//        delete from sales and supply
+//    2. price == 0
+//        price = basicCost*1.30
+//        sell
+//    3. store/saled>2.5
+//        1. price<= basicCost
+//             offer=0 && delete product from offers.
+//             price=basic
+//        else
+//             offer=0
+//             price=price*0.9
+//    else:
+//         price<= basicCost
+//             offer=0 && delete product from offers.
+//             price=basic
+//         else
+//             offer=saled*1.10
+//             price=price*1.10
+//
+//    4. market>20
+//        price=price*1.10
+
+
+    public StorePage trading() throws InterruptedException {
+
+        if(isDepProcessed(driver.getCurrentUrl())){
+            logMe("Already processed");
+            return new StorePage(driver);
+        }
+
+
+        driver.findElement(By.xpath("//a[text()='Торговый зал']")).click();
+        String store = new String();
+        String price = new String();
+        String saled = new String();
+        String basicCost = new String();
+        String market = new String();
+        String offer = new String();
+        String avgPrice = new String();
+        String retailerStore = new String();
+        String result = new String();
+        String productName = new String();
+        boolean action=false;
+
+//      1. store==0
+//           delete from sales and supply
+        for(int i=0; i<driver.findElements(By.xpath("//tr[@class='odd' or @class='even']")).size();i++){
+            store = driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[6]")).get(i).getText().replaceAll(" ","");
+            if(Double.valueOf(store)==0){
+                driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[2]/input")).get(i).click();
+                action=true;
+            }
+        }
+        driver.findElement(By.xpath("//input[@value='Ликвидировать остатки товара']")).click();
+        if(action)
+        driver.switchTo().alert().accept();
+
+        // ВТОРОЙ ЗАХОД. ибо с первого не проходит!
+        action=false;
+        for(int i=0; i<driver.findElements(By.xpath("//tr[@class='odd' or @class='even']")).size();i++){
+            store = driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[6]")).get(i).getText().replaceAll(" ","");
+            if(Double.valueOf(store)==0){
+                driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[2]/input")).get(i).click();
+                action=true;
+            }
+        }
+        if(driver.findElements(By.xpath("//input[@value='Ликвидировать остатки товара']")).size()>0)
+            driver.findElement(By.xpath("//input[@value='Ликвидировать остатки товара']")).click();
+        else{
+            driver.findElement(By.xpath("//a[text()='Магазин']")).click();
+        }
+        if(action)
+        driver.switchTo().alert().accept();
+
+
+//    2. price == 0
+//    price = avgPrice*1.30
+//
+//    3. store/saled>2.5
+//        1. price<= basicCost
+//             offer=0 && delete product from offers.
+//             price=basic
+//        else
+//             offer=0
+//             price=price*0.9
+//    else:
+//         price<= basicCost
+//             offer=0 && delete product from offers.
+//             price=basic
+//         else
+//             offer=saled*1.10
+//             price=price*1.10
+
+        for(int i=0; i<driver.findElements(By.xpath("//tr[@class='odd' or @class='even']")).size();i++){
+            result="";
+            store = driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[6]")).get(i).getText().replaceAll(" ","");
+            saled = driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[4]")).get(i).getText().replaceAll(" ","");
+            basicCost = driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[9]")).get(i).getText().replaceAll(" ", "").replaceAll("\\$", "");
+            avgPrice = driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[12]")).get(i).getText().replaceAll(" ", "").replaceAll("\\$", "");
+            price = driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).getAttribute("value");
+            market =driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[11]")).get(i).getText().split(" ")[0];
+            productName =driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[3]")).get(i).getAttribute("title").split(" \\(кликните")[0];
+
+            //2
+            if(price.equals("0.00")){
+                price = String.valueOf(Double.valueOf(avgPrice)*1.30);
+                driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(price);
+            }
+
+            //3
+            if(Double.valueOf(store)/Double.valueOf(saled)>2.5){
+                if(Double.valueOf(price)<Double.valueOf(basicCost)){
+                    price = basicCost;
+                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(price);
+                    result+="Продажа ниже себестоимости; ";
+                }
+                else {
+                    price = String.valueOf(Double.valueOf(price)*0.9);
+                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(price);
+                }
+            }
+            else{
+                if(Double.valueOf(price)<Double.valueOf(basicCost)){
+                    price = basicCost;
+                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(price);
+                    result+="Продажа ниже себестоимости; ";
+                }
+                else {
+                    price = String.valueOf(Double.valueOf(price)*1.1);
+                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(price);
+                }
+            }
+//          4. market>20
+//               price=price*1.10
+            if(Double.valueOf(market)>20){
+                price = String.valueOf(Double.valueOf(price)*1.1);
+                driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(price);
+                result+="Рынок забит; ";
+            }
+
+            recordDepartment(productName,result);
+        }
+        driver.findElement(By.xpath("//input[@value='Установить цены']")).click();
+
+
+//    1. store==0
+//        delete from sales and supply
+//    2. price == 0
+//        price = basicCost*1.30
+//        sell
+//    3. store/saled>2.5
+//        1. price<= basicCost
+//             offer=offer*0.8.
+//             price=basic
+//        else
+//             offer=offer*0.8.
+//             price=price*0.9
+//    else:
+//         price<= basicCost
+//             offer=offer*0.8.
+//             price=basic
+//         else
+//             offer=saled*1.10
+//             price=price*1.10
+//
+//    4. market>20
+//        price=price*1.10
+
+
+
+        driver.findElement(By.xpath("//a[text()='Снабжение']")).click();
+
+//      delete second offer!
+        if(driver.findElements(By.xpath("//tr[contains(@id,'product_sub_row')]/td[7]/input")).size()>0){
+            waitForElement("//tr[contains(@id,'product_sub_row')]/td[7]/input");
+            waitForElementVisible("//tr[contains(@id,'product_sub_row')]/td[7]/input");
+            for(int i=0; i<driver.findElements(By.xpath("//tr[contains(@id,'product_sub_row')]/td[7]/input")).size();i++){
+                driver.findElements(By.xpath("//tr[contains(@id,'product_sub_row')]/td[7]/input")).get(i).click();
+            }
+            driver.findElement(By.xpath("//input[@value='Разорвать выбранные контракты']")).click();
+            driver.switchTo().alert().accept();
+        }
+
+
+
+//      1. store==0
+//      delete from sales and supply
+        //Thread.sleep(15000);
+        int rows = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]")).size();
+        waitForElement("//tr[contains(@id,'product_row')]/td[10]/input["+rows+"]");
+        for(int i=0; i< rows;i++){
+            store = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[1]//tr[1]/td[2]")).get(i).getText().replaceAll(" ","");
+            if(Double.valueOf(store)==0)
+                Thread.sleep(100);
+                try{
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[10]/input")).get(i).click();
+                }   catch (WebDriverException e){
+                    System.out.println(e.getMessage());
+                    System.out.println(driver.getPageSource());
+                }
+        }
+        if(driver.findElements(By.xpath("//input[@value='Разорвать выбранные контракты']")).size()>0){
+            driver.findElement(By.xpath("//input[@value='Разорвать выбранные контракты']")).click();
+            driver.switchTo().alert().accept();
+        }
+
+
+        //3
+        for(int i=0; i<driver.findElements(By.xpath("//tr[contains(@id,'product_row')]")).size();i++){
+            result="";
+            saled = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[1]//tr[5]/td[2]")).get(i).getText().replaceAll(" ","");
+            basicCost = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[8]//tr[1]/td[2]")).get(i).getText().replaceAll(" ", "").replaceAll("\\$", "");
+            store = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[1]//tr[1]/td[2]")).get(i).getText().replaceAll(" ","");
+            retailerStore = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[9]//tr[3]/td[2]")).get(i).getText().replaceAll(" ","");
+            offer = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).getAttribute("value");
+            productName=driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/th//td/img")).get(i).getAttribute("alt");
+
+
+            //3
+            if(Double.valueOf(store)/Double.valueOf(saled)>2.5){
+                if(Double.valueOf(store)/Double.valueOf(saled)>10){
+                    offer = "0";
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).sendKeys(offer);
+                    result+="Overcroud "+productName+" "+store+"; ";
+                }
+                else {
+                    offer = String.valueOf(Double.valueOf(offer)*0.8);
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).sendKeys(offer);
+                    result+="SuperOvercroud "+productName+" "+store+"; ";
+                }
+
+            }
+            else{
+                offer = String.valueOf(Double.valueOf(saled)*1.1);
+                driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).clear();
+                driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).clear();
+                driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).sendKeys(offer);
+            }
+
+            if(Double.valueOf(retailerStore)/Double.valueOf(saled)<3){
+                logMe("Warning! "+productName+" МАЛО!");
+                result+="Мало "+productName+" "+retailerStore+"; ";
+            }
+            recordDepartment(productName, result);
+        }
+
+        if(driver.findElements(By.xpath("//input[@value='Изменить']")).size()>0){
+            driver.findElement(By.xpath("//input[@value='Изменить']")).click();
+        }
+
+
+
+
+        driver.findElement(By.xpath("//a[text()='Магазин']")).click();
+
+        //Записываем в базу о прохождении продразделения.
+        //recordDepartment("product","ok");
+
+        return new StorePage(driver);
+    }
+
+    protected void recordDepartment(String product,String result){
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:store.db");
+            c.setAutoCommit(false);
+            //System.out.println("Opened database successfully");
+
+            int session = Integer.valueOf(formattedDate("MMdd"));
+            String depName =  driver.findElement(By.xpath("//div[@id='headerInfo']/h1")).getText();
+            String depUrl = driver.getCurrentUrl();
+
+
+            stmt = c.createStatement();
+            String sql = "INSERT INTO MARKET (SESSION,DEPNAME,DEPURL,RESULT,PRODUCT) " +
+                    "VALUES (" +
+                    session +
+                    ",'"+depName +"'"+
+                    ",'"+depUrl +"'"+
+                    ",'"+result +"'"+
+                    ",'"+product +"'"+
+                    ");";
+            stmt.executeUpdate(sql);
+
+            stmt.close();
+            c.commit();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        //System.out.println("Records created successfully");
+    } 
+    public boolean isDepProcessed(String dep){
+        Connection c = null;
+        Statement stmt = null;
+        boolean result=false;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:store.db");
+            c.setAutoCommit(false);
+            //System.out.println("Opened database successfully");
+
+            int session = Integer.valueOf(formattedDate("MMdd"));
+            //String depName =  driver.findElement(By.xpath("//div[@id='headerInfo']/h1")).getText();
+            String depUrl = driver.getCurrentUrl();
+
+
+            stmt = c.createStatement();
+            String sql = "select count(*) from market where session="+session+" and depurl like '"+dep+"%';";
+            ResultSet rs =  stmt.executeQuery(sql);
+
+            while ( rs.next() ) {
+                int id = rs.getInt("count(*)");
+                if(id>0)
+                    result=true;
+                else
+                    result=false;
+            }
+
+            rs.close();
+            stmt.close();
+            c.commit();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        //logMe("result is "+result);
+        return result;
     }
 
     public StorePage setAutoQaSlave() throws InterruptedException {
@@ -190,8 +433,8 @@ public class StorePage extends Page {
 
 
     private boolean isNeedtoEducate(){
-        String salarySlave = driver.findElement(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).getText().split("\\$")[0];
-        String salaryTown  = driver.findElement(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).getText().split("городу ")[1].replaceAll("\\$\\)","");
+        String salarySlave = driver.findElement(By.xpath("//tr[td[text()='Зарплата одного сотрудника']]/td[2]")).getText().replaceAll(" ","").split("\\$")[0];
+        String salaryTown  = driver.findElement(By.xpath("//tr[td[text()='Зарплата одного сотрудника']]/td[2]")).getText().split("городу ")[1].replaceAll(" ","").replaceAll("\\$\\)", "");
         //logMe(salarySlave);
         //logMe(salaryTown);
         if (Double.valueOf(salarySlave) > Double.valueOf(salaryTown)*0.3)

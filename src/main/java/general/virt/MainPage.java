@@ -123,7 +123,7 @@ public class MainPage extends Page {
                 "Нидерланды",
                 "Норвегия",
 //                "Республика Беларусь",
-//                "Россия",
+                "Россия",
 //                "Узбекистан",
 //                "Украина",
                 "Финляндия",
@@ -167,6 +167,8 @@ public class MainPage extends Page {
         }
 
         driver.get(mainUrl);
+        logMe("Wait 11 minutes...");
+        Thread.sleep(11*60*1000);
         return new MainPage(driver);
     }
 

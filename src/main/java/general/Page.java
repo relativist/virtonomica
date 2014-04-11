@@ -5,11 +5,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.io.IOException;
-import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -138,38 +136,27 @@ public class Page extends TestCase {
     private double getK(String type)
     {
         //logMe("type: "+type);
-        switch(type)
-        {
-            case("shop"):
-            case("restaurant"):
-            case("lab"):
-                return 5;
-            case("workshop"):
-            case("mill"):
-            case("sawmill"):
-                return 50;
-            case("animalfarm"):
-                return 7.5;
-            case("medicine"):
-            case("fishingbase"):
-                return 12.5;
-            case("orchard"):
-            case("farm"):
-                return 20;
-            case("mine"):
-                return 100;
-            case("office"):
-                return 1;
-            case("service"):
-                return 1.5;
-            case("energy"):
-                return 75.0;
-            case("villa"):
-            case("warehouse"):
-            case("unknown"):
-            default:
-                return 0;
-        }//end switch
+        if (type.equals("shop") || type.equals("restaurant") || type.equals("lab")) {
+            return 5;
+        } else if (type.equals("workshop") || type.equals("mill") || type.equals("sawmill")) {
+            return 50;
+        } else if (type.equals("animalfarm")) {
+            return 7.5;
+        } else if (type.equals("medicine") || type.equals("fishingbase")) {
+            return 12.5;
+        } else if (type.equals("orchard") || type.equals("farm")) {
+            return 20;
+        } else if (type.equals("mine")) {
+            return 100;
+        } else if (type.equals("office")) {
+            return 1;
+        } else if (type.equals("service")) {
+            return 1.5;
+        } else if (type.equals("energy")) {
+            return 75.0;
+        } else {
+            return 0;
+        }
     }//end getType()
 
     public void waitForElement(String xpath) throws InterruptedException {
@@ -207,12 +194,12 @@ public class Page extends TestCase {
 
     @Before
     protected void setUp() throws Exception {
-//        System.out.println("SetUp driver");
-//        System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
-//        driver = new ChromeDriver();
+        System.out.println("SetUp driver");
+        System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
+        driver = new ChromeDriver();
 
-        DesiredCapabilities capability = DesiredCapabilities.chrome();
-        driver = new RemoteWebDriver(new URL("http://alpina.ixtens.local:5555/wd/hub"), capability);
+//        DesiredCapabilities capability = DesiredCapabilities.chrome();
+//        driver = new RemoteWebDriver(new URL("http://alpina.ixtens.local:5555/wd/hub"), capability);
     }
 
     @After

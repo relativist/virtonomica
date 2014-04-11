@@ -3,9 +3,11 @@ package autotest;
 
 import general.Page;
 import general.virt.LoginPage;
-import general.virt.PlantPage;
+import general.virt.StorePage;
+import help.CreateDB;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -25,10 +27,10 @@ public class StoreIT extends Page {
 //
 //    }
 //
-//    @Override
-//    protected void tearDown() throws Exception {
-//
-//    }
+    @Override
+    protected void tearDown() throws Exception {
+
+    }
 
     // ТОП-1
     // квала рабочих увеличивается пока максимальное количество рабов дозволеное на предприятии будет едва выше текущего.
@@ -38,29 +40,41 @@ public class StoreIT extends Page {
 
     @Test
     public void test() throws Throwable {
-        List<String> list = new LoginPage(driver).openVirtUrl().login().selectPlant().getListAllUnit();
+
+        int session = Integer.valueOf(formattedDate("MMdd"));
+
+        File file = new File("store.db");
+        if(!file.exists()) {
+            logMe("creating new database table!");
+            new CreateDB().createStore();
+        }
+
+
+//        new LoginPage(driver)
+//                .openVirtUrl()
+//                .login()
+//                .selectStore()
+//                .selectPlantByUnitId("5208739");
+//        //new StorePage(driver).trading();
+//        new StorePage(driver).setAutoQaSlave().educate().trading();
+//
+//        assertTrue(false);
+//
+//
+        List<String> list = new LoginPage(driver).openVirtUrl().login().selectStore().getListAllUnit();
         logMe("go");
 
         String currenUrl = new String();
         for(int i=0; i< list.size(); i++){
             currenUrl = list.get(i);
             logMe(currenUrl);
+            if(new StorePage(driver).isDepProcessed(currenUrl)){
+                logMe("Already processed");
+                continue;
+            }
             driver.get(currenUrl);
-            new PlantPage(driver).setAutoQaSlave().educate().supply();
-
+            //new StorePage(driver).setAutoQaSlave().educate().trading();
+            new StorePage(driver).trading();
         }
-
-//        new LoginPage(driver)
-//                .openVirtUrl()
-//                .login()
-//                .selectPlant()
-//                .selectPlantByUnitId("5180845").supply();
-
-
     }
-
-
-
-
-
 }

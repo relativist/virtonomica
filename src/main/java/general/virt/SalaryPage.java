@@ -20,7 +20,7 @@ public class SalaryPage extends Page {
         String localPage = driver.getCurrentUrl();
         String unitId = getUnitIdByUrl(localPage);
         double qaPlayer = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Квалификация игрока']]/td[2]")).getText().replaceAll("\\D", ""));
-        double pageQtySlave = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество рабочих']]/td[2]")).getText().replaceAll(" ","").split("\\(")[0]);
+        double pageQtySlave = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество сотрудников']]/td[2]")).getText().replaceAll(" ","").split("\\(")[0]);
 
         if(pageQtySlave==0){
             logMe("No Slave - no Problem!");
@@ -48,8 +48,10 @@ public class SalaryPage extends Page {
         WebElement slaveQaLocal = driver.findElement(By.id("apprisedEmployeeLevel"));
         double slaveQaNeed = Double.valueOf(driver.findElement(By.xpath("//span[contains(text(),'в среднем по городу')]")).getText().split("требуется ")[1].replaceAll("\\)",""));
 
-
+        double prevQa=0.00;
+        boolean tooHugeToContimue=false; //если при увеличении цены квала уже не меняется - выходить из этого цикла
         int counter=0;
+        logMe("brilliant: "+brilliantQA);
         // если текущая квала больше идеальной уменьшаем ЗП
         if(Double.valueOf(slaveQaLocal.getText())>brilliantQA){
             //logMe("Уменьшаем ЗП!");
@@ -57,7 +59,7 @@ public class SalaryPage extends Page {
                 if(!slaveQaLocal.getText().equals("0"))
                     if(Double.valueOf(slaveQaLocal.getText())>brilliantQA){
                         salary = Double.valueOf(salarySlave.getAttribute("value"));
-                        salary-=1.0;
+                        salary-=5.0;
                         salarySlave.clear();
                         salarySlave.sendKeys(String.valueOf(salary));
                         //logMe("(-1) salary: "+salary+" qa: "+slaveQaLocal.getText());
@@ -96,11 +98,15 @@ public class SalaryPage extends Page {
         }// если текущая квала меньше идеальной увеличиваем ЗП
         else{
             //logMe("Увеличиваем ЗП!");
-            while(Double.valueOf(slaveQaLocal.getText())!=brilliantQA){
+            while(Double.valueOf(slaveQaLocal.getText())!=brilliantQA || !tooHugeToContimue){
                 if(!(slaveQaLocal.getText().equals("0")))
                     if(Double.valueOf(slaveQaLocal.getText())<brilliantQA){
+                        //logMe("current QA: "+slaveQaLocal.getText()+" prevQa: "+prevQa+" brilliant: "+brilliantQA);
+                        if(Double.valueOf(slaveQaLocal.getText())==prevQa)
+                            tooHugeToContimue=true;
+                        prevQa = Double.valueOf(slaveQaLocal.getText());
                         salary = Double.valueOf(salarySlave.getAttribute("value"));
-                        salary+=1.0;
+                        salary+=5.0;
                         salarySlave.clear();
                         salarySlave.sendKeys(String.valueOf(salary));
                         //logMe("(+1) salary: "+salary+" qa: "+slaveQaLocal.getText());
