@@ -63,13 +63,6 @@ public class AnalyzemarketIT extends Page {
             .getAnalyzeMarket("Электроинструмент", "Промышленные товары", session)
     ;
 
-
-
-
     }
-
-
-
-
 
 }

@@ -20,7 +20,7 @@ import java.util.List;
     Simple Soap import product and verify them to correct import to MPO ( SP )
 */
 
-public class StoreIT extends Page {
+public class Store1QAEducateIT extends Page {
 
 //    @Override
 //    protected void setUp() throws Exception {
@@ -68,13 +68,13 @@ public class StoreIT extends Page {
         for(int i=0; i< list.size(); i++){
             currenUrl = list.get(i);
             logMe(currenUrl);
-            if(new StorePage(driver).isDepProcessed(currenUrl)){
-                logMe("Already processed");
-                continue;
-            }
+//            if(new StorePage(driver).isDepProcessed(currenUrl)){
+//                logMe("Already processed");
+//                continue;
+//            }
             driver.get(currenUrl);
-            //new StorePage(driver).setAutoQaSlave().educate().trading();
-            new StorePage(driver).trading();
+            new StorePage(driver).setAutoQaSlave().educate();
+            //new StorePage(driver).trading();
         }
     }
 }

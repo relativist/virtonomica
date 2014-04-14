@@ -128,7 +128,20 @@ public class StorePage extends Page {
                 action=true;
             }
         }
-        driver.findElement(By.xpath("//input[@value='Ликвидировать остатки товара']")).click();
+
+        //Если ничего не продается, то нафиг такой магазин нужен??!? - Удаляем
+        if(driver.findElements(By.xpath("//input[@value='Ликвидировать остатки товара']")).size()>0)
+            driver.findElement(By.xpath("//input[@value='Ликвидировать остатки товара']")).click();
+        else{
+            driver.findElement(By.xpath("//a[text()='Магазин']")).click();
+            String currentUrl = driver.getCurrentUrl();
+            String UnitId = getUnitIdByUrl(currentUrl);
+            driver.get("http://virtonomica.ru/vera/window/unit/close/"+UnitId);
+            driver.findElement(By.xpath("//input[@value='Закрыть предприятие']")).click();
+            driver.switchTo().alert().accept();
+
+        }
+
         if(action)
         driver.switchTo().alert().accept();
 
@@ -143,9 +156,6 @@ public class StorePage extends Page {
         }
         if(driver.findElements(By.xpath("//input[@value='Ликвидировать остатки товара']")).size()>0)
             driver.findElement(By.xpath("//input[@value='Ликвидировать остатки товара']")).click();
-        else{
-            driver.findElement(By.xpath("//a[text()='Магазин']")).click();
-        }
         if(action)
         driver.switchTo().alert().accept();
 
@@ -273,6 +283,7 @@ public class StorePage extends Page {
 
 
 //      1. store==0
+//      удаляем дублируемые саплаерные заказы
 //      delete from sales and supply
         //Thread.sleep(15000);
         int rows = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]")).size();
@@ -285,7 +296,7 @@ public class StorePage extends Page {
                     driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[10]/input")).get(i).click();
                 }   catch (WebDriverException e){
                     System.out.println(e.getMessage());
-                    System.out.println(driver.getPageSource());
+                    //System.out.println(driver.getPageSource());
                 }
         }
         if(driver.findElements(By.xpath("//input[@value='Разорвать выбранные контракты']")).size()>0){
