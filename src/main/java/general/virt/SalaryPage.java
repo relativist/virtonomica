@@ -34,7 +34,7 @@ public class SalaryPage extends Page {
         //если все ок - уходим, нам нечего тут делать!
         String qaSlave = driver.findElement(By.xpath("//tr[td[text()='Уровень квалификации сотрудников']]/td[2]")).getText().split(" ")[0];
         if(Double.valueOf(qaSlave) == brilliantQA){
-            //logMe("OK! Nothing to do here!");
+            logMe("OK! Nothing to do here!");
             driver.get(localPage);
             return new SalaryPage(driver);
         }
@@ -58,6 +58,8 @@ public class SalaryPage extends Page {
             while(Double.valueOf(slaveQaLocal.getText())!=brilliantQA){
                 if(!slaveQaLocal.getText().equals("0"))
                     if(Double.valueOf(slaveQaLocal.getText())>brilliantQA){
+                        if(Double.valueOf(slaveQaLocal.getText())==brilliantQA)
+                            break;
                         salary = Double.valueOf(salarySlave.getAttribute("value"));
                         salary-=5.0;
                         salarySlave.clear();
@@ -68,6 +70,8 @@ public class SalaryPage extends Page {
                         counter=0;
                     }
                     else{
+                        if(Double.valueOf(slaveQaLocal.getText())==brilliantQA)
+                            break;
                         salary = Double.valueOf(salarySlave.getAttribute("value"));
                         salary+=0.1;
                         salarySlave.clear();
@@ -102,6 +106,9 @@ public class SalaryPage extends Page {
                 if(!(slaveQaLocal.getText().equals("0")))
                     if(Double.valueOf(slaveQaLocal.getText())<brilliantQA){
                         //logMe("current QA: "+slaveQaLocal.getText()+" prevQa: "+prevQa+" brilliant: "+brilliantQA);
+                        if(Double.valueOf(slaveQaLocal.getText())==brilliantQA)
+                            break;
+
                         if(Double.valueOf(slaveQaLocal.getText())==prevQa)
                             tooHugeToContimue=true;
                         prevQa = Double.valueOf(slaveQaLocal.getText());
@@ -115,6 +122,8 @@ public class SalaryPage extends Page {
                         counter=0;
                     }
                     else{
+                        if(Double.valueOf(slaveQaLocal.getText())==brilliantQA)
+                            break;
                         salary = Double.valueOf(salarySlave.getAttribute("value"));
                         salary-=0.1;
                         salarySlave.clear();

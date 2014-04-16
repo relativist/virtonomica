@@ -444,8 +444,8 @@ public class StorePage extends Page {
 
 
     private boolean isNeedtoEducate(){
-        String salarySlave = driver.findElement(By.xpath("//tr[td[text()='Зарплата одного сотрудника']]/td[2]")).getText().replaceAll(" ","").split("\\$")[0];
-        String salaryTown  = driver.findElement(By.xpath("//tr[td[text()='Зарплата одного сотрудника']]/td[2]")).getText().split("городу ")[1].replaceAll(" ","").replaceAll("\\$\\)", "");
+        String salarySlave = driver.findElement(By.xpath("//tr[td[text()='Зарплата одного сотрудника']]/td[2]")).getText().replaceAll(" ","").split("\\$")[0].replaceAll(" ","");
+        String salaryTown  = driver.findElement(By.xpath("//tr[td[text()='Зарплата одного сотрудника']]/td[2]")).getText().split("городу ")[1].replaceAll(" ","").replaceAll("\\$\\)", "").replaceAll(" ","");
         //logMe(salarySlave);
         //logMe(salaryTown);
         if (Double.valueOf(salarySlave) > Double.valueOf(salaryTown)*0.3)

@@ -8,13 +8,13 @@ import org.openqa.selenium.support.ui.Select;
 /**
  * Created by rest on 3/7/14.
  */
-public class PlantPage extends Page {
-    public PlantPage(WebDriver driver_out) {
+public class OfficePage extends Page {
+    public OfficePage(WebDriver driver_out) {
         super();
         driver = driver_out;
     }
 
-    public PlantPage educate(){
+    public OfficePage educate(){
         if(isStuding() && isNeedtoEducate()){
             logMe("Обучаю персонал");
             String currentUrl = driver.getCurrentUrl();
@@ -23,7 +23,7 @@ public class PlantPage extends Page {
             driver.findElement(By.xpath("//input[@value='Обучить']")).click();
             driver.get(currentUrl);
         }
-        return new PlantPage(driver);
+        return new OfficePage(driver);
     }
 
 
@@ -32,7 +32,7 @@ public class PlantPage extends Page {
     2. если у поставщика меньше чем два моих требования - бить тревогу
     3. если на складе меньше двух требования и больше одного - перезаказать сумму
     */
-    public PlantPage supply(){
+    public OfficePage supply(){
         driver.findElement(By.xpath("//a[text()='Снабжение']")).click();
         String title="";
         String need="";
@@ -86,11 +86,11 @@ public class PlantPage extends Page {
         }
 
         driver.findElement(By.xpath("//a[text()='Завод']")).click();
-        return new PlantPage(driver);
+        return new OfficePage(driver);
     }
 
 
-    public PlantPage sales(){
+    public OfficePage sales(){
 
         driver.findElement(By.xpath("//a[text()='Финансовый отчёт']")).click();
         String balance = driver.findElement(By.xpath("//tr[td[text()='Прибыль']]//td[2]")).getText().replaceAll(" ", "").replaceAll("\\$", "");
@@ -180,19 +180,31 @@ public class PlantPage extends Page {
         }
 
         driver.findElement(By.xpath("//a[text()='Завод']")).click();
-        return new PlantPage(driver);
+        return new OfficePage(driver);
     }
 
-    public PlantPage setAutoQaSlave() throws InterruptedException {
+    public OfficePage setAutoQaSlave() throws InterruptedException {
         new SalaryPage(driver).autoSetSalaryAndQa();
-        return new PlantPage(driver);
+        return new OfficePage(driver);
+    }
+
+
+
+    public OfficePage checkOfficeLoad(){
+        Double load = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Уровень управленческой нагрузки']]/td[2]//td[2]")).getText().split(" % ")[0]);
+        logMe("Загрузка офиса: "+load);
+        if(load > 80 ){
+            logMe("TOO HUGE LOAD OFFICE!!!");
+        }
+
+        return new OfficePage(driver);
     }
 
 
 
     private boolean isNeedtoEducate(){
-        String salarySlave = driver.findElement(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).getText().split("\\$")[0].replaceAll(" ","");
-        String salaryTown  = driver.findElement(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).getText().split("городу ")[1].replaceAll("\\$\\)","").replaceAll(" ","");
+        String salarySlave = driver.findElement(By.xpath("//tr[td[text()='Зарплата одного сотрудника']]/td[2]")).getText().split("\\$")[0].replaceAll(" ","");
+        String salaryTown  = driver.findElement(By.xpath("//tr[td[text()='Зарплата одного сотрудника']]/td[2]")).getText().split("городу: ")[1].replaceAll("\\$\\)","").replaceAll(" ","");
         //logMe(salarySlave);
         //logMe(salaryTown);
         if (Double.valueOf(salarySlave) > Double.valueOf(salaryTown)*0.3)
@@ -212,7 +224,7 @@ public class PlantPage extends Page {
         else return false;
     }
 
-    public PlantPage getInfo(){
+    public OfficePage getInfo(){
         logMe("INFO:");
         String qtyEq = driver.findElement(By.xpath("//tr[td[text()='Количество оборудования']]/td[2]")).getText().split(" ед. ")[0].replaceAll(" ","");
         String qaEq = driver.findElement(By.xpath("//tr[td[text()='Качество оборудования']]/td[2]")).getText().split(" ")[0];
@@ -234,7 +246,7 @@ public class PlantPage extends Page {
         logMe("Максимальная обученность рабов "+String.valueOf(calcQualTop1(Double.valueOf(playerSkill),Double.valueOf(qtySlave))));
         logMe("Максимальная количество рабов вообще "+String.valueOf(calcPersonalTop3(Double.valueOf(playerSkill))));
 
-        return new PlantPage(driver);
+        return new OfficePage(driver);
     }
 
 }

@@ -4,8 +4,6 @@ package help;
 import general.Page;
 import org.junit.Test;
 
-import java.io.File;
-
 /**
  * Created by a.sitnikov on 18.02.14.
  */
@@ -31,15 +29,19 @@ public class Tmp_true extends Page {
     @Test
     public void test() throws Throwable {
 
-        int session = Integer.valueOf(formattedDate("MMdd"));
+//        int session = Integer.valueOf(formattedDate("MMdd"));
+//
+//
+//        File file = new File("market.db");
+//        if(!file.exists()) {
+//            //Создаем его.
+//            //file.createNewFile();
+//            new CreateDB().main();
+//        }
 
-
-        File file = new File("market.db");
-        if(!file.exists()) {
-            //Создаем его.
-            //file.createNewFile();
-            new CreateDB().main();
-        }
+        String s = "4.26 % (106+1 ед.)";
+        String d = s.split(" % ")[1].split("\\+")[0].replaceAll("\\D+","");
+        logMe(d);
 
     }
 

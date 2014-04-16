@@ -1,5 +1,6 @@
 package general;
 
+import general.virt.RepairPage;
 import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
@@ -186,6 +187,10 @@ public class Page extends TestCase {
         SimpleDateFormat formatter = new SimpleDateFormat(format);
         String formattedDate = formatter.format(aDate);
         return formattedDate;
+    }
+
+    public int repairIt(){
+        return new RepairPage(driver).repairIt();
     }
 
 
