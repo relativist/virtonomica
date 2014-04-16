@@ -3,6 +3,7 @@ package help;
 
 import general.Page;
 import general.virt.LoginPage;
+import general.virt.PlantPage;
 import org.junit.Test;
 
 /**
@@ -51,8 +52,8 @@ public class Tmp2 extends Page {
                 .openVirtUrl()
                 .login()
                 .selectOffice()
-                .selectPlantByUnitId("5122779").repairIt();
-
+                .selectPlantByUnitId("5241612");
+        new PlantPage(driver).sales();
 
     }
 

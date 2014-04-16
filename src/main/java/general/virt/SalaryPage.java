@@ -20,7 +20,11 @@ public class SalaryPage extends Page {
         String localPage = driver.getCurrentUrl();
         String unitId = getUnitIdByUrl(localPage);
         double qaPlayer = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Квалификация игрока']]/td[2]")).getText().replaceAll("\\D", ""));
-        double pageQtySlave = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество сотрудников']]/td[2]")).getText().replaceAll(" ","").split("\\(")[0]);
+        double pageQtySlave = 0.0;
+        if(driver.findElements(By.xpath("//tr[td[text()='Количество сотрудников']]/td[2]")).size()>0)
+            pageQtySlave = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество сотрудников']]/td[2]")).getText().replaceAll(" ","").split("\\(")[0]);
+        else
+            pageQtySlave = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество рабочих']]/td[2]")).getText().replaceAll(" ","").split("\\(")[0]);
 
         if(pageQtySlave==0){
             logMe("No Slave - no Problem!");
