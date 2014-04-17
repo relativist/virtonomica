@@ -12,13 +12,13 @@ import java.util.Set;
 /**
  * Created by rest on 3/7/14.
  */
-public class PlantPage extends Page {
-    public PlantPage(WebDriver driver_out) {
+public class WareHousePage extends Page {
+    public WareHousePage(WebDriver driver_out) {
         super();
         driver = driver_out;
     }
 
-    public PlantPage educate(){
+    public WareHousePage educate(){
         if(isStuding() && isNeedtoEducate()){
             logMe("Обучаю персонал");
             String currentUrl = driver.getCurrentUrl();
@@ -28,7 +28,7 @@ public class PlantPage extends Page {
                 driver.findElement(By.xpath("//input[@value='Обучить']")).click();
             driver.get(currentUrl);
         }
-        return new PlantPage(driver);
+        return new WareHousePage(driver);
     }
 
 
@@ -37,7 +37,7 @@ public class PlantPage extends Page {
     2. если у поставщика меньше чем два моих требования - бить тревогу
     3. если на складе меньше двух требования и больше одного - перезаказать сумму
     */
-    public PlantPage supply(){
+    public WareHousePage supply(){
         driver.findElement(By.xpath("//a[text()='Снабжение']")).click();
         String title="";
         String need="";
@@ -126,10 +126,10 @@ public class PlantPage extends Page {
         }
 
         driver.findElement(By.xpath("//a[text()='Завод']")).click();
-        return new PlantPage(driver);
+        return new WareHousePage(driver);
     }
 
-    public PlantPage supplyProductsWithSuppliers(){
+    public WareHousePage supplyProductsWithSuppliers(){
         String need = new String();
         String title = new String();
         //если нет поставщика данного товара, то идем и закупаем из своих. если нет своих - тревога.
@@ -168,11 +168,11 @@ public class PlantPage extends Page {
 
         }
         driver.navigate().refresh();
-        return new PlantPage(driver);
+        return new WareHousePage(driver);
     }
 
 
-    public PlantPage sales(){
+    public WareHousePage sales(){
 
 //        driver.findElement(By.xpath("//a[text()='Финансовый отчёт']")).click();
 //        String balance = driver.findElement(By.xpath("//tr[td[text()='Прибыль']]//td[2]")).getText().replaceAll(" ", "").replaceAll("\\$", "");
@@ -288,12 +288,12 @@ public class PlantPage extends Page {
         }
         driver.findElement(By.xpath("//input[@value='Сохранить изменения']")).click();
         driver.findElement(By.xpath("//a[text()='Завод']")).click();
-        return new PlantPage(driver);
+        return new WareHousePage(driver);
     }
 
-    public PlantPage setAutoQaSlave() throws InterruptedException {
+    public WareHousePage setAutoQaSlave() throws InterruptedException {
         new SalaryPage(driver).autoSetSalaryAndQa();
-        return new PlantPage(driver);
+        return new WareHousePage(driver);
     }
 
 
@@ -320,7 +320,7 @@ public class PlantPage extends Page {
         else return false;
     }
 
-    public PlantPage getInfo(){
+    public WareHousePage getInfo(){
         logMe("INFO:");
         String qtyEq = driver.findElement(By.xpath("//tr[td[text()='Количество оборудования']]/td[2]")).getText().split(" ед. ")[0].replaceAll(" ","");
         String qaEq = driver.findElement(By.xpath("//tr[td[text()='Качество оборудования']]/td[2]")).getText().split(" ")[0];
@@ -342,7 +342,7 @@ public class PlantPage extends Page {
         logMe("Максимальная обученность рабов "+String.valueOf(calcQualTop1(Double.valueOf(playerSkill),Double.valueOf(qtySlave))));
         logMe("Максимальная количество рабов вообще "+String.valueOf(calcPersonalTop3(Double.valueOf(playerSkill))));
 
-        return new PlantPage(driver);
+        return new WareHousePage(driver);
     }
 
 }

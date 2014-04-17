@@ -74,7 +74,6 @@ public class Store1QAEducateIT extends Page {
 //            }
             driver.get(currenUrl);
             new StorePage(driver).setAutoQaSlave().educate();
-            //new StorePage(driver).trading();
         }
     }
 }

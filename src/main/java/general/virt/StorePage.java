@@ -139,7 +139,8 @@ public class StorePage extends Page {
             driver.get("http://virtonomica.ru/vera/window/unit/close/"+UnitId);
             driver.findElement(By.xpath("//input[@value='Закрыть предприятие']")).click();
             driver.switchTo().alert().accept();
-
+            driver.findElement(By.xpath("//a[text()='Магазин']")).click();
+            return new StorePage(driver);
         }
 
         if(action)
@@ -239,7 +240,8 @@ public class StorePage extends Page {
 
             recordDepartment(productName,result);
         }
-        driver.findElement(By.xpath("//input[@value='Установить цены']")).click();
+        if(driver.findElements(By.xpath("//input[@value='Установить цены']")).size()!=0)
+            driver.findElement(By.xpath("//input[@value='Установить цены']")).click();
 
 
 //    1. store==0
@@ -355,11 +357,11 @@ public class StorePage extends Page {
 
 
 
-        driver.findElement(By.xpath("//a[text()='Магазин']")).click();
+
 
         //Записываем в базу о прохождении продразделения.
         //recordDepartment("product","ok");
-
+        driver.findElement(By.xpath("//a[text()='Магазин']")).click();
         return new StorePage(driver);
     }
 

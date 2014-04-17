@@ -49,14 +49,6 @@ public class Top1PlantIT extends Page {
             new PlantPage(driver).setAutoQaSlave().educate().supply();
 
         }
-
-//        new LoginPage(driver)
-//                .openVirtUrl()
-//                .login()
-//                .selectPlant()
-//                .selectPlantByUnitId("5180845").supply();
-
-
     }
 
 
