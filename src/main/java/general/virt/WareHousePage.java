@@ -4,12 +4,9 @@ import general.Page;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -34,66 +31,12 @@ public class WareHousePage extends Page {
         return new WareHousePage(driver);
     }
 
-    public List<WebElement> getFamily(int numberOfParent){
-        List<WebElement> family = null;
-        List<WebElement> all = driver.findElements(By.xpath("//table//tr[@class='p_title' or @class='odd' or @class='even']"));
-        int i = 0;
-        for(WebElement el:all){
-            if(el.getAttribute("class").equals("p_title")){
-                i++;
-            }
-            while(i==numberOfParent){
-                family.add(el);
-            }
-        }
-        return family;
-    }
 
-    public boolean isMyProduct(ArrayList<String> wProducts,String product){
-        for(int i=0; i<wProducts.size();i++){
-            if(wProducts.get(i).split(";")[0].equals(product))
-                if(wProducts.get(i).split(";")[3].equals("my"))
-                    return true;
-        }
-        return false;
-    }
-
-    public boolean isConfProduct(ArrayList<String> wProducts,String product){
-        for(int i=0; i<wProducts.size();i++){
-            if(wProducts.get(i).split(";")[0].equals(product))
-                return true;
-        }
-        return false;
-    }
-
-//    Step 1
-//    главная страница
-//    снабжение
-//    ищем поставщиков у кого на складах меньше чем мне требуется - удаляем.
-//            главная страница
-//    главная страница
-//    Step 2
-//    главная страница
-//    снабжение
-//    если товара*3 > отгрузок - обнуляем заказы
-//    главная страница
-//
-//    Step 3
-//    главная страница
-//    на главной странице смотрим товар если на складе товара меньше чем отгрузок*1.5 а отгрузки по контрактам не ноль, закупаемся:
-//    идем в снабжение
-//    ищем в договорах продукт если есть:
-//    берем лучший коэффициент текущих договоров продукта: цена / кач (смотрим в конф файл, если нет продукта - пропускаем продукт - сигналим.)
-//    ищем в поставщиках по заданному кретерию(цена.кач.колич.).
-//    сравниваем с нашим лучшим  коэфф
-//    нашли лучше - закупаем все унего. остальные обнуляем.
-//
-//    не нашли - закупаемся у текущих.
-//
-//
-//    если нет договора о продукте:
-//    заключаем договор по кретерию (цена кач колич). покупаем.
-
+    /*
+    1. если на складе больше в два раза чем требуется. обнуляем оффер. ждем
+    2. если у поставщика меньше чем два моих требования - бить тревогу
+    3. если на складе меньше двух требования и больше одного - перезаказать сумму
+    */
     public WareHousePage supply(){
         //Step1
         driver.findElement(By.xpath("//a[text()='Снабжение']")).click();
@@ -271,9 +214,7 @@ public class WareHousePage extends Page {
             }
         }
 
-
-
-        //driver.findElement(By.xpath("//a[text()='Склад']")).click();
+        driver.findElement(By.xpath("//a[text()='Завод']")).click();
         return new WareHousePage(driver);
     }
 
