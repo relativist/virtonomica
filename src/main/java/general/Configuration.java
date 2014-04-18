@@ -2,6 +2,8 @@ package general;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Properties;
 
 /**
@@ -15,7 +17,8 @@ public class Configuration {
 
     private Configuration() {
         try {
-            properties.load(new FileInputStream(CONF));
+            //properties.load(new FileInputStream(CONF));
+            properties.load(new InputStreamReader(new FileInputStream(CONF), "UTF-8"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -30,5 +33,20 @@ public class Configuration {
 
     public String getParameter(String name) {
         return (String) properties.get(name);
+    }
+
+    public ArrayList<String> getWProducts() {
+        int count = Integer.valueOf((String) properties.get("wCount"));
+        ArrayList<String> products = new ArrayList<String>();
+        String tmp ="";
+        for(int i=1; i<=count; i++){
+
+            tmp=String.valueOf(properties.get("wp"+i));
+            System.out.println(i+")"+tmp);
+            if(tmp == (null))
+                continue;
+            products.add(tmp);
+        }
+        return products;
     }
 }

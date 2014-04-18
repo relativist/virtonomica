@@ -2,7 +2,6 @@ package help;
 
 
 import general.Page;
-import general.virt.LoginPage;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -19,6 +18,15 @@ import java.util.ArrayList;
 
 public class Tempo extends Page {
 
+    public boolean isMyProduct(ArrayList<String> wProducts,String product){
+        for(int i=0; i<wProducts.size();i++){
+            if(wProducts.get(i).split(";")[0].equals(product))
+                if(wProducts.get(i).split(";")[3].equals("my"))
+                    return true;
+        }
+        return false;
+    }
+
     @Override
     protected void setUp() throws Exception {
 
@@ -31,34 +39,16 @@ public class Tempo extends Page {
 
     @Test
     public void test() throws Throwable {
+        ArrayList<String> products = getWproducts();
 
-        // нужно научиться находить максимальное количество оборудования при максимальном ТОП-1
-        double qaPlayer=27;
-        double qtySlave=180;
-        double qaSlave=5.67;
+//        for(int i=0; i<products.size(); i++)
+//            logMe(products.get(i));
 
-
-        double maxQa=0.0;
-        double maxSlave=0.0;
-
-
-        double result=100;
-        String type = "workshop";
-
-        maxQa = calcQualTop1(qaPlayer,qtySlave,type);
-        maxSlave = calcPersonalTop1(qaPlayer, qaSlave, type);
-        logMe("Max QA:"+String.valueOf(maxQa)+" \tSlave: "+qtySlave+"\tMax Slave: "+String.valueOf(maxSlave));
-
-        for(;qtySlave>0; qtySlave--){
-            qaSlave=maxQa;
-            maxQa = calcQualTop1(qaPlayer,qtySlave,type);
-            maxSlave = calcPersonalTop1(qaPlayer, qaSlave, type);
-            logMe("Max QA:"+String.valueOf(maxQa)+" \tSlave: "+qtySlave+"\tMax Slave: "+String.valueOf(maxSlave));
-            if(qtySlave*100/maxSlave > 5)
-                break;
-        }
+        logMe(""+isMyProduct(products,"Натуральные лекарственные компоненты"));
 
     }
+
+    //
 
 
 

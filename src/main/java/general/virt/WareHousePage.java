@@ -4,9 +4,12 @@ import general.Page;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -31,101 +34,246 @@ public class WareHousePage extends Page {
         return new WareHousePage(driver);
     }
 
-
-    /*
-    1. если на складе больше в два раза чем требуется. обнуляем оффер. ждем
-    2. если у поставщика меньше чем два моих требования - бить тревогу
-    3. если на складе меньше двух требования и больше одного - перезаказать сумму
-    */
-    public WareHousePage supply(){
-        driver.findElement(By.xpath("//a[text()='Снабжение']")).click();
-        String title="";
-        String need="";
-        String have="";
-        String offer="";
-        String sklad="";
-        String error = "";
-        boolean change = false;
-        boolean isNeedToFindSuppliers = false;
-
-        supplyProductsWithSuppliers();
-        //если у поставщика склад пустой. проходим по поставщикам и удаляем
-        for(int i =0; i<driver.findElements(By.xpath("//tr[contains(@id,'product_row')]//a[@title]")).size();i++){
-            if(driver.findElements(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td")).size()>6){
-                title = driver.findElement(By.xpath("//tr[contains(@id,'product_row')][" + (i + 1) + "]//a[@title]")).getAttribute("title");
-                sklad = driver.findElement(By.xpath("//tr[contains(@id,'product_row')][" + (i + 1) + "]/td[7]//tr[2]/td[2]")).getText().replaceAll(" ", "");
-
-                if(Integer.valueOf(sklad)==0){
-                    change=true;
-                    logMe("Удалили ненужного поставщика "+title);
-                    driver.findElement(By.xpath("//tr[contains(@id,'product_row')][" + (i + 1) + "]/td[8]/input")).click();
-                }
+    public List<WebElement> getFamily(int numberOfParent){
+        List<WebElement> family = null;
+        List<WebElement> all = driver.findElements(By.xpath("//table//tr[@class='p_title' or @class='odd' or @class='even']"));
+        int i = 0;
+        for(WebElement el:all){
+            if(el.getAttribute("class").equals("p_title")){
+                i++;
+            }
+            while(i==numberOfParent){
+                family.add(el);
             }
         }
-        if(change) {
+        return family;
+    }
+
+    public boolean isMyProduct(ArrayList<String> wProducts,String product){
+        for(int i=0; i<wProducts.size();i++){
+            if(wProducts.get(i).split(";")[0].equals(product))
+                if(wProducts.get(i).split(";")[3].equals("my"))
+                    return true;
+        }
+        return false;
+    }
+
+    public boolean isConfProduct(ArrayList<String> wProducts,String product){
+        for(int i=0; i<wProducts.size();i++){
+            if(wProducts.get(i).split(";")[0].equals(product))
+                return true;
+        }
+        return false;
+    }
+
+//    Step 1
+//    главная страница
+//    снабжение
+//    ищем поставщиков у кого на складах меньше чем мне требуется - удаляем.
+//            главная страница
+//    главная страница
+//    Step 2
+//    главная страница
+//    снабжение
+//    если товара*3 > отгрузок - обнуляем заказы
+//    главная страница
+//
+//    Step 3
+//    главная страница
+//    на главной странице смотрим товар если на складе товара меньше чем отгрузок*1.5 а отгрузки по контрактам не ноль, закупаемся:
+//    идем в снабжение
+//    ищем в договорах продукт если есть:
+//    берем лучший коэффициент текущих договоров продукта: цена / кач (смотрим в конф файл, если нет продукта - пропускаем продукт - сигналим.)
+//    ищем в поставщиках по заданному кретерию(цена.кач.колич.).
+//    сравниваем с нашим лучшим  коэфф
+//    нашли лучше - закупаем все унего. остальные обнуляем.
+//
+//    не нашли - закупаемся у текущих.
+//
+//
+//    если нет договора о продукте:
+//    заключаем договор по кретерию (цена кач колич). покупаем.
+
+    public WareHousePage supply(){
+        //Step1
+        driver.findElement(By.xpath("//a[text()='Снабжение']")).click();
+        int i = 1;//счетчик парентов
+        int j = 1;//счетчик детей
+        String productStore ="";
+        String productOffer="";
+        String productTitle="";
+        String supplierStore="";
+        String supplierTotalStore="";
+        boolean action=false;
+
+        ArrayList<String> wProducts = getWproducts();
+        boolean result = true;
+
+        List<WebElement> family = null;
+        List<WebElement> all = driver.findElements(By.xpath("//table//tr[@class='p_title' or @class='odd' or @class='even']"));
+
+
+        for(WebElement el:all){
+            if(el.getAttribute("class").equals("p_title")){
+                //j=1;
+                //обновляем данные для парента!
+                productTitle = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//div/strong")).getText();
+                // на складе
+                productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
+                // отгрузки
+                if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).size()==0)
+                    productOffer="0";
+                else
+                    productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).getText().replaceAll(" ", "");
+                result=isConfProduct(wProducts,productTitle);
+                //logMe("result = "+result);
+                if(!result){
+                    logMe("ОШИБКА!!!! НУЖНО ВНЕСТИ В БАЗУ НАШ ПРОДУКТ!");
+                    logMe(productTitle);
+                    assertTrue(false);
+                }
+
+
+                //logMe(productTitle+" "+productStore+" "+productOffer);
+                i++;
+            }
+            else{
+                //апдейтим данные для чайлда и применяем правила:
+                //ищем поставщиков у кого на складах меньше чем мне требуется - удаляем.
+                //проставляем галки и удаляем
+                //supplierStore= driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[9]//span")).getText().replaceAll(" ","").split("\\W")[0];
+                supplierStore= driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[9]//span")).getText().replaceAll(" ","");
+                if(supplierStore.contains("из")){
+                    //logMe("Contains!");
+                    supplierStore=supplierStore.split("из")[1];
+                }
+                supplierTotalStore=supplierStore.split("\\W")[1];
+                supplierStore=supplierStore.split("\\W")[0];
+
+                //logMe(j+" child "+supplierStore);
+
+                //проставляем галки и удаляем
+                if(Double.valueOf(supplierStore)<Double.valueOf(productOffer) && !isMyProduct(wProducts,productTitle)){
+                    driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[1]/input")).click();
+                    action=true;
+                }
+                j++;
+            }
+        }
+        if(action){
             driver.findElement(By.xpath("//input[@value='Разорвать выбранные контракты']")).click();
             driver.switchTo().alert().accept();
-            change=false;
-            isNeedToFindSuppliers=true;
-        }
-
-        if(isNeedToFindSuppliers) {
-            supplyProductsWithSuppliers();
-            isNeedToFindSuppliers=false;
+            action=false;
         }
 
 
 
+        //    Step 2
+        //    главная страница
+        //    снабжение
+        //    если товара*3 > отгрузок - обнуляем заказы
+        //    главная страница
+        i = 1;//счетчик парентов
+        j = 1;//счетчик детей
+        family = null;
+        all = driver.findElements(By.xpath("//table//tr[@class='p_title' or @class='odd' or @class='even']"));
+        boolean isNeedEraseOffer=false;
 
-        // корректировка заказов!
-        for(int i =0; i<driver.findElements(By.xpath("//tr[contains(@id,'product_row')]//a[@title]")).size();i++){
-            title = driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]//a[@title]")).getAttribute("title");
-            if(driver.findElements(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td")).size()>6){
-                error = "";
-                title = driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]//a[@title]")).getAttribute("title");
-                //logMe("//tr[td[contains(text(),'Требуется')]]["+(i+1)+"]/td[2]");
-                need = driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[1]//td[2]")).getText().replaceAll(" ", "");
-                have = driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[2]//td[2]")).getText().replaceAll(" ", "");
-                offer = driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[4]//input")).getAttribute("value").replaceAll(" ", "");
-                sklad = driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[7]//tr[2]/td[2]")).getText().replaceAll(" ", "");
+        for(WebElement el:all){
+            if(el.getAttribute("class").equals("p_title")){
 
-                if(Integer.valueOf(have)>2*Integer.valueOf(need)){
-                    if(!offer.equals("0")){
-                        driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[4]//input")).clear();
-                        driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[4]//input")).sendKeys("0");
-                    }
-                    continue;
-                }
+                //обновляем данные для парента!
+                productTitle = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//div/strong")).getText();
+                // на складе
+                productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
+                // отгрузки
+                if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).size()==0)
+                    productOffer="0";
+                else
+                    productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).getText().replaceAll(" ", "");
 
-                if(Integer.valueOf(sklad)<2*Integer.valueOf(need))
-                    error+=" Поставщик обосрётся.";
-
-                if(Integer.valueOf(have)<2*Integer.valueOf(need)){
-                    driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[4]//input")).clear();
-                    driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[4]//input")).sendKeys(need);
-                    change=true;
-                }
-
-
-
-                if(!error.equals(""))
-                    logMe(title+"\t\t"+error);
+                isNeedEraseOffer=false;
+                if(Double.valueOf(productStore)>3*Double.valueOf(productOffer))
+                    isNeedEraseOffer=true;
+                //logMe(productTitle+" "+productStore+" "+productOffer+" "+isNeedEraseOffer);
+                i++;
             }
-            else {
-                //logMe("Нет поставщика "+title);
+            else{
+                //апдейтим данные для чайлда и применяем правила:
+                //    если товара*3 > отгрузок - обнуляем заказы
+                supplierStore= driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[9]//span")).getText().replaceAll(" ","");
+                if(supplierStore.contains("из")){
+                    //logMe("Contains!");
+                    supplierStore=supplierStore.split("из")[1];
+                }
+                //logMe(j+" child "+supplierStore);
+                supplierTotalStore=supplierStore.split("\\W")[1];
+                supplierStore=supplierStore.split("\\W")[0];
+
+
+                //обнуляем или не обнуляем
+                result = isMyProduct(wProducts,productTitle);
+                //logMe(result+" my"+productTitle);
+                if(isNeedEraseOffer && !result){
+                    //logMe("delete data!");
+                    driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).clear();
+                    driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).clear();
+                    driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).sendKeys("0");
+                    action=true;
+                }
+                if(result){
+                    driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).clear();
+                    driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).clear();
+                    driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).sendKeys(supplierTotalStore);
+                    action=true;
+                }
+                j++;
             }
-
-
-
-
         }
 
-        if(change){
-            driver.findElement(By.name("applyChanges")).click();
-            change=false;
+        if(action){
+            driver.findElement(By.xpath("//input[@value='Изменить']")).click();
+            //driver.switchTo().alert().accept();
+            action=false;
         }
 
-        driver.findElement(By.xpath("//a[text()='Завод']")).click();
+        driver.findElement(By.xpath("//a[text()='Склад']")).click();
+
+
+
+
+
+
+
+        //    Step 3
+        //    главная страница
+        //    на главной странице смотрим товар если на складе товара меньше чем отгрузок, закупаемся:
+        //    идем в снабжение
+        //    ищем в договорах продукт если есть:
+        //    берем лучший коэффициент текущих договоров продукта: цена / кач (смотрим в конф файл, если нет продукта - пропускаем продукт - сигналим.)
+        //    ищем в поставщиках по заданному кретерию(цена.кач.колич.).
+        //    сравниваем с нашим лучшим  коэфф
+        //    нашли лучше - закупаем все унего. остальные обнуляем.
+        //
+        //    не нашли - закупаемся у текущих.
+        //
+        //
+        //    если нет договора о продукте:
+        //    заключаем договор по кретерию (цена кач колич). покупаем.
+
+        for(int counter=1; counter<driver.findElements(By.xpath("//tr[@class='odd' or @class='even']")).size(); counter++ ){
+            productTitle= driver.findElement(By.xpath("//tr[@class='odd' or @class='even']["+counter+"]//img")).getText().replaceAll(" ","");
+            productStore = driver.findElement(By.xpath("//tr[@class='odd' or @class='even']["+counter+"]/td[2]")).getText().replaceAll(" ", "");
+            productOffer = driver.findElement(By.xpath("//tr[@class='odd' or @class='even']["+counter+"]/td[6]")).getText().replaceAll(" ", "");
+            if(Double.valueOf(productStore)<Double.valueOf(productOffer)){
+                logMe(productTitle+" закупаем");
+                logMe("ERROR!!!");
+            }
+        }
+
+
+
+        //driver.findElement(By.xpath("//a[text()='Склад']")).click();
         return new WareHousePage(driver);
     }
 

@@ -10,6 +10,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -55,6 +56,10 @@ public class Page extends TestCase {
 
     public static String getParameter(String name) {
         return Configuration.getInstance().getParameter(name);
+    }
+
+    public static ArrayList<String> getWproducts() {
+        return Configuration.getInstance().getWProducts();
     }
 
     public void logMe(String s){
