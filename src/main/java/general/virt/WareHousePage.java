@@ -4,9 +4,12 @@ import general.Page;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,21 +20,37 @@ public class WareHousePage extends Page {
         super();
         driver = driver_out;
     }
-
-    public WareHousePage educate(){
-        if(isStuding() && isNeedtoEducate()){
-            logMe("Обучаю персонал");
-            String currentUrl = driver.getCurrentUrl();
-            String UnitId = getUnitIdByUrl(currentUrl);
-            driver.get("http://virtonomica.ru/vera/window/unit/employees/education/"+UnitId);
-            if(driver.findElements(By.xpath("//input[@value='Обучить']")).size()>0)
-                driver.findElement(By.xpath("//input[@value='Обучить']")).click();
-            driver.get(currentUrl);
+    public List<WebElement> getFamily(int numberOfParent){
+        List<WebElement> family = null;
+        List<WebElement> all = driver.findElements(By.xpath("//table//tr[@class='p_title' or @class='odd' or @class='even']"));
+        int i = 0;
+        for(WebElement el:all){
+            if(el.getAttribute("class").equals("p_title")){
+                i++;
+            }
+            while(i==numberOfParent){
+                family.add(el);
+            }
         }
-        return new WareHousePage(driver);
+        return family;
     }
 
+    public boolean isMyProduct(ArrayList<String> wProducts,String product){
+        for(int i=0; i<wProducts.size();i++){
+            if(wProducts.get(i).split(";")[0].equals(product))
+                if(wProducts.get(i).split(";")[3].equals("my"))
+                    return true;
+        }
+        return false;
+    }
 
+    public boolean isConfProduct(ArrayList<String> wProducts,String product){
+        for(int i=0; i<wProducts.size();i++){
+            if(wProducts.get(i).split(";")[0].equals(product))
+                return true;
+        }
+        return false;
+    }
     /*
     1. если на складе больше в два раза чем требуется. обнуляем оффер. ждем
     2. если у поставщика меньше чем два моих требования - бить тревогу
