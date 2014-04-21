@@ -964,8 +964,10 @@ public class WareHousePage extends Page {
     }
 
 //продавать по себестоимости и только своим.
-    public WareHousePage sales(){
-
+    public WareHousePage sales() throws InterruptedException {
+        Thread.sleep(1000);
+        waitForElement("//a[text()='Сбыт']");
+        waitForElementVisible("//a[text()='Сбыт']");
         driver.findElement(By.xpath("//a[text()='Сбыт']")).click();
         for(int i=0; i<driver.findElements(By.xpath("//table[@class='grid']//tr[@class]")).size(); i ++){
             String selfCost = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[4]//tr[td[contains(text(),'Себестоимость')]]/td[2]")).get(i).getText();

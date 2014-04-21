@@ -41,13 +41,13 @@ public class Store1QAEducateIT extends Page {
     @Test
     public void test() throws Throwable {
 
-        int session = Integer.valueOf(formattedDate("MMdd"));
-
-        File file = new File("store.db");
-        if(!file.exists()) {
-            logMe("creating new database table!");
-            new CreateDB().createStore();
-        }
+//        int session = Integer.valueOf(formattedDate("MMdd"));
+//
+//        File file = new File("store.db");
+//        if(!file.exists()) {
+//            logMe("creating new database table!");
+//            new CreateDB().createStore();
+//        }
 
 
 //        new LoginPage(driver)

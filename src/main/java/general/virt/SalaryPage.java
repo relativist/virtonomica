@@ -199,13 +199,20 @@ public class SalaryPage extends Page {
             return new SalaryPage(driver);
         }
         // текущая зп
-        S= Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).getText().split("\\$")[0].replaceAll(" ",""));
+        if(driver.findElements(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).size()==0)
+            S = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Зарплата одного сотрудника']]/td[2]")).getText().split("\\$")[0].replaceAll(" ",""));
+        else
+            S = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).getText().split("\\$")[0].replaceAll(" ",""));
 
         // средняя зп по городу
-        Savg=Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).getText().split("в среднем по городу ")[1].replaceAll("\\)","").replaceAll("\\$","").replaceAll(" ",""));
+        if(driver.findElements(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).size()==0)
+            Savg=Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Зарплата одного сотрудника']]/td[2]")).getText().replaceAll(":","").split("в среднем по городу ")[1].replaceAll("\\)","").replaceAll("\\$","").replaceAll(" ",""));
+        else
+            Savg=Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).getText().replaceAll(":","").split("в среднем по городу ")[1].replaceAll("\\)","").replaceAll("\\$","").replaceAll(" ",""));
+
         // Средняя квалификация по городу
         Qavg=Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Уровень квалификации сотрудников']]/td[2]"))
-                .getText().split(",")[0].split("по городу ")[1].replaceAll("\\)", "").replaceAll("\\$", "").replaceAll(" ", ""));
+                .getText().split(",")[0].replaceAll(":","").split("по городу ")[1].replaceAll("\\)", "").replaceAll("\\$", "").replaceAll(" ", ""));
 
         // АЛГОРИТМ
         Double b=0.0;

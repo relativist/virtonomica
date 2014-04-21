@@ -20,8 +20,12 @@ public class StorePage extends Page {
         driver = driver_out;
     }
 
-    public ArrayList<String> getCurrentTypesDepFromSalesRoom{
-
+    public ArrayList<String> getCurrentTypesDepFromSalesRoom(){
+        ArrayList<String> departments = new ArrayList<String>();
+        for(int i=0; i< driver.findElements(By.xpath("//tr/td[@class='title']")).size(); i++){
+            departments.add(driver.findElements(By.xpath("//tr/td[@class='title']")).get(i).getText().split(" Обзор")[0]);
+        }
+        return departments;
     }
 
 
@@ -29,9 +33,7 @@ public class StorePage extends Page {
         ArrayList<String> mySellProducts = getMyProductsToSell();
         driver.findElement(By.xpath("//a[text()='Торговый зал']")).click();
 
-        for(int i=0; i< driver.findElements(By.xpath("//tr/td[@class='title']")).size(); i++){
-            logMe(driver.findElements(By.xpath("//tr/td[@class='title']")).get(i).getText().split(" Обзор")[0]);
-        }
+
         return new StorePage(driver);
     }
 
