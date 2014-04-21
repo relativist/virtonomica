@@ -3,7 +3,6 @@ package autotest;
 
 import general.Page;
 import general.virt.LoginPage;
-import general.virt.PlantPage;
 import general.virt.WareHousePage;
 import org.junit.Test;
 
@@ -43,8 +42,8 @@ public class WarehouseSupply extends Page {
             currenUrl = list.get(i);
             logMe(currenUrl);
             driver.get(currenUrl);
-            //new WareHousePage(driver).supply().sales();
-            new WareHousePage(driver).sales();
+            new WareHousePage(driver).supply().sales();
+            //new WareHousePage(driver).sales();
 
         }
     }

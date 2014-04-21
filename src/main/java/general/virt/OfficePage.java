@@ -184,7 +184,7 @@ public class OfficePage extends Page {
     }
 
     public OfficePage setAutoQaSlave() throws InterruptedException {
-        new SalaryPage(driver).autoSetSalaryAndQa();
+        new SalaryPage(driver).autoSetSalaryAndQaFormula();
         return new OfficePage(driver);
     }
 

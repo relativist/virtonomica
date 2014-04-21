@@ -49,4 +49,19 @@ public class Configuration {
         }
         return products;
     }
+
+    public ArrayList<String> getMyProductsToSell() {
+        int count = Integer.valueOf((String) properties.get("myProSize"));
+        ArrayList<String> products = new ArrayList<String>();
+        String tmp ="";
+        for(int i=1; i<=count; i++){
+
+            tmp=String.valueOf(properties.get("myPro"+i));
+            //System.out.println(i+")"+tmp);
+            if(tmp == (null))
+                continue;
+            products.add(tmp);
+        }
+        return products;
+    }
 }

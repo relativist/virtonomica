@@ -2,7 +2,10 @@ package help;
 
 
 import general.Page;
+import general.virt.LoginPage;
 import org.junit.Test;
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.Select;
 
 import java.util.ArrayList;
 
@@ -27,10 +30,10 @@ public class Tempo extends Page {
         return false;
     }
 
-    @Override
-    protected void setUp() throws Exception {
-
-    }
+//    @Override
+//    protected void setUp() throws Exception {
+//
+//    }
 
     @Override
     protected void tearDown() throws Exception {
@@ -39,43 +42,47 @@ public class Tempo extends Page {
 
     @Test
     public void test() throws Throwable {
-        //ArrayList<String> products = getWproducts();
-        ArrayList<String> p = new ArrayList<String>();
-        ArrayList<Double> num = new ArrayList<Double>();
-        p.add("4.23;1");
-        p.add("1.23;2");
-        p.add("5.23;3");
-        p.add("3.23;4");
-        Double best=0.0;
-        for(int counter=0; counter<p.size(); counter++){
-            num.add(Double.valueOf(p.get(counter).split(";")[0]));
-        }
-        for(int counter=0; counter<num.size(); counter++){
-            if(num.get(counter)>best)
-                best=num.get(counter);
-        }
-        for(int counter=0; counter<p.size(); counter++){
-            if(p.get(counter).split(";")[0].equals(String.valueOf(best))){
-                logMe("best "+p.get(counter).split(";")[1]);
+        new LoginPage(driver).openVirtUrl().login();
+        driver.get("http://virtonomica.ru/vera/main/globalreport/marketing/by_trade_at_cities");
+        Select s1 = new Select(driver.findElement(By.id("__product_category_list")));
+        String outputString="";
+//        for(int i=0; i<9; i++){
+//            s1.selectByIndex(i);
+//            outputString=s1.getFirstSelectedOption().getText();
+//            for(int j=0; j<driver.findElements(By.xpath("//*[@id='__products_list']/span//img")).size();j ++){
+//                outputString+=";"+driver.findElements(By.xpath("//*[@id='__products_list']/span//img")).get(j).getAttribute("title");
+//            }
+//            s1 = new Select(driver.findElement(By.id("__product_category_list")));
+//            logMe(outputString);
+//
+//        }
+        int seconds=1000;
+
+        s1 = new Select(driver.findElement(By.xpath("//fieldset/table[2]//td[1]/select")));
+        for(int i=1; i<s1.getOptions().size(); i++){
+            s1.selectByIndex(i);
+            s1 = new Select(driver.findElement(By.xpath("//fieldset/table[2]//td[1]/select")));
+            Thread.sleep(seconds);
+            outputString=s1.getFirstSelectedOption().getText()+";";
+            Select s2 = new Select(driver.findElement(By.xpath("//fieldset/table[2]//td[3]/select")));
+            for(int j=1; j<s2.getOptions().size(); j++){
+                s2.selectByIndex(j);
+                s2 = new Select(driver.findElement(By.xpath("//fieldset/table[2]//td[3]/select")));
+                Thread.sleep(seconds);
+                Select s3 = new Select(driver.findElement(By.xpath("//fieldset/table[2]//td[5]/select")));
+                outputString+=s2.getFirstSelectedOption().getText()+";";
+                for(int k=1; k<s3.getOptions().size(); k++){
+                    s3.selectByIndex(k);
+                    Thread.sleep(seconds);
+                    s3 = new Select(driver.findElement(By.xpath("//fieldset/table[2]//td[5]/select")));
+                    //outputString+=s3.getFirstSelectedOption().getText()+";";
+                    logMe(outputString+s3.getFirstSelectedOption().getText());
+                }
+                s2 = new Select(driver.findElement(By.xpath("//fieldset/table[2]//td[3]/select")));
             }
+            s1 = new Select(driver.findElement(By.xpath("//fieldset/table[2]//td[1]/select")));
         }
-        logMe("Shit!");
-
-
-
-
-
-//        for(int i=0; i<products.size(); i++)
-//            logMe(products.get(i));
-
-        //logMe(""+isMyProduct(products,"Натуральные лекарственные компоненты"));
-
     }
 
-    //
-
-
-
-
-
 }
+

@@ -62,6 +62,10 @@ public class Page extends TestCase {
         return Configuration.getInstance().getWProducts();
     }
 
+    public static ArrayList<String> getMyProductsToSell() {
+        return Configuration.getInstance().getMyProductsToSell();
+    }
+
     public void logMe(String s){
         System.out.println(s);
     }

@@ -20,20 +20,6 @@ public class WareHousePage extends Page {
         super();
         driver = driver_out;
     }
-    public List<WebElement> getFamily(int numberOfParent){
-        List<WebElement> family = null;
-        List<WebElement> all = driver.findElements(By.xpath("//table//tr[@class='p_title' or @class='odd' or @class='even']"));
-        int i = 0;
-        for(WebElement el:all){
-            if(el.getAttribute("class").equals("p_title")){
-                i++;
-            }
-            while(i==numberOfParent){
-                family.add(el);
-            }
-        }
-        return family;
-    }
 
     private Integer sleepTimer=1000;
 

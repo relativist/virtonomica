@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 /**
  * Created by rest on 3/7/14.
@@ -18,6 +19,23 @@ public class StorePage extends Page {
         super();
         driver = driver_out;
     }
+
+    public ArrayList<String> getCurrentTypesDepFromSalesRoom{
+
+    }
+
+
+    public StorePage autoBuyProducts(){
+        ArrayList<String> mySellProducts = getMyProductsToSell();
+        driver.findElement(By.xpath("//a[text()='Торговый зал']")).click();
+
+        for(int i=0; i< driver.findElements(By.xpath("//tr/td[@class='title']")).size(); i++){
+            logMe(driver.findElements(By.xpath("//tr/td[@class='title']")).get(i).getText().split(" Обзор")[0]);
+        }
+        return new StorePage(driver);
+    }
+
+
 
     public StorePage educate(){
         if(isStuding() && isNeedtoEducate()){
@@ -30,6 +48,8 @@ public class StorePage extends Page {
         }
         return new StorePage(driver);
     }
+
+
 
     public StorePage finans(){
         driver.findElement(By.xpath("//a[text()='Финансовый отчёт']")).click();
@@ -159,7 +179,6 @@ public class StorePage extends Page {
             driver.findElement(By.xpath("//input[@value='Ликвидировать остатки товара']")).click();
         if(action)
         driver.switchTo().alert().accept();
-
 
 //    2. price == 0
 //    price = avgPrice*1.30
@@ -439,7 +458,8 @@ public class StorePage extends Page {
     }
 
     public StorePage setAutoQaSlave() throws InterruptedException {
-        new SalaryPage(driver).autoSetSalaryAndQa();
+        new SalaryPage(driver).autoSetSalaryAndQaFormula();
+        //new SalaryPage(driver).autoSetSalaryAndQa();
         return new StorePage(driver);
     }
 
