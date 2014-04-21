@@ -171,7 +171,7 @@ public class PlantPage extends Page {
         return new PlantPage(driver);
     }
 
-
+    // продавать по ценам себестоимости и только своим.
     public PlantPage sales(){
 
 //        driver.findElement(By.xpath("//a[text()='Финансовый отчёт']")).click();
@@ -264,11 +264,19 @@ public class PlantPage extends Page {
 
         driver.findElement(By.xpath("//a[text()='Сбыт']")).click();
         for(int i=0; i<driver.findElements(By.xpath("//table[@class='grid']//tr[@class]")).size(); i ++){
-            String selfCost = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[5]//tr[td[contains(text(),'Себестоимость')]]/td[2]")).get(i).getText();
+            String selfCost="";
+            if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[5]//tr[td[contains(text(),'Себестоимость')]]/td[2]")).size()==0)
+                selfCost = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[4]//tr[td[contains(text(),'Себестоимость')]]/td[2]")).get(i).getText();
+            else
+                selfCost = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[5]//tr[td[contains(text(),'Себестоимость')]]/td[2]")).get(i).getText();
             if(selfCost.equals("Не известна")||selfCost.equals("---"))
                 continue;
             selfCost=selfCost.replaceAll(" ","").replaceAll("\\$","");
-            String priceToSell = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).getAttribute("value");
+            String priceToSell="";
+            if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).size()==0)
+                priceToSell = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).getAttribute("value");
+            else
+                priceToSell = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).getAttribute("value");
             Double sCost=Double.valueOf(selfCost);
             Double pToSell=Double.valueOf(priceToSell);
 //            logMe(sCost+"");
@@ -279,11 +287,21 @@ public class PlantPage extends Page {
                 logMe("prices not changed.");
                 continue;
             }
-            driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).clear();
-            driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).clear();
-            driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).sendKeys(selfCost);
-
-            Select s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[9]/select")).get(i));
+            if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).size()==0){
+                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
+                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
+                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).sendKeys(selfCost);
+            }
+            else {
+                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).clear();
+                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).clear();
+                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).sendKeys(selfCost);
+            }
+            Select s1 = null;
+            if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[9]/select")).size()==0)
+                s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/select")).get(i));
+            else
+                s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[9]/select")).get(i));
             s1.selectByVisibleText("Только своей компании");
         }
         driver.findElement(By.xpath("//input[@value='Сохранить изменения']")).click();
@@ -292,7 +310,8 @@ public class PlantPage extends Page {
     }
 
     public PlantPage setAutoQaSlave() throws InterruptedException {
-        new SalaryPage(driver).autoSetSalaryAndQa();
+        //new SalaryPage(driver).autoSetSalaryAndQa();
+        new SalaryPage(driver).autoSetSalaryAndQaFormula();
         return new PlantPage(driver);
     }
 

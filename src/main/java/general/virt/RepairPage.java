@@ -483,12 +483,6 @@ public class RepairPage extends Page {
         }
         driver.get("http://virtonomica.ru/vera/main/unit/view/"+page);
 
-
-
-
-
-
-
         return 0;
     }
 }

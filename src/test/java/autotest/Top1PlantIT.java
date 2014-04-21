@@ -45,6 +45,8 @@ public class Top1PlantIT extends Page {
         for(int i=0; i< list.size(); i++){
             currenUrl = list.get(i);
             logMe(currenUrl);
+            if(new PlantPage(driver).isSlaveOnVacation())
+                continue;
             driver.get(currenUrl);
             new PlantPage(driver).setAutoQaSlave().educate().supply();
 

@@ -39,12 +39,36 @@ public class Tempo extends Page {
 
     @Test
     public void test() throws Throwable {
-        ArrayList<String> products = getWproducts();
+        //ArrayList<String> products = getWproducts();
+        ArrayList<String> p = new ArrayList<String>();
+        ArrayList<Double> num = new ArrayList<Double>();
+        p.add("4.23;1");
+        p.add("1.23;2");
+        p.add("5.23;3");
+        p.add("3.23;4");
+        Double best=0.0;
+        for(int counter=0; counter<p.size(); counter++){
+            num.add(Double.valueOf(p.get(counter).split(";")[0]));
+        }
+        for(int counter=0; counter<num.size(); counter++){
+            if(num.get(counter)>best)
+                best=num.get(counter);
+        }
+        for(int counter=0; counter<p.size(); counter++){
+            if(p.get(counter).split(";")[0].equals(String.valueOf(best))){
+                logMe("best "+p.get(counter).split(";")[1]);
+            }
+        }
+        logMe("Shit!");
+
+
+
+
 
 //        for(int i=0; i<products.size(); i++)
 //            logMe(products.get(i));
 
-        logMe(""+isMyProduct(products,"Натуральные лекарственные компоненты"));
+        //logMe(""+isMyProduct(products,"Натуральные лекарственные компоненты"));
 
     }
 

@@ -4,6 +4,7 @@ package autotest;
 import general.Page;
 import general.virt.LoginPage;
 import general.virt.PlantPage;
+import general.virt.WareHousePage;
 import org.junit.Test;
 
 import java.util.List;
@@ -18,40 +19,34 @@ import java.util.List;
     Simple Soap import product and verify them to correct import to MPO ( SP )
 */
 
-public class PlantRepairIT extends Page {
+public class WarehouseSupply extends Page {
 
 //    @Override
 //    protected void setUp() throws Exception {
 //
 //    }
 //
-//    @Override
-//    protected void tearDown() throws Exception {
-//
-//    }
+    @Override
+    protected void tearDown() throws Exception {
+
+    }
 
 
 
     @Test
     public void test() throws Throwable {
-        List<String> list = new LoginPage(driver).openVirtUrl().login().selectPlant().getListAllUnit();
+        List<String> list = new LoginPage(driver).openVirtUrl().login().selectWareHouse().getListAllUnit();
         logMe("go");
 
         String currenUrl = new String();
         for(int i=0; i< list.size(); i++){
             currenUrl = list.get(i);
-            logMe(i+" of "+list.size()+" )"+currenUrl);
+            logMe(currenUrl);
             driver.get(currenUrl);
-            if(!new PlantPage(driver).isSlaveOnVacation()) {
-                new PlantPage(driver).repairIt();
-                //new PlantPage(driver).sales();
-                new PlantPage(driver).setAutoQaSlave().educate().supply().sales();
-            }
-
+            //new WareHousePage(driver).supply().sales();
+            new WareHousePage(driver).sales();
 
         }
-
-
     }
 
 
