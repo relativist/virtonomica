@@ -46,7 +46,7 @@ public class Top1OfficeIT extends Page {
             currenUrl = list.get(i);
             logMe(currenUrl);
             driver.get(currenUrl);
-            new OfficePage(driver).setAutoQaSlave().educate().checkOfficeLoad();
+            new OfficePage(driver).setAutoQaSlave().educate().checkOfficeLoad().repairIt();
         }
     }
 }

@@ -6,6 +6,9 @@ import general.virt.LoginPage;
 import general.virt.StorePage;
 import org.junit.Test;
 
+import java.io.File;
+import java.util.List;
+
 /**
  * Created by a.sitnikov on 18.02.14.
  */
@@ -48,12 +51,36 @@ public class Tmp2 extends Page {
 //
 //        }
 
-        new LoginPage(driver)
-                .openVirtUrl()
-                .login()
-                .selectStore()
-                .selectPlantByUnitId("5155078");
-        new StorePage(driver).autoBuyProducts();
+        int session = Integer.valueOf(formattedDate("MMdd"));
+
+        File file = new File("store.db");
+        if(!file.exists()) {
+            logMe("creating new database table!");
+            new CreateDB().createStore();
+        }
+        List<String> list = new LoginPage(driver).openVirtUrl().login().selectStore().getListAllUnit();
+        logMe("go");
+
+        String currenUrl = new String();
+        for(int i=0; i< list.size(); i++){
+            currenUrl = list.get(i);
+            logMe(currenUrl);
+            driver.get(currenUrl);
+            new StorePage(driver).autoBuyProducts();
+        }
+//        File file = new File("store.db");
+//        if(!file.exists()) {
+//            logMe("creating new database table!");
+//            new CreateDB().createStore();
+//        }
+//
+//        new LoginPage(driver)
+//                .openVirtUrl()
+//                .login()
+//                .selectStore()
+//                .selectPlantByUnitId("5182194");
+//        new StorePage(driver).autoBuyProducts();
+//        new StorePage(driver).trading();
         //new WareHousePage(driver).sales();
 
     }

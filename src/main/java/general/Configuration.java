@@ -56,10 +56,23 @@ public class Configuration {
         for(int i=1; i<=count; i++){
 
             tmp=String.valueOf(properties.get("myPro"+i));
-            if(tmp == (null))
-                continue;
+            //System.out.println("load: "+tmp);
             products.add(tmp);
         }
         return products;
     }
+
+    public ArrayList<String> getMyProductsDepToSell() {
+        int count = Integer.valueOf((String) properties.get("myProDepSize"));
+        ArrayList<String> products = new ArrayList<String>();
+        String tmp ="";
+        for(int i=1; i<=count; i++){
+
+            tmp=String.valueOf(properties.get("myProDep"+i));
+            //System.out.println("load: "+tmp);
+            products.add(tmp);
+        }
+        return products;
+    }
+
 }
