@@ -28,10 +28,38 @@ public class StorePage extends Page {
         return departments;
     }
 
+    public boolean isThisProductSellOnSellPage(String productTitle){
+        for(int i=0; i<driver.findElements(By.xpath("//tr[@class=' product_row']/th//tr/td[1]/img")).size(); i ++){
+            if(productTitle.equals(driver.findElements(By.xpath("//tr[@class=' product_row']/th//tr/td[1]/img")).get(i).getAttribute("alt")))
+                return true;
+        }
+        return false;
+    }
 
+    //автоматическая закупка в магазинах
     public StorePage autoBuyProducts(){
+        int maxDepSize = Integer.valueOf(getParameter("StoreSize"
+                +driver.findElement(By.xpath("//tr[td[text()='Торговая площадь']]/td[2]")).getText().replaceAll(" ","").split("м")[0]));
         ArrayList<String> mySellProducts = getMyProductsToSell();
         driver.findElement(By.xpath("//a[text()='Торговый зал']")).click();
+        ArrayList <String> currentTypesDep = getCurrentTypesDepFromSalesRoom();
+        int depCount = Integer.valueOf(currentTypesDep.size());
+        driver.findElement(By.xpath("//a[text()='Снабжение']")).click();
+
+
+        //идем в снабжение и по выясненым отделам закупаем продукты. (смотрим на кретерий в конфиге)
+        //если встречаются в снабжении продукты пропускаем идем дальше
+        //если размер
+        for(String dep: currentTypesDep){
+            for(int i=0; i<mySellProducts.size(); i ++){
+                if(mySellProducts.get(i).split(";")[0].equals(dep));             // too many iteration!!!
+                logMe("покупаем продукцию: "+dep);
+            }
+        }
+
+
+
+
 
 
         return new StorePage(driver);

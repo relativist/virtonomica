@@ -42,7 +42,6 @@ public class Configuration {
         for(int i=1; i<=count; i++){
 
             tmp=String.valueOf(properties.get("wp"+i));
-            //System.out.println(i+")"+tmp);
             if(tmp == (null))
                 continue;
             products.add(tmp);
@@ -57,7 +56,6 @@ public class Configuration {
         for(int i=1; i<=count; i++){
 
             tmp=String.valueOf(properties.get("myPro"+i));
-            //System.out.println(i+")"+tmp);
             if(tmp == (null))
                 continue;
             products.add(tmp);
