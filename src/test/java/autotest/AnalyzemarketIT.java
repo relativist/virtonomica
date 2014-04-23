@@ -49,11 +49,11 @@ public class AnalyzemarketIT extends Page {
 
     logMe("today session: "+session);
     new LoginPage(driver).openVirtUrl().login()
-            .getAnalyzeMarket("Лекарственные травы", "Аптека", session)
-            .getAnalyzeMarket("Природные лекарства", "Аптека", session)
-            .getAnalyzeMarket("Натуральный кофе", "Бакалея", session)
-            .getAnalyzeMarket("Растворимый кофе", "Бакалея", session)
-            .getAnalyzeMarket("Цветы и эфиромасличные культуры", "Бакалея", session)
+//            .getAnalyzeMarket("Лекарственные травы", "Аптека", session)
+//            .getAnalyzeMarket("Природные лекарства", "Аптека", session)
+//            .getAnalyzeMarket("Натуральный кофе", "Бакалея", session)
+//            .getAnalyzeMarket("Растворимый кофе", "Бакалея", session)
+//            .getAnalyzeMarket("Цветы и эфиромасличные культуры", "Бакалея", session)
             .getAnalyzeMarket("Энергетические напитки", "Бакалея", session)
             .getAnalyzeMarket("Ликер", "Бакалея", session)
             .getAnalyzeMarket("Консервированные оливки", "Продукты питания", session)

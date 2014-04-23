@@ -4,9 +4,7 @@ import general.Page;
 import org.openqa.selenium.WebDriver;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.*;
 
 /**
  * Created by rest on 3/7/14.
@@ -49,6 +47,8 @@ public class HelpPage extends Page {
         Statement stmt = null;
         boolean result=false;
         ArrayList<String> dbProducts = new ArrayList<String>();
+        LinkedHashSet shopWithDep = new LinkedHashSet();
+        LinkedHashSet uniqueCity = new LinkedHashSet();
 
         // Create a hash map
         Hashtable balance = new Hashtable();
@@ -80,6 +80,7 @@ public class HelpPage extends Page {
 
         //добываем города по продукту которые нас устраивают (фильтр из конфигурации)
         for(String dbProduct: dbProducts){
+            logMe("-----------------------"+dbProduct+" = "+getDepByProTitle(dbProduct,companyProductDepToSell)+"-----------------------");
             //logMe(dbProduct+" "+getDepByProTitle(dbProduct,companyProductDepToSell)+" "+getProductDataFromCompanyConfig(dbProduct,companyProductToSell));
             //title;volume;localsales;qa;brand;price;base_value_to_buy
             String productData=getProductDataFromCompanyConfig(dbProduct,companyProductToSell);
@@ -99,17 +100,24 @@ public class HelpPage extends Page {
             sql = "select city from market where product='"+productName+"' and volume > "+productVolume+" and localsales>"+productLocal+" and qa<"+productQa+" and brand<"+productBrand+" and price > "+productPrice+" and region!='Франция' order by price desc;";
             rs =  stmt.executeQuery(sql);
 
+
             while ( rs.next() ) {
                 String city = rs.getString("city");
-                String key = city+";"+getDepByProTitle(dbProduct,companyProductDepToSell);
-                int value = 0;
+                //String key = city+";"+getDepByProTitle(dbProduct,companyProductDepToSell);
+                String key = city;
+                int value = 1;
+                //logMe(city+";"+getDepByProTitle(dbProduct,companyProductDepToSell));
+                logMe(city);
                 if(balance.containsKey(key)){
                     value = Integer.valueOf((Integer) balance.get(key));
-                    value ++;
+                    value +=1;
                 }
 
-                //logMe("key: "+key+" value: "+value);
                 balance.put(key,value);
+
+//                if((Integer)balance.get(key)>2){
+//                    shopWithDep.add(city+";"+getDepByProTitle(dbProduct,companyProductDepToSell));
+//                }
             }
 
             rs.close();
@@ -124,14 +132,65 @@ public class HelpPage extends Page {
 
         // проходимся по хэшу и показываем тех у кого больше двух вхождений.
         names = balance.keys();
+        int sizeOfShops=0;
         while(names.hasMoreElements()) {
-
             str = (String) names.nextElement();
-            if((Integer)balance.get(str)>2)
-                System.out.println(str + ": " +balance.get(str));
+            if((Integer)balance.get(str)>3) {
+                logMe(str + ": " + balance.get(str));
+                uniqueCity.add(str);
+
+                for(String dbProduct: dbProducts){
+                    //logMe("-----------------------"+dbProduct+" = "+getDepByProTitle(dbProduct,companyProductDepToSell)+"-----------------------");
+                    //logMe(dbProduct+" "+getDepByProTitle(dbProduct,companyProductDepToSell)+" "+getProductDataFromCompanyConfig(dbProduct,companyProductToSell));
+                    //title;volume;localsales;qa;brand;price;base_value_to_buy
+                    String productData=getProductDataFromCompanyConfig(dbProduct,companyProductToSell);
+                    String productName=productData.split(";")[0];
+                    String productVolume=productData.split(";")[1];
+                    String productLocal=productData.split(";")[2];
+                    String productQa=productData.split(";")[3];
+                    String productBrand=productData.split(";")[4];
+                    String productPrice=productData.split(";")[5];
+
+                    c = null;
+                    stmt = null;
+                    Class.forName("org.sqlite.JDBC");
+                    c = DriverManager.getConnection("jdbc:sqlite:market.db");
+                    c.setAutoCommit(false);
+                    stmt = c.createStatement();
+                    sql = "select city from market where product='"+productName+"' and volume > "+productVolume+" and localsales>"+productLocal+" and qa<"+productQa+" and brand<"+productBrand+" and price > "+productPrice+" and region!='Франция' order by price desc;";
+                    rs =  stmt.executeQuery(sql);
+
+
+                    while ( rs.next() ) {
+                        String city = rs.getString("city");
+                        //String key = city+";"+getDepByProTitle(dbProduct,companyProductDepToSell);
+                        String key = city;
+                        int value = 1;
+                        if(str.equals(city)){
+                            shopWithDep.add(city+";"+getDepByProTitle(dbProduct,companyProductDepToSell));
+                        }
+                    }
+
+                    rs.close();
+                    stmt.close();
+                    c.commit();
+                    c.close();
+
+                }
+            }
         }
+        logMe("Size = "+uniqueCity.size());
         System.out.println();
 
+
+        System.out.println();
+        System.out.println();
+
+
+        for(Iterator iter = shopWithDep.iterator(); iter.hasNext();) {
+            final String content = (String) iter.next();
+            System.out.println(content);
+        }
 
         return result;
     }
