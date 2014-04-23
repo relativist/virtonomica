@@ -54,7 +54,8 @@ public class PlantPage extends Page {
             if(driver.findElements(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td")).size()>6){
                 title = driver.findElement(By.xpath("//tr[contains(@id,'product_row')][" + (i + 1) + "]//a[@title]")).getAttribute("title");
                 sklad = driver.findElement(By.xpath("//tr[contains(@id,'product_row')][" + (i + 1) + "]/td[7]//tr[2]/td[2]")).getText().replaceAll(" ", "");
-
+                if(sklad.equals("Неогр."))
+                    sklad="100000000";
                 if(Integer.valueOf(sklad)==0){
                     change=true;
                     logMe("Удалили ненужного поставщика "+title);
@@ -96,7 +97,8 @@ public class PlantPage extends Page {
                     }
                     continue;
                 }
-
+                if(sklad.equals("Неогр."))
+                    sklad="100000000";
                 if(Integer.valueOf(sklad)<2*Integer.valueOf(need))
                     error+=" Поставщик обосрётся.";
 
