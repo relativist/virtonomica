@@ -1,7 +1,6 @@
 package help;
 
 
-import autotest.OfficeIT;
 import autotest.PlantIT;
 import autotest.Store1QAEducateIT;
 import autotest.Store2tradingIT;
@@ -11,7 +10,7 @@ import org.junit.runners.Suite;
 
     @RunWith(Suite.class)
     @Suite.SuiteClasses({
-            OfficeIT.class,
+            //OfficeIT.class,
             PlantIT.class,
             Store1QAEducateIT.class,
             Store2tradingIT.class,

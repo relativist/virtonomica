@@ -53,8 +53,8 @@ public class CreateDB
         System.out.println("Table created successfully");
     }
 
-    public void createMarket()
-    {
+    public void createMarket(){
+
         Connection c = null;
         Statement stmt = null;
         try {
@@ -88,8 +88,8 @@ public class CreateDB
     }
 
 
-    public void createStore()
-    {
+    public void createStore(){
+
         Connection c = null;
         Statement stmt = null;
         try {
@@ -104,6 +104,30 @@ public class CreateDB
                     " DEPURL           TEXT    NOT NULL, " +
                     " RESULT           TEXT    NOT NULL, " +
                     " PRODUCT           TEXT    NOT NULL) " ;
+
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        System.out.println("Table created successfully");
+    }
+
+    public void createPlant(){
+
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:plant.db");
+            System.out.println("Opened database successfully");
+
+            stmt = c.createStatement();
+            String sql = "CREATE TABLE PLANT " +
+                    "(SESSION        INT     NOT NULL," +
+                    " DEPURL           TEXT    NOT NULL) " ;
 
             stmt.executeUpdate(sql);
             stmt.close();

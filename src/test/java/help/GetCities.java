@@ -19,7 +19,7 @@ import java.util.ArrayList;
     Simple Soap import product and verify them to correct import to MPO ( SP )
 */
 
-public class Tempo extends Page {
+public class GetCities extends Page {
 
     public boolean isMyProduct(ArrayList<String> wProducts,String product){
         for(int i=0; i<wProducts.size();i++){
@@ -57,6 +57,8 @@ public class Tempo extends Page {
 //
 //        }
         int seconds=1000;
+        String secondString=new String();
+        String thirdString=new String();
 
         s1 = new Select(driver.findElement(By.xpath("//fieldset/table[2]//td[1]/select")));
         for(int i=1; i<s1.getOptions().size(); i++){
@@ -70,13 +72,15 @@ public class Tempo extends Page {
                 s2 = new Select(driver.findElement(By.xpath("//fieldset/table[2]//td[3]/select")));
                 Thread.sleep(seconds);
                 Select s3 = new Select(driver.findElement(By.xpath("//fieldset/table[2]//td[5]/select")));
-                outputString+=s2.getFirstSelectedOption().getText()+";";
+
+                secondString="";
+                secondString+=outputString+s2.getFirstSelectedOption().getText()+";";
                 for(int k=1; k<s3.getOptions().size(); k++){
                     s3.selectByIndex(k);
                     Thread.sleep(seconds);
                     s3 = new Select(driver.findElement(By.xpath("//fieldset/table[2]//td[5]/select")));
-                    //outputString+=s3.getFirstSelectedOption().getText()+";";
-                    logMe(outputString+s3.getFirstSelectedOption().getText());
+                    thirdString=secondString+s3.getFirstSelectedOption().getText()+";";
+                    logMe(thirdString);
                 }
                 s2 = new Select(driver.findElement(By.xpath("//fieldset/table[2]//td[3]/select")));
             }

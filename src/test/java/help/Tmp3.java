@@ -3,8 +3,10 @@ package help;
 
 import general.Page;
 import general.virt.LoginPage;
-import general.virt.WareHousePage;
+import general.virt.PlantPage;
 import org.junit.Test;
+
+import java.io.File;
 
 /**
  * Created by a.sitnikov on 18.02.14.
@@ -37,12 +39,28 @@ public class Tmp3 extends Page {
     @Test
     public void test() throws Throwable {
 
+        File file = new File("plant.db");
+        if(!file.exists()) {
+            logMe("creating new database table!");
+            new CreateDB().createPlant();
+        }
 
         new LoginPage(driver)
                 .openVirtUrl()
                 .login()
-                .selectPlantByUnitId("5259270");
-        new WareHousePage(driver).sales();
+                .selectPlantByUnitId("4249107");
+        //new StorePage(driver).trading();
+        String currentURL = driver.getCurrentUrl();
+        if(! new PlantPage(driver).isDepProcessed(currentURL)){
+            if(!new PlantPage(driver).isSlaveOnVacation()) {
+                new PlantPage(driver).repairIt();
+                new PlantPage(driver).setAutoQaSlave().educate().supply().sales();
+            }
+            new PlantPage(driver).recordDepartment(currentURL);
+        }
+        else logMe("Already processed");
+
+        //new StorePage(driver).autoBuyProducts();
 
     }
 

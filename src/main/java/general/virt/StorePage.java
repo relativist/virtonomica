@@ -401,6 +401,7 @@ public class StorePage extends Page {
 
 //      1. store==0
 //           delete from sales and supply
+        //удаляем товар из зала продаж который по нулям. не продается.на складе ноль.
         for(int i=0; i<driver.findElements(By.xpath("//tr[@class='odd' or @class='even']")).size();i++){
             store = driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[6]")).get(i).getText().replaceAll(" ","");
             if(Double.valueOf(store)==0){
@@ -408,6 +409,7 @@ public class StorePage extends Page {
                 action=true;
             }
         }
+
 
         //Если ничего не продается, то нафиг такой магазин нужен??!? - Удаляем
 //        if(driver.findElements(By.xpath("//input[@value='Ликвидировать остатки товара']")).size()>0)
@@ -423,8 +425,11 @@ public class StorePage extends Page {
 //            return new StorePage(driver);
 //        }
 
-        if(action)
-        driver.switchTo().alert().accept();
+        if(action) {
+            if(driver.findElements(By.xpath("//input[@value='Ликвидировать остатки товара']")).size()>0)
+                driver.findElement(By.xpath("//input[@value='Ликвидировать остатки товара']")).click();
+            driver.switchTo().alert().accept();
+        }
 
         // ВТОРОЙ ЗАХОД. ибо с первого не проходит!
         action=false;
@@ -435,29 +440,36 @@ public class StorePage extends Page {
                 action=true;
             }
         }
-        if(driver.findElements(By.xpath("//input[@value='Ликвидировать остатки товара']")).size()>0)
-            driver.findElement(By.xpath("//input[@value='Ликвидировать остатки товара']")).click();
-        if(action)
-        driver.switchTo().alert().accept();
+        if(action) {
+            if(driver.findElements(By.xpath("//input[@value='Ликвидировать остатки товара']")).size()>0)
+                driver.findElement(By.xpath("//input[@value='Ликвидировать остатки товара']")).click();
+            driver.switchTo().alert().accept();
+        }
 
-//    2. price == 0
+//    2. price == 0 если забыли проставить цену - назначаем среднюю цену по городу +30%
 //    price = avgPrice*1.30
 //
-//    3. store/saled>2.5
-//        1. price<= basicCost
-//             offer=0 && delete product from offers.
-//             price=basic
+//    3. store/saled>3 // если продажи отстают от снабжения
+//        1. price<= basicCost // товар продается ниже себестоимости // товар в конф фале должен быть не помечен как для низкой продажи
+//             offer=0.7 * offer // оффер уменьшаем на 30%
+//             price=price // цену не меняем!
 //        else
-//             offer=0
-//             price=price*0.9
-//    else:
-//         price<= basicCost
-//             offer=0 && delete product from offers.
-//             price=basic // поправочка!!! можно продавать ниже себестоимости.
-//         else
-//             offer=saled*1.10
-//             price=price*1.10
+//             offer=offer*0.7
+//             price=price*0.9 // цену делаем меньше
+//    else: // если с продажами все нормально
+//         price<= basicCost // товар в конф фале должен быть не помечен как для низкой продажи
+//             offer=0.7
+//             price=price // поправочка!!! можно продавать ниже себестоимости. // цену не меняем!
+//         else //продажи идут нормально но не шибко хорошо.
+//             offer=saled*0,9
+//             price=price*0,9
+//         if saled ==  store или saled > offer // продажи очень хорошо идут увеличиваем оффер//
+//              offer=saled*1.50
+//              price=price*1.10
+//          if рынок забит > 30%
+//              price=price*1.3
 
+        //сейчас мы в тоговом зале
         for(int i=0; i<driver.findElements(By.xpath("//tr[@class='odd' or @class='even']")).size();i++){
             result="";
             store = driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[6]")).get(i).getText().replaceAll(" ","");
@@ -477,8 +489,8 @@ public class StorePage extends Page {
             }
 
             //3
-            if(Double.valueOf(store)/Double.valueOf(saled)>2.5){
-                if(Double.valueOf(price)<Double.valueOf(basicCost)){
+            if(Double.valueOf(store)/Double.valueOf(saled)>3){
+                if(Double.valueOf(price)<Double.valueOf(basicCost) && !getParameter("ShopGoodsLessSelfCost").contains(productName)){
                     price = basicCost;
 //                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
 //                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
@@ -493,14 +505,29 @@ public class StorePage extends Page {
                 }
             }
             else{
-                if(Double.valueOf(price)<Double.valueOf(basicCost)){
-                    price = basicCost;
+                if(Double.valueOf(price)<Double.valueOf(basicCost) && !getParameter("ShopGoodsLessSelfCost").contains(productName)){
+                    if(saled.equals(store)){
+                        price = String.valueOf(Double.valueOf(price)*1.1);
+                        driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                        driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                        driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(price);
+                    }
+                    else {
+                        price = basicCost;
 //                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
 //                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
 //                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(price);
-                    result+="Продажа ниже себестоимости; ";
+                        result += "Продажа ниже себестоимости; ";
+                    }
                 }
                 else {
+                    price = String.valueOf(Double.valueOf(price)*1.1);
+                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(price);
+                }
+
+                if(saled.equals(store)){
                     price = String.valueOf(Double.valueOf(price)*1.1);
                     driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
                     driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
@@ -509,8 +536,8 @@ public class StorePage extends Page {
             }
 //          4. market>20
 //               price=price*1.10
-            if(Double.valueOf(market)>20){
-                price = String.valueOf(Double.valueOf(price)*1.1);
+            if(Double.valueOf(market)>30){
+                price = String.valueOf(Double.valueOf(price)*1.2);
                 driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
                 driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
                 driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(price);
@@ -519,8 +546,15 @@ public class StorePage extends Page {
 
             recordDepartment(productName,result);
         }
-        if(driver.findElements(By.xpath("//input[@value='Установить цены']")).size()!=0)
-            driver.findElement(By.xpath("//input[@value='Установить цены']")).click();
+
+        if(driver.findElements(By.xpath("//input[@value='Установить цены']")).size()!=0) {
+//            driver.findElement(By.xpath("//input[@value='Установить цены']")).click();
+//            waitForElement("//input[@class='button160']");
+//            waitForElementVisible("//input[@class='button160']");
+//            driver.findElement(By.xpath("//input[@class='button160']")).click();
+            driver.findElement(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).sendKeys(Keys.ENTER);
+        }
+
 
 
 //    1. store==0
@@ -563,21 +597,22 @@ public class StorePage extends Page {
 
 //      1. store==0
 //      удаляем дублируемые саплаерные заказы
-//      delete from sales and supply
         //Thread.sleep(15000);
         int rows = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]")).size();
         waitForElement("//tr[contains(@id,'product_row')]/td[10]/input["+rows+"]");
         for(int i=0; i< rows;i++){
             store = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[1]//tr[1]/td[2]")).get(i).getText().replaceAll(" ","");
-            if(Double.valueOf(store)==0)
+            String supplierStore = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[9]//tr[3]/td[2]")).get(i).getText().replaceAll(" ", "").replaceAll("\\$", "");
+            if(Double.valueOf(store)==0 && Double.valueOf(supplierStore)!=0) {
                 Thread.sleep(100);
-                try{
+                try {
                     driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[10]/input")).get(i).click();
-                    logMe("удалили херь =(");
-                }   catch (WebDriverException e){
+                    logMe("удалили того саплаера если у нас на складе ноль и у него на складе ноль.");
+                } catch (WebDriverException e) {
                     System.out.println(e.getMessage());
                     //System.out.println(driver.getPageSource());
                 }
+            }
         }
         if(driver.findElements(By.xpath("//input[@value='Разорвать выбранные контракты']")).size()>0){
             driver.findElement(By.xpath("//input[@value='Разорвать выбранные контракты']")).click();
@@ -595,10 +630,15 @@ public class StorePage extends Page {
             offer = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).getAttribute("value");
             productName=driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/th//td/img")).get(i).getAttribute("alt");
 
+            //если новый продукт: офер не ноль, на складе поставщика не ноль, у нас на складе ноль, продажи = ноль
+            if(Double.valueOf(offer)>1 && Double.valueOf(retailerStore)>1 && Double.valueOf(store)<1 && Double.valueOf(saled)<1){
+                continue;
+            }
+
 
             //3
-            if(Double.valueOf(store)/Double.valueOf(saled)>2.5){
-                if(Double.valueOf(store)/Double.valueOf(saled)>10){
+            if(Double.valueOf(store)/Double.valueOf(saled)>=3){
+                if(Double.valueOf(store)/Double.valueOf(saled)>=10){
                     offer = "0";
                     driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).clear();
                     driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).clear();
@@ -612,17 +652,28 @@ public class StorePage extends Page {
                     driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).sendKeys(offer);
                     result+="SuperOvercroud "+productName+" "+store+"; ";
                 }
-
             }
             else{
-                offer = String.valueOf(Double.valueOf(saled)*1.1);
-                driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).clear();
-                driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).clear();
-                driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).sendKeys(offer);
+
+                if(offer.equals("0"))
+                    offer=String.valueOf(Double.valueOf(saled)*0.8);
+
+                if(Double.valueOf(saled) == Double.valueOf(store) || Double.valueOf(saled) >= Double.valueOf(offer) ){
+                    offer = String.valueOf(Double.valueOf(saled)*1.5);
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).sendKeys(offer);
+                }
+                else {
+                    offer = String.valueOf(Double.valueOf(saled) * 1.1);
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).clear();
+                    driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[5]/input")).get(i).sendKeys(offer);
+                }
             }
 
             if(Double.valueOf(retailerStore)/Double.valueOf(saled)<3){
-                logMe("Warning! "+productName+" МАЛО!");
+                logMe("Warning! " + productName + " МАЛО!");
                 result+="Мало "+productName+" "+retailerStore+"; ";
             }
             recordDepartment(productName, result);
@@ -732,5 +783,6 @@ public class StorePage extends Page {
             return true;
         else return false;
     }
+
 
 }
