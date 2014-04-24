@@ -291,7 +291,7 @@ public class WareHousePage extends Page {
                         //logMe("кликнули закупить");
                         driver.findElement(By.id("amountInput")).clear();
                         driver.findElement(By.id("amountInput")).clear();
-                        driver.findElement(By.id("amountInput")).sendKeys(myProducts.get(counter).split(";")[1]);
+                        driver.findElement(By.id("amountInput")).sendKeys(Double.valueOf(myProducts.get(counter).split(";")[1])*1.2+"");
                         ((JavascriptExecutor) driver).executeScript("document.getElementById('submitLink').click();");
                         //logMe("закупили");
 
@@ -745,7 +745,7 @@ public class WareHousePage extends Page {
                         if(j==k && !isOtherHasBetterProduct){
                             driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).clear();
                             driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).clear();
-                            driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).sendKeys(productsToBuy.get(counter).split(";")[1]);
+                            driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).sendKeys(Double.valueOf(productsToBuy.get(counter).split(";")[1])*1.2+"");
                             action=true;
                         }
                         if(isOtherHasBetterProduct){
@@ -817,7 +817,7 @@ public class WareHousePage extends Page {
                     String goodId = driver.findElements(By.xpath("//*[@id='mainTable']//tr[@class='odd' or @class='even']/td[@class='choose']/span")).get(getBestLineFromSupplyWindow()).getAttribute("id");
                     ((JavascriptExecutor) driver).executeScript("document.getElementById(" + goodId + ").click();");
 
-                    driver.findElement(By.id("amountInput")).sendKeys(String.valueOf(productsToBuyExternal.get(counter).split(";")[1]));
+                    driver.findElement(By.id("amountInput")).sendKeys(Double.valueOf(productsToBuyExternal.get(counter).split(";")[1])*1.2+"");
                     ((JavascriptExecutor) driver).executeScript("document.getElementById('submitLink').click();");
 
                     driver.findElement(By.xpath("//span[text()='Закрыть окно']")).click();
@@ -952,7 +952,7 @@ public class WareHousePage extends Page {
                 String goodId = driver.findElement(By.xpath("//table[@class='list main_table']/tbody/tr/td[11]/span")).getAttribute("id");
                 ((JavascriptExecutor) driver).executeScript("document.getElementById(" + goodId + ").click();");
 
-                driver.findElement(By.id("amountInput")).sendKeys(String.valueOf(need));
+                driver.findElement(By.id("amountInput")).sendKeys(String.valueOf(Double.valueOf(need)*1.2+""));
                 ((JavascriptExecutor) driver).executeScript("document.getElementById('submitLink').click();");
                 driver.findElement(By.xpath("//span[text()='Закрыть окно']")).click();
                 driver.switchTo().window(handle1);
@@ -966,6 +966,8 @@ public class WareHousePage extends Page {
 //продавать по себестоимости и только своим.
     public WareHousePage sales() throws InterruptedException {
         Thread.sleep(1000);
+        String wareHouseFixedPrice=getParameter("WareHouseFixedPrice");
+        logMe("param is : "+wareHouseFixedPrice);
         waitForElement("//a[text()='Сбыт']");
         waitForElementVisible("//a[text()='Сбыт']");
         driver.findElement(By.xpath("//a[text()='Сбыт']")).click();
@@ -977,16 +979,29 @@ public class WareHousePage extends Page {
             String priceToSell = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).getAttribute("value");
             Double sCost=Double.valueOf(selfCost);
             Double pToSell=Double.valueOf(priceToSell);
+
+            String productTitle = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[3]//img")).get(i).getAttribute("alt");
+            logMe(productTitle);
+            if(productTitle.equals("Ликер"))
+                logMe(productTitle);
+
             if((sCost+sCost*0.1)>=pToSell && (pToSell+pToSell*0.1)>=sCost) {
-                logMe("prices not changed.");
+                logMe("prices not changed for "+productTitle);
                 continue;
             }
-            driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
-            driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
-            driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).sendKeys(selfCost);
 
-            Select s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/select")).get(i));
-            s1.selectByVisibleText("Только своей компании");
+
+
+
+            //если в настройках нет продукта у которого фиксированной цены нет, меняем цену на себестоимость. иначе - ничего не трогаем. оставляем как есть у этого продукта.
+            if(!wareHouseFixedPrice.contains(productTitle)){
+                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
+                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
+                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).sendKeys(selfCost);
+
+                Select s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/select")).get(i));
+                s1.selectByVisibleText("Только своей компании");
+            }
         }
         driver.findElement(By.xpath("//input[@value='Сохранить изменения']")).click();
         driver.findElement(By.xpath("//a[text()='Склад']")).click();
@@ -1022,29 +1037,5 @@ public class WareHousePage extends Page {
         else return false;
     }
 
-    public WareHousePage getInfo(){
-        logMe("INFO:");
-        String qtyEq = driver.findElement(By.xpath("//tr[td[text()='Количество оборудования']]/td[2]")).getText().split(" ед. ")[0].replaceAll(" ","");
-        String qaEq = driver.findElement(By.xpath("//tr[td[text()='Качество оборудования']]/td[2]")).getText().split(" ")[0];
-        String wearEq = driver.findElement(By.xpath("//tr[td[text()='Износ оборудования']]/td[2]//td[2]")).getText().split(" ")[0];
-        String qaEqneed = driver.findElement(By.xpath("//tr[td[text()='Качество оборудования']]/td[2]")).getText().split("технологии ")[1].replaceAll("\\)","");
-
-        String qtySlave = driver.findElement(By.xpath("//tr[td[text()='Количество рабочих']]/td[2]")).getText().replaceAll(" ","").split("\\(")[0];
-        String qaSlave = driver.findElement(By.xpath("//tr[td[text()='Уровень квалификации сотрудников']]/td[2]")).getText().split(" ")[0];
-        String qaSlaveneed = driver.findElement(By.xpath("//tr[td[text()='Уровень квалификации сотрудников']]/td[2]")).getText().split("технологии ")[1].replaceAll("\\)","");
-
-        String technologyLevel = driver.findElement(By.xpath("//tr[td[text()='Уровень технологии']]/td[2]")).getText();
-        String playerSkill = driver.findElement(By.xpath("//tr[td[text()='Квалификация игрока']]/td[2]")).getText().replaceAll("\\D","");
-        String totalSlaveGlobal = driver.findElement(By.xpath("//tr[td[contains(text(),'Суммарное количество подчинённых')]]/td[2]")).getText().replaceAll(" ","");
-
-
-        logMe("максимальное качество оборудования " + String.valueOf(calcEqQualMax(Double.valueOf(qaSlave))));
-        logMe("Максимальная технология "+String.valueOf(calcTechMax(Double.valueOf(playerSkill))));
-        logMe("Максимальное количество рабов на заводе "+String.valueOf(calcPersonalTop1(Double.valueOf(playerSkill), Double.valueOf(qaSlave)))); 
-        logMe("Максимальная обученность рабов "+String.valueOf(calcQualTop1(Double.valueOf(playerSkill),Double.valueOf(qtySlave))));
-        logMe("Максимальная количество рабов вообще "+String.valueOf(calcPersonalTop3(Double.valueOf(playerSkill))));
-
-        return new WareHousePage(driver);
-    }
 
 }

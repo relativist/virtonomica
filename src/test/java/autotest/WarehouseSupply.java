@@ -43,8 +43,6 @@ public class WarehouseSupply extends Page {
             logMe(currenUrl);
             driver.get(currenUrl);
             new WareHousePage(driver).supply().sales();
-            //new WareHousePage(driver).sales();
-
         }
     }
 

@@ -8,17 +8,13 @@ import org.junit.Test;
 
 import java.util.List;
 
-/**
- * Created by a.sitnikov on 18.02.14.
- */
-
 
 /*
     Descriprion
     Simple Soap import product and verify them to correct import to MPO ( SP )
 */
 
-public class Top1OfficeIT extends Page {
+public class OfficeIT extends Page {
 
 //    @Override
 //    protected void setUp() throws Exception {

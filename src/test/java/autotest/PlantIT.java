@@ -18,7 +18,7 @@ import java.util.List;
     Simple Soap import product and verify them to correct import to MPO ( SP )
 */
 
-public class PlantRepairIT extends Page {
+public class PlantIT extends Page {
 
 //    @Override
 //    protected void setUp() throws Exception {
@@ -44,11 +44,8 @@ public class PlantRepairIT extends Page {
             driver.get(currenUrl);
             if(!new PlantPage(driver).isSlaveOnVacation()) {
                 new PlantPage(driver).repairIt();
-                //new PlantPage(driver).sales();
                 new PlantPage(driver).setAutoQaSlave().educate().supply().sales();
             }
-
-
         }
 
 

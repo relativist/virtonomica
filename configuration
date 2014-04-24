@@ -1,8 +1,6 @@
 #main param
-login = relativist
-pass = .ktymrf
-
 url = http://virtonomica.ru/
+myId = 5122778
 
 #Warehouse configuration
 #product;price;qa;own
@@ -72,6 +70,7 @@ myPro11=Оливковое масло;40000;30;10;1.2;700;5000
 myPro12=Специи;40000;30;10;1;800;2000
 myPro13=Сыр фета;40000;30;10;1;60;2000
 
+WareHouseFixedPrice=Ликер
 
 #будущие товары :
 #оливковое масло+

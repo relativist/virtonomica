@@ -57,6 +57,12 @@ public class Page extends TestCase {
     public static String getParameter(String name) {
         return Configuration.getInstance().getParameter(name);
     }
+    public static String getLogin() {
+        return Passwd.getInstance().getLogin();
+    }
+    public static String getPasswd() {
+        return Passwd.getInstance().getPasswd();
+    }
 
     public static ArrayList<String> getWproducts() {
         return Configuration.getInstance().getWProducts();

@@ -4,3 +4,4 @@ target/
 log.txt
 market.db
 store.db
+passFile

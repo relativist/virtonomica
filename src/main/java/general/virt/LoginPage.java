@@ -20,10 +20,10 @@ public class LoginPage extends Page {
 
     public MainPage login(){
         driver.findElement(By.id("login")).click();
-        driver.findElement(By.id("username")).sendKeys(getParameter("login"));
-        driver.findElement(By.id("userpass")).sendKeys(getParameter("pass"));
+        driver.findElement(By.id("username")).sendKeys(getLogin());
+        driver.findElement(By.id("userpass")).sendKeys(getPasswd());
         driver.findElement(By.xpath("//i[text()='Войти']")).click();
-        driver.get("http://virtonomica.ru/vera/main/company/view/5122778/unit_list");
+        driver.get("http://virtonomica.ru/vera/main/company/view/"+getParameter("myId")+"/unit_list");
 
         return new MainPage(driver);
     }

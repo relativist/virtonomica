@@ -1,7 +1,9 @@
-package autotest;
+package help;
 
 
 import general.Page;
+import general.virt.LoginPage;
+import general.virt.WareHousePage;
 import org.junit.Test;
 
 /**
@@ -14,17 +16,17 @@ import org.junit.Test;
     Simple Soap import product and verify them to correct import to MPO ( SP )
 */
 
-public class AllInOneIT extends Page {
+public class Tmp3 extends Page {
 
 //    @Override
 //    protected void setUp() throws Exception {
 //
 //    }
 //
-//    @Override
-//    protected void tearDown() throws Exception {
-//
-//    }
+    @Override
+    protected void tearDown() throws Exception {
+
+    }
 
     // ТОП-1
     // квала рабочих увеличивается пока максимальное количество рабов дозволеное на предприятии будет едва выше текущего.
@@ -35,12 +37,17 @@ public class AllInOneIT extends Page {
     @Test
     public void test() throws Throwable {
 
-        new PlantRepairIT().test();
-        new Top1OfficeIT().test();
-        new Top1PlantIT().test();
-        new Store1QAEducateIT().test();
-        new WarehouseSupply().test();
+
+        new LoginPage(driver)
+                .openVirtUrl()
+                .login()
+                .selectPlantByUnitId("5259270");
+        new WareHousePage(driver).sales();
 
     }
+
+
+
+
 
 }

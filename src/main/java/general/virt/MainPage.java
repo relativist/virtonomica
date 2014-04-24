@@ -168,7 +168,7 @@ public class MainPage extends Page {
 
         driver.get(mainUrl);
         logMe("Wait 11 minutes...");
-        Thread.sleep(3*60*1000);
+        Thread.sleep(11*60*1000);
         return new MainPage(driver);
     }
 

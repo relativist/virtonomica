@@ -4,10 +4,8 @@ package autotest;
 import general.Page;
 import general.virt.LoginPage;
 import general.virt.StorePage;
-import help.CreateDB;
 import org.junit.Test;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -68,10 +66,7 @@ public class Store1QAEducateIT extends Page {
         for(int i=0; i< list.size(); i++){
             currenUrl = list.get(i);
             logMe(currenUrl);
-//            if(new StorePage(driver).isDepProcessed(currenUrl)){
-//                logMe("Already processed");
-//                continue;
-//            }
+
             driver.get(currenUrl);
             new StorePage(driver).setAutoQaSlave().educate();
         }

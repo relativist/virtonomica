@@ -33,7 +33,7 @@ public class PlantPage extends Page {
 
 
     /*
-    1. если на складе больше в два раза чем требуется. обнуляем оффер. ждем
+    1. если на складе больше в три раза чем требуется. обнуляем оффер. ждем
     2. если у поставщика меньше чем два моих требования - бить тревогу
     3. если на складе меньше двух требования и больше одного - перезаказать сумму
     */
@@ -90,7 +90,7 @@ public class PlantPage extends Page {
                 offer = driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[4]//input")).getAttribute("value").replaceAll(" ", "");
                 sklad = driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[7]//tr[2]/td[2]")).getText().replaceAll(" ", "");
 
-                if(Integer.valueOf(have)>2*Integer.valueOf(need)){
+                if(Integer.valueOf(have)>3*Integer.valueOf(need)){
                     if(!offer.equals("0")){
                         driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[4]//input")).clear();
                         driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[4]//input")).sendKeys("0");
@@ -104,7 +104,7 @@ public class PlantPage extends Page {
 
                 if(Integer.valueOf(have)<2*Integer.valueOf(need)){
                     driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[4]//input")).clear();
-                    driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[4]//input")).sendKeys(need);
+                    driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[4]//input")).sendKeys(Double.valueOf(need)*1.05+"");
                     change=true;
                 }
 
@@ -114,7 +114,7 @@ public class PlantPage extends Page {
                     logMe(title+"\t\t"+error);
             }
             else {
-                //logMe("Нет поставщика "+title);
+                logMe("Нет поставщика "+title);
             }
 
 
@@ -175,94 +175,20 @@ public class PlantPage extends Page {
 
     // продавать по ценам себестоимости и только своим.
     public PlantPage sales(){
+        boolean isForOther=false; //менять цену, но продажу для кого не менять!!!
+        boolean isColdPrice=false; // вообще нихуа не менять!!!
 
-//        driver.findElement(By.xpath("//a[text()='Финансовый отчёт']")).click();
-//        String balance = driver.findElement(By.xpath("//tr[td[text()='Прибыль']]//td[2]")).getText().replaceAll(" ", "").replaceAll("\\$", "");
-//        logMe("balance = "+balance);
-//
-//        driver.findElement(By.xpath("//a[text()='Сбыт']")).click();
-//        String generalSalePrice = "0";
-//        boolean debet = true; //все хорошо. положительный баланс
-//        boolean highdebet = false; //все хорошо. положительный баланс , но не на много!
-//        boolean changeAnyPrice = true;
-//        String settablePrice = "0.0";
-//        if(Float.valueOf(balance)>0){
-//            debet=true;
-//            if(Float.valueOf(balance)>5000000)
-//                highdebet=true;
-//            else
-//                highdebet=false;
-//        }
-//        else debet = false;
-//        if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]")).size()>1)
-//            for(int i=0; i<driver.findElements(By.xpath("//table[@class='grid']//tr[@class]")).size(); i ++){
-//                settablePrice = "0.0";
-//
-//                //продаваемая цена
-//                if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[5]//tr[3]/td[2]")).get(i).getText().equals("---") ||
-//                        driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[5]//tr[3]/td[2]")).get(i).getText().equals("Не известна"))
-//                    continue;
-//
-//                //кому продавать
-//                Select s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[9]/select")).get(i));
-//                logMe("selected: "+s1.getFirstSelectedOption().getText());
-//                if(s1.getFirstSelectedOption().getText().equals("Не продавать"))
-//                    s1.selectByVisibleText("Только своей компании");
-//                else if(!s1.getFirstSelectedOption().getText().equals("Не продавать"))
-//                    changeAnyPrice=false;
-//
-//
-//                generalSalePrice = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).getText().replaceAll(" ","").replaceAll("\\$","");
-//                if(debet && highdebet && changeAnyPrice) //уменьшаем на 5%
-//                    settablePrice = String.valueOf(Float.valueOf(generalSalePrice)*0.95);
-//                else if(!debet) //увеличиваем на 10%
-//                    settablePrice = String.valueOf(Float.valueOf(generalSalePrice)*1.10);
-//
-//                logMe("Recomended Pice to set up is : "+ settablePrice);
-//                driver.findElement(By.xpath("//input[@value='Сохранить изменения']")).click();
-//            }
-//        else{
-//            for(int i=0; i<driver.findElements(By.xpath("//table[@class='grid']//tr[@class]")).size(); i ++){
-//                settablePrice = "0";
-//
-//                //продаваемая цена
-//                if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[4]//tr[3]/td[2]")).get(i).getText().equals("---") ||
-//                        driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[4]//tr[3]/td[2]")).get(i).getText().equals("Не известна"))
-//                    continue;
-//
-//                //кому продавать
-//                Select s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/select")).get(i));
-//                logMe("selected: "+s1.getFirstSelectedOption().getText());
-//                if(s1.getFirstSelectedOption().getText().equals("Не продавать"))
-//                    s1.selectByVisibleText("Только своей компании");
-//                else if(!s1.getFirstSelectedOption().getText().equals("Не продавать"))
-//                    changeAnyPrice=false;
-//
-//
-//                generalSalePrice = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).getAttribute("value").replaceAll(" ","").replaceAll("\\$","");
-//                logMe("generalSalePrice = "+generalSalePrice);
-//                if(debet && highdebet && changeAnyPrice){ //уменьшаем на 5%
-//                    settablePrice = String.valueOf(Float.valueOf(generalSalePrice)*0.95);
-//                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
-//                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).sendKeys(settablePrice);
-//                }
-//                else if(!debet){ //увеличиваем на 10%
-//                    settablePrice = String.valueOf(Float.valueOf(generalSalePrice)*1.10);
-//                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
-//                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).sendKeys(settablePrice);
-//                }
-//                else{
-//                    settablePrice = generalSalePrice;
-//                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
-//                    driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).sendKeys(settablePrice);
-//                }
-//
-//
-//                logMe("Recomended Pice to set up is : "+ settablePrice);
-//                driver.findElement(By.xpath("//input[@value='Сохранить изменения']")).click();
-//            }
-//        }
+        if(driver.findElements(By.xpath("//*[@id='mainContent']/fieldset")).size()!=0){
+            String tempoS = driver.findElement(By.xpath("//fieldset")).getText().trim().split("\\s")[1];
+            logMe(tempoS);
+            if(tempoS.contains("ForOtherSales"))
+                isForOther=true;
+            if(tempoS.contains("ColdPrice"))
+                isColdPrice=true;
+        }
 
+        if(isColdPrice)
+            return new PlantPage(driver);
 
         driver.findElement(By.xpath("//a[text()='Сбыт']")).click();
         for(int i=0; i<driver.findElements(By.xpath("//table[@class='grid']//tr[@class]")).size(); i ++){
@@ -280,31 +206,34 @@ public class PlantPage extends Page {
             else
                 priceToSell = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).getAttribute("value");
             Double sCost=Double.valueOf(selfCost);
+            if(isForOther)
+                sCost=sCost*1.3;
+            else
+                sCost=sCost*1.1;
+
             Double pToSell=Double.valueOf(priceToSell);
-//            logMe(sCost+"");
-//            logMe(pToSell+"");
-//            logMe((sCost+sCost*1.05)+">"+pToSell);
-//            logMe((pToSell+pToSell*1.05)+">"+sCost);
-            if((sCost+sCost*0.1)>=pToSell && (pToSell+pToSell*0.1)>=sCost) {
+
+            if((sCost+sCost*0.13)>=pToSell && (pToSell+pToSell*0.13)>=sCost) {
                 logMe("prices not changed.");
                 continue;
             }
             if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).size()==0){
                 driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
                 driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
-                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).sendKeys(selfCost);
+                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).sendKeys(String.valueOf(sCost));
             }
             else {
                 driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).clear();
                 driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).clear();
-                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).sendKeys(selfCost);
+                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).sendKeys(String.valueOf(sCost));
             }
             Select s1 = null;
             if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[9]/select")).size()==0)
                 s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/select")).get(i));
             else
                 s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[9]/select")).get(i));
-            s1.selectByVisibleText("Только своей компании");
+            if(!isForOther)
+                s1.selectByVisibleText("Только своей компании");
         }
         driver.findElement(By.xpath("//input[@value='Сохранить изменения']")).click();
         driver.findElement(By.xpath("//a[text()='Завод']")).click();

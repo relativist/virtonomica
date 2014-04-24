@@ -3,7 +3,7 @@ package autotest;
 
 import general.Page;
 import general.virt.LoginPage;
-import general.virt.PlantPage;
+import general.virt.StorePage;
 import org.junit.Test;
 
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
     Simple Soap import product and verify them to correct import to MPO ( SP )
 */
 
-public class Top1PlantIT extends Page {
+public class Store3AutoBuyProductsIT extends Page {
 
 //    @Override
 //    protected void setUp() throws Exception {
@@ -38,23 +38,37 @@ public class Top1PlantIT extends Page {
 
     @Test
     public void test() throws Throwable {
-        List<String> list = new LoginPage(driver).openVirtUrl().login().selectPlant().getListAllUnit();
+
+//        int session = Integer.valueOf(formattedDate("MMdd"));
+//
+//        File file = new File("store.db");
+//        if(!file.exists()) {
+//            logMe("creating new database table!");
+//            new CreateDB().createStore();
+//        }
+
+
+//        new LoginPage(driver)
+//                .openVirtUrl()
+//                .login()
+//                .selectStore()
+//                .selectPlantByUnitId("5208739");
+//        //new StorePage(driver).trading();
+//        new StorePage(driver).setAutoQaSlave().educate().trading();
+//
+//        assertTrue(false);
+//
+//
+        List<String> list = new LoginPage(driver).openVirtUrl().login().selectStore().getListAllUnit();
         logMe("go");
 
         String currenUrl = new String();
         for(int i=0; i< list.size(); i++){
             currenUrl = list.get(i);
             logMe(currenUrl);
-            if(new PlantPage(driver).isSlaveOnVacation())
-                continue;
-            driver.get(currenUrl);
-            new PlantPage(driver).setAutoQaSlave().educate().supply();
 
+            driver.get(currenUrl);
+            new StorePage(driver).autoBuyProducts();
         }
     }
-
-
-
-
-
 }
