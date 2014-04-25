@@ -193,7 +193,6 @@ public class Page extends TestCase {
     public void waitForElementVisible(String xpath) throws InterruptedException {
         for(int i=0; i<TIMEOUT_IN_SECONDS; i++){
             if(driver.findElement(By.xpath(xpath)).isDisplayed()){
-                //logMe("FOUND!");
                 break;
             }
             //logMe("WAIT");

@@ -1,8 +1,10 @@
 package general.virt;
 
 import general.Page;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 
@@ -195,7 +197,7 @@ public class HelpPage extends Page {
         return result;
     }
 
-    public void createStore(String cityName){
+    public boolean createStore(String cityName) throws IOException, InterruptedException {
         //открываем файл с городами
         //ищем наш город, берем эту строку
         //
@@ -210,7 +212,85 @@ public class HelpPage extends Page {
 
         //в завимимости от размера - количество рабов.
         //реклама.
+//        File file = new File("city");
+//        String followString = new String();
+//        BufferedReader in = new BufferedReader(new FileReader( file.getAbsoluteFile()));
+//        while ((followString = in.readLine()) != null) {
+//            if(followString.contains(cityName))
+//                break;
+//
+//        }
+//        in.close();
+//        logMe(followString);
+//
+//        driver.findElement(By.xpath("//a[contains(text(),'Создать подразделение')]")).click();
+//        driver.findElement(By.xpath("//tr[td[contains(text(),'Магазин')]]/td[1]/input")).click();
+//        driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+//        String prevValue = new String();
+//
+//        for(String item: followString.split(";")){
+//            if(item.equals(prevValue))
+//                continue;
+//            if(driver.findElements(By.xpath("//tr[td[contains(text(),'"+item+"')]]/td[1]/input[@disabled]")).size()!=0){
+//                logMe("Нужно создать офис в "+item);
+//                return false;
+//            }
+//            driver.findElement(By.xpath("//tr[td[contains(text(),'"+item+"')]]/td[1]/input")).click();
+//            driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+//            prevValue=item;
+//        }
+//
+//        driver.findElement(By.xpath("//tr[td[contains(text(),'Центр города')]]/td[1]/input")).click();
+//        driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+//
+//
+//        driver.findElements(By.xpath("//tr//tr[@class='odd' or @class='even']")).get(driver.findElements(By.xpath("//tr//tr[@class='odd' or @class='even']")).size()-1).click();
+//        driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+//        double arenda = Double.valueOf(driver.findElement(By.xpath("//tr[th[text()='Недельная стоимость аренды']]/td")).getText().replaceAll(" ","").replaceAll("\\$",""));
+//
+//
+//        logMe("arenda = "+arenda);
+//
+//        if(arenda>1500000){
+//            logMe("Too expensive!");
+//            return false;
+//        }
+//
+//        logMe("Done");
+//        driver.findElement(By.xpath("//input[contains(@value,'Создать подразделение')]")).click();
 
+        //удалить нижнюю строку!!!!!
+        driver.get("http://virtonomica.ru/vera/main/unit/view/5483861");
+        String shopUrl = driver.getCurrentUrl();
+        String shopId = getUnitIdByUrl(shopUrl);
+        String shopSize = driver.findElement(By.xpath("//tr[td[text()='Торговая площадь']]/td[2]")).getText().replaceAll(" ", "").split("м")[0];
+        String employee = "";
+        if(shopSize.equals("500"))
+            employee="25";
+        else if(shopSize.equals("1000"))
+            employee="50";
+        else if(shopSize.equals("10000"))
+            employee="50";
+        driver.get("http://virtonomica.ru/vera/window/unit/employees/engage/"+shopId);
+        driver.findElement(By.id("quantity")).clear();
+        driver.findElement(By.id("quantity")).clear();
+
+        driver.findElement(By.id("quantity")).sendKeys("100");
+
+
+        driver.findElement(By.xpath("//input[contains(@value,'Сохранить изменения')]")).click();
+        driver.switchTo().alert().accept();
+        driver.get(shopUrl);
+        new StorePage(driver).setAutoQaSlave();
+        driver.findElement(By.xpath("//a[text()='Маркетинг и Реклама']")).click();
+        driver.findElement(By.xpath("//tr[td/label[text()='Радио']]/td[1]/input")).click();
+        driver.findElement(By.xpath("//input[contains(@value,'Начать рекламную кампанию')]")).click();
+        driver.findElement(By.xpath("//a[text()='Магазин']")).click();
+
+
+
+
+        return true;
     }
 
     public void createAllStores(String cityName){
