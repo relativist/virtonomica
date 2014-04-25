@@ -53,8 +53,10 @@ public class WareHousePage extends Page {
 
     public boolean isConfProduct(ArrayList<String> wProducts,String product){
         for(int i=0; i<wProducts.size();i++){
-            if(wProducts.get(i).split(";")[0].equals(product))
+            if(wProducts.get(i).split(";")[0].equals(product)) {
                 return true;
+            }
+            //else logMe(wProducts.get(i).split(";")[0]+" не "+ product);
         }
         return false;
     }
@@ -669,7 +671,17 @@ public class WareHousePage extends Page {
 
                         if(productsToBuy.get(counter).split(";")[0].equals(productTitle)){
                             logMe("Нашли наш продукт. нужно найти лучшего поставщика");
-                            productsToBuyExternal.remove(counter);
+                            //logMe("тут падает, размер: "+productsToBuyExternal.size()+"");
+                            //if(productsToBuyExternal.size()>1)
+                            logMe("перечисляем:");
+                            int numtoDell=0;
+                            for(int c1=0; c1<productsToBuyExternal.size(); c1++){
+                                if(productsToBuyExternal.get(c1).equals(productTitle))
+                                    numtoDell=c1;
+                                logMe(productsToBuyExternal.get(c1));
+                            }
+                            logMe("перечислили : для удаления"+numtoDell);
+                                productsToBuyExternal.remove(numtoDell);
                             k=Integer.valueOf(getTheBestSupplier(productTitle).split(";")[0]);
 
                             // здесь выясняем , есть ли продукт лучше коэфф чем у нас есть ?!? если есть - пометим что нужно докупить этот продукт в следущем цикле. кладем в массив.

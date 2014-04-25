@@ -2,8 +2,9 @@ package help;
 
 
 import general.Page;
-import general.virt.HelpPage;
 import org.junit.Test;
+
+import java.util.ArrayList;
 
 /**
  * Created by a.sitnikov on 18.02.14.
@@ -36,7 +37,15 @@ public class Tmp5 extends Page {
     @Test
     public void test() throws Throwable {
 
-        new HelpPage().generateStoreBaseToBuild();
+        //new HelpPage().generateStoreBaseToBuild();
+        ArrayList<String>s = new ArrayList<String>();
+        s.add("1");
+        s.add("2");
+        s.add("3");
+        s.remove(2);
+        s.remove(1);
+        s.remove(0);
+        logMe(s.toString());
 
     }
 

@@ -30,35 +30,10 @@ public class Store3AutoBuyProductsIT extends Page {
 
     }
 
-    // ТОП-1
-    // квала рабочих увеличивается пока максимальное количество рабов дозволеное на предприятии будет едва выше текущего.
-    // при этом происходит обучение персонала
-    // если ТопРабочих < Рабочих, уменьшить зп пока ТопРабочих ~= Рабочих  [количество]
-
-
     @Test
     public void test() throws Throwable {
 
-//        int session = Integer.valueOf(formattedDate("MMdd"));
-//
-//        File file = new File("store.db");
-//        if(!file.exists()) {
-//            logMe("creating new database table!");
-//            new CreateDB().createStore();
-//        }
 
-
-//        new LoginPage(driver)
-//                .openVirtUrl()
-//                .login()
-//                .selectStore()
-//                .selectPlantByUnitId("5208739");
-//        //new StorePage(driver).trading();
-//        new StorePage(driver).setAutoQaSlave().educate().trading();
-//
-//        assertTrue(false);
-//
-//
         List<String> list = new LoginPage(driver).openVirtUrl().login().selectStore().getListAllUnit();
         logMe("go");
 

@@ -4,8 +4,11 @@ package autotest;
 import general.Page;
 import general.virt.LoginPage;
 import general.virt.OfficePage;
+import general.virt.PlantPage;
+import help.CreateDB;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.List;
 
 
@@ -34,15 +37,31 @@ public class OfficeIT extends Page {
 
     @Test
     public void test() throws Throwable {
+
+        File file = new File("plant.db");
+        if(!file.exists()) {
+            logMe("creating new database table!");
+            new CreateDB().createPlant();
+        }
+
         List<String> list = new LoginPage(driver).openVirtUrl().login().selectOffice().getListAllUnit();
         logMe("go");
 
-        String currenUrl = new String();
+        String currentUrl = new String();
         for(int i=0; i< list.size(); i++){
-            currenUrl = list.get(i);
-            logMe(currenUrl);
-            driver.get(currenUrl);
+            currentUrl = list.get(i);
+            logMe(i+" of "+list.size()+" )"+currentUrl);
+
+            if(new PlantPage(driver).isDepProcessed(currentUrl)){
+                logMe("Already processed");
+                continue;
+            }
+
+            logMe(currentUrl);
+            driver.get(currentUrl);
             new OfficePage(driver).setAutoQaSlave().educate().checkOfficeLoad().repairIt();
+
+            new PlantPage(driver).recordDepartment(currentUrl);
         }
     }
 }

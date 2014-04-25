@@ -60,7 +60,7 @@ public class Store2tradingIT extends Page {
                 continue;
             }
             driver.get(currenUrl);
-            new StorePage(driver).trading();
+            new StorePage(driver).setAutoQaSlave().educate().trading();
         }
     }
 }
