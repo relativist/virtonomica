@@ -6,9 +6,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -217,12 +219,12 @@ public class Page extends TestCase {
 
     @Before
     protected void setUp() throws Exception {
-        System.out.println("SetUp driver");
-        System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
-        driver = new ChromeDriver();
+//        System.out.println("SetUp driver");
+//        System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
+//        driver = new ChromeDriver();
 
-//        DesiredCapabilities capability = DesiredCapabilities.chrome();
-//        driver = new RemoteWebDriver(new URL("http://alpina.ixtens.local:5555/wd/hub"), capability);
+        DesiredCapabilities capability = DesiredCapabilities.chrome();
+        driver = new RemoteWebDriver(new URL("http://alpina.ixtens.local:5555/wd/hub"), capability);
     }
 
     @After
