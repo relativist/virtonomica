@@ -224,7 +224,7 @@ public class Page extends TestCase {
 //        driver = new ChromeDriver();
 
         DesiredCapabilities capability = DesiredCapabilities.chrome();
-        driver = new RemoteWebDriver(new URL("http://alpina.ixtens.local:5555/wd/hub"), capability);
+        driver = new RemoteWebDriver(new URL("http://localhost:5555/wd/hub"), capability);
     }
 
     @After
