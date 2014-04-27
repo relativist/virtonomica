@@ -60,8 +60,9 @@ public class PlantIT extends Page {
 
             if(!new PlantPage(driver).isSlaveOnVacation()) {
                 new PlantPage(driver).repairIt();
-                new PlantPage(driver).setAutoQaSlave().educate().sales();
-                //new PlantPage(driver).setAutoQaSlave().educate().supply().sales();
+                //new PlantPage(driver).setAutoQaSlave().educate().sales();
+                //new PlantPage(driver).supply();
+                new PlantPage(driver).setAutoQaSlave().educate().supply().sales();
             }
             new PlantPage(driver).recordDepartment(currentUrl);
 

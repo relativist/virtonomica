@@ -75,29 +75,49 @@ public class WareHousePage extends Page {
     }
 
     // возвращает лучшую позицию в окне саплаеров товаров. "позиция; коэфф"
-    public String getBestLineAndKoeffFromSupplyWindow(){
+    public String getBestLineAndKoeffFromSupplyWindow(String productOffer){
         ArrayList<String> koff = new ArrayList<String>();
         String price = "";
         String quality = "";
+        String qty = "";
         driver.findElement(By.xpath("//a[text()='Все']")).click();
         for(int i=0; i<driver.findElements(By.xpath("//table[@class='list main_table']//tr[@class='odd' or @class='even']")).size(); i++){
+
+            //ограничение на красные ограничители
+            if (driver.findElements(By.xpath("//table[@class='list main_table']//tr[@class='odd' or @class='even']["+(i+1)+"]/td[4]/span")).size()>0){
+                qty = driver.findElement(By.xpath("//table[@class='list main_table']//tr[@class='odd' or @class='even']["+(i+1)+"]/td[4]/span")).getText().replaceAll(" ","").split(":")[1];
+            }
+            else qty = productOffer;
+
+
             price = driver.findElements(By.xpath("//table[@class='list main_table']//tr[@class='odd' or @class='even']/td[9]")).get(i).getText().replaceAll("\\$","").replaceAll(" ","");
-            quality = driver.findElements(By.xpath("//table[@class='list main_table']//tr[@class='odd' or @class='even']/td[10]")).get(i).getText().replaceAll("\\$","").replaceAll(" ","");
+
+            //если кнасное ограничение меньше оффера то ставим качество = 1
+            if(Double.valueOf(qty)<Double.valueOf(productOffer))
+                quality = "1";
+            else
+                quality = driver.findElements(By.xpath("//table[@class='list main_table']//tr[@class='odd' or @class='even']/td[10]")).get(i).getText().replaceAll("\\$","").replaceAll(" ","");
+
             koff.add(String.valueOf(Double.valueOf(price) / Double.valueOf(quality) + ";" + i));
+            logMe("getBestLineAndKoeffFromSupplyWindow:");
+            logMe(price+" "+quality+" "+i);
+            logMe(productOffer+" "+qty);
         }
 
         int minvaluePosition = getMinValue(koff);
+        logMe("minimal position: "+minvaluePosition);
         String returnKoeff = "";
         for(int couner=0; couner<koff.size();couner++){
             if(Integer.valueOf(koff.get(couner).split(";")[1]) == minvaluePosition)
                 returnKoeff = koff.get(couner).split(";")[0];
         }
         String returnValue= String.valueOf(minvaluePosition)+";"+returnKoeff;
+        logMe("returned : "+minvaluePosition + " "+returnKoeff);
         return returnValue;
     }
 
     public void doesWeHaveBetterProduct(ArrayList<String> myProducts,ArrayList<String> wProducts) throws InterruptedException {
-        //    Step 2.5
+        //    Step 2.7
         //    главная страница
         //    снабжение только своих продуктов.
         int i = 1;//счетчик парентов
@@ -122,13 +142,12 @@ public class WareHousePage extends Page {
                     // на складе
                     productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
                     // отгрузки
-                    if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).size()==0)
-                        productOffer="0";
-                    else
-                        productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).getText().replaceAll(" ", "");
+                    if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).size()!=0)
+                        productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).getText().replaceAll(" ", "");
+                    else productOffer="0";
                     // закупаем продукт наш. чтоб на заводах ничего не оставалось. все храним на складах.
                     if(myProducts.get(counter).equals(productTitle)){
-                        logMe("Закупаем наш продукт!" + productTitle);
+                        logMe("Закупаем чужой продукт! " + productTitle);
                         String handle1 = driver.getWindowHandle();
                         driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//div[2]/a[2]/img")).click();
                         Set<String> handles=driver.getWindowHandles();
@@ -240,13 +259,13 @@ public class WareHousePage extends Page {
                     // на складе
                     productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
                     // отгрузки
-                    if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).size()==0)
-                        productOffer="0";
-                    else
-                        productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).getText().replaceAll(" ", "");
+                    //productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).getText().replaceAll(" ", "");
+
                     // закупаем продукт наш. чтоб на заводах ничего не оставалось. все храним на складах.
                     if(myProducts.get(counter).split(";")[0].equals(productTitle)){
-                        logMe("Закупаем наш продукт!" + productTitle);
+                        logMe("Закупаем чужой продукт!" + productTitle);
+                        productOffer = String.valueOf(Double.valueOf(myProducts.get(counter).split(";")[1])*1.1);
+                        logMe("Для чужого продукта "+productTitle+"  закупаем "+productOffer);
                         String handle1 = driver.getWindowHandle();
                         driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//div[2]/a[2]/img")).click();
                         Set<String> handles=driver.getWindowHandles();
@@ -278,10 +297,27 @@ public class WareHousePage extends Page {
                         driver.findElement(By.name("quality[from]")).clear();
                         driver.findElement(By.name("quality[from]")).sendKeys(getQaFromConfFileByName(wProducts,productTitle));
 
+                        driver.findElement(By.name("free_for_buy[from]")).clear();
+                        driver.findElement(By.name("free_for_buy[from]")).clear();
+                        driver.findElement(By.name("free_for_buy[from]")).sendKeys(productOffer);
+
+
+
                         driver.findElement(By.xpath("//input[@class='button160']")).click();
                         //getBestLineFromSupplyWindow();
+                        String goodId ="0";
 
-                        String goodId = driver.findElements(By.xpath("//*[@id='mainTable']//tr[@class='odd' or @class='even']/td[@class='choose']/span")).get(getBestLineFromSupplyWindow()).getAttribute("id");
+                        if(driver.findElements(By.xpath("//*[@id='mainTable']//tr[@class='odd' or @class='even']/td[@class='choose']/span")).size()!=0) {
+                            //goodId = driver.findElements(By.xpath("//*[@id='mainTable']//tr[@class='odd' or @class='even']/td[@class='choose']/span")).get(getBestLineFromSupplyWindow()).getAttribute("id");
+                            String selectedNumber = String.valueOf(Integer.valueOf(getBestLineAndKoeffFromSupplyWindow(productOffer).split(";")[0])+1);
+                            goodId = driver.findElement(By.xpath("//*[@id='mainTable']//tr[@class='odd' or @class='even']["+selectedNumber+"]/td[@class='choose']/span")).getAttribute("id");
+                            //goodId = getBestLineAndKoeffFromSupplyWindow(productOffer).split(";")[0];
+                            logMe("goodId = "+goodId);
+                        }
+                        else{
+                            logMe("ERRORRRRRR По заданному кретерию не найден ни один саплаер!!!");
+                            continue;
+                        }
                         //String goodId = "";
                         String quantity = "";
 
@@ -293,7 +329,7 @@ public class WareHousePage extends Page {
                         //logMe("кликнули закупить");
                         driver.findElement(By.id("amountInput")).clear();
                         driver.findElement(By.id("amountInput")).clear();
-                        driver.findElement(By.id("amountInput")).sendKeys(Double.valueOf(myProducts.get(counter).split(";")[1])*1.2+"");
+                        driver.findElement(By.id("amountInput")).sendKeys(productOffer);
                         ((JavascriptExecutor) driver).executeScript("document.getElementById('submitLink').click();");
                         //logMe("закупили");
 
@@ -331,11 +367,16 @@ public class WareHousePage extends Page {
         Thread.sleep(sleepTimer);
     }
 
+    public String getDepParameter(){
+        return "";
+    }
+
     //функция снабжения своими продуктами. т.е. ищем все продукты свои в поставщиках и закупаем все что можно. обход - прошлый цикл меняется дерево. поэтому сделали так.
     public void supplyOurProducts(ArrayList<String> myProducts,ArrayList<String> wProducts) throws InterruptedException {
         //    Step 2.5
         //    главная страница
         //    снабжение только своих продуктов.
+        logMe("2.5  Пытаемся закупить у своих саплаеров все что имеется!");
         int i = 1;//счетчик парентов
         int j = 1;//счетчик детей
         boolean isNeedEraseOffer=false;
@@ -358,13 +399,10 @@ public class WareHousePage extends Page {
                     // на складе
                     productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
                     // отгрузки
-                    if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).size()==0)
-                        productOffer="0";
-                    else
-                        productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).getText().replaceAll(" ", "");
+                    //productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).getText().replaceAll(" ", "");
                     // закупаем продукт наш. чтоб на заводах ничего не оставалось. все храним на складах.
                     if(myProducts.get(counter).equals(productTitle)){
-                        logMe("Закупаем наш продукт!" + productTitle);
+                        logMe("Закупаем НАШ продукт!" + productTitle);
                         String handle1 = driver.getWindowHandle();
                         driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//div[2]/a[2]/img")).click();
                         Set<String> handles=driver.getWindowHandles();
@@ -471,7 +509,8 @@ public class WareHousePage extends Page {
         List<WebElement> family = null;
         List<WebElement> all = driver.findElements(By.xpath("//table//tr[@class='p_title' or @class='odd' or @class='even']"));
 
-
+        logMe("1 . проверяем базу продуктов. (все ли продукты которые на складе содеражтся в конфиге)");
+        logMe("удаляем тех саплаеров , у кого меньше на складе чем наш оффер");
         for(WebElement el:all){
             if(el.getAttribute("class").equals("p_title")){
                 //j=1;
@@ -483,10 +522,9 @@ public class WareHousePage extends Page {
                 else
                     productStore="0";
                 // отгрузки
-                if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).size()==0)
-                    productOffer="0";
-                else
-                    productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).getText().replaceAll(" ", "");
+                if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).size()!=0)
+                    productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).getText().replaceAll(" ", "");
+                else productOffer="0";
                 result=isConfProduct(wProducts,productTitle);
                 //logMe("result = "+result);
                 if(!result){
@@ -543,6 +581,8 @@ public class WareHousePage extends Page {
         i = 1;//счетчик парентов
         j = 1;//счетчик детей
         family = null;
+        logMe("2. если товара больше на складе чем заказов - обнуляем заказы.");
+        logMe("если наш продукт - закупаем всё");
         all = driver.findElements(By.xpath("//table//tr[@class='p_title' or @class='odd' or @class='even']"));
         boolean isNeedEraseOffer=false;
         ArrayList<String> myProducts= new ArrayList<String>();
@@ -555,18 +595,22 @@ public class WareHousePage extends Page {
                 if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).size()>0)
                     productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
                 else
-                    productStore="0";
+                    productStore="0.0";
                 // отгрузки
-                if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).size()==0)
-                    productOffer="0";
-                else
-                    productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).getText().replaceAll(" ", "");
+                if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).size()!=0)
+                    productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).getText().replaceAll(" ", "");
+                else productOffer="0";
 
                 isNeedEraseOffer=false;
-                if(Double.valueOf(productStore)>3*Double.valueOf(productOffer))
-                    isNeedEraseOffer=true;
-                if(isMyProduct(wProducts,productTitle))
+                if(Double.valueOf(productStore)>3*Double.valueOf(productOffer) && !isMyProduct(wProducts,productTitle)) {
+                    logMe("Будем удалять продукт "+ productTitle + "потому что на складе  больше товара чем заказов в 3 раза.");
+                    logMe(productStore+">3*"+productOffer);
+                    isNeedEraseOffer = true;
+                }
+                if(isMyProduct(wProducts,productTitle)) {
+                    logMe("мой продукт"+ productTitle);
                     myProducts.add(productTitle);
+                }
 
                 //logMe(productTitle+" "+productStore+" "+productOffer+" "+isNeedEraseOffer);
                 i++;
@@ -588,13 +632,14 @@ public class WareHousePage extends Page {
                 result = isMyProduct(wProducts,productTitle);
                 //logMe(result+" my"+productTitle);
                 if(isNeedEraseOffer && !result){
-                    //logMe("delete data!");
+                    logMe("Обнуляем заказ! "+productTitle);
                     driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).clear();
                     driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).clear();
                     driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).sendKeys("0");
                     action=true;
                 }
                 if(result){
+                    logMe("наш продукт" + productTitle + "закупаем все что имеется");
                     driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).clear();
                     driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).clear();
                     driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).sendKeys(supplierTotalStore);
@@ -610,8 +655,8 @@ public class WareHousePage extends Page {
             action=false;
         }
 
-
-        supplyOurProducts(myProducts,wProducts);
+        //Включить!Открыть!!!
+        //supplyOurProducts(myProducts,wProducts);
 
         driver.findElement(By.xpath("//a[text()='Склад']")).click();
 
@@ -630,6 +675,7 @@ public class WareHousePage extends Page {
         //
         //    если нет договора о продукте:
         //    заключаем договор по кретерию (цена кач колич). покупаем.
+        logMe("3. Смотрим на общую картину. закупаем товары которых не хватает ( офер больше склада )");
         ArrayList<String> productsToBuy = new ArrayList<String>();
         boolean isNeedToBuy=false;
 
@@ -637,8 +683,8 @@ public class WareHousePage extends Page {
             productTitle= driver.findElement(By.xpath("//tr[@class='odd' or @class='even']["+counter+"]//img")).getAttribute("alt");
             productStore = driver.findElement(By.xpath("//tr[@class='odd' or @class='even']["+counter+"]/td[2]")).getText().replaceAll(" ", "");
             productOffer = driver.findElement(By.xpath("//tr[@class='odd' or @class='even']["+counter+"]/td[6]")).getText().replaceAll(" ", "");
-            if(Double.valueOf(productStore)<Double.valueOf(productOffer)){
-                logMe(productTitle+" закупаем");
+            if(Double.valueOf(productStore)<Double.valueOf(productOffer)*2){
+                logMe(productTitle+" закупаем. Нехватка товара!");
                 productsToBuy.add(productTitle+";"+productOffer);
                 isNeedToBuy=true;
             }
@@ -653,6 +699,7 @@ public class WareHousePage extends Page {
                 j = 1;//счетчик детей
                 int k=0; //лучший саплаер!
                 family = null;
+                logMe("Закупаем "+productsToBuy.get(counter));
                 boolean isOtherHasBetterProduct = false;
                 all = driver.findElements(By.xpath("//table//tr[@class='p_title' or @class='odd' or @class='even']"));
 
@@ -664,25 +711,27 @@ public class WareHousePage extends Page {
                         // на складе
                         productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
                         // отгрузки
-                        if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).size()==0)
-                            productOffer="0";
-                        else
-                            productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).getText().replaceAll(" ", "");
+                        if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).size()!=0)
+                            productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).getText().replaceAll(" ", "");
+                        else productOffer="0";
+
+                        isOtherHasBetterProduct=false;
 
                         if(productsToBuy.get(counter).split(";")[0].equals(productTitle)){
                             logMe("Нашли наш продукт. нужно найти лучшего поставщика");
                             //logMe("тут падает, размер: "+productsToBuyExternal.size()+"");
                             //if(productsToBuyExternal.size()>1)
-                            logMe("перечисляем:");
+                            logMe("перечисляем массив тех продуктов в случае необходимости которых нужно закупить в нижних иконках :");
                             int numtoDell=0;
                             for(int c1=0; c1<productsToBuyExternal.size(); c1++){
                                 if(productsToBuyExternal.get(c1).equals(productTitle))
                                     numtoDell=c1;
                                 logMe(productsToBuyExternal.get(c1));
                             }
-                            logMe("перечислили : для удаления"+numtoDell);
+                            logMe("удаляем продукт из массива с номером "+numtoDell);
                                 productsToBuyExternal.remove(numtoDell);
-                            k=Integer.valueOf(getTheBestSupplier(productTitle).split(";")[0]);
+
+                            k=Integer.valueOf(getTheBestLocalSupplier(productTitle).split(";")[0]);
 
                             // здесь выясняем , есть ли продукт лучше коэфф чем у нас есть ?!? если есть - пометим что нужно докупить этот продукт в следущем цикле. кладем в массив.
                             logMe("ищем лучший продукт по коэфф чем мы имеем!!!");
@@ -697,8 +746,8 @@ public class WareHousePage extends Page {
                                     //System.out.println("Pop Up Title: " + driver.switchTo().window(popupHandle).getTitle());
                                 }
                             }
-
-                            driver.findElement(By.xpath("//a[text()='Свои']")).click();
+                            //logMe("у продукта "+productTitle+"кликаем СВОИ");
+                            //driver.findElement(By.xpath("//a[text()='Свои']")).click();
                             if (driver.findElements(By.xpath("//a[contains(text(),'Отменить фильтр')]")).size() !=0)
                                 if (driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).isDisplayed() )
                                     driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).click();
@@ -718,21 +767,23 @@ public class WareHousePage extends Page {
                             driver.findElement(By.name("quality[from]")).sendKeys(getQaFromConfFileByName(wProducts,productTitle));
 
                             driver.findElement(By.xpath("//input[@class='button160']")).click();
-                            String bestOtherValue = getBestLineAndKoeffFromSupplyWindow();
+                            String bestOtherValue = getBestLineAndKoeffFromSupplyWindow(productOffer);
 
 
                             driver.findElement(By.xpath("//span[text()='Закрыть окно']")).click();
                             driver.switchTo().window(handle1);
                             Thread.sleep(sleepTimer);
 
+
                             logMe("Сравниваем продукт у нас и у них "+productTitle);
-                            if(Double.valueOf(getTheBestSupplier(productTitle).split(";")[1])<Double.valueOf(bestOtherValue.split(";")[1])){
+                            if(Double.valueOf(getTheBestLocalSupplier(productTitle).split(";")[1])<Double.valueOf(bestOtherValue.split(";")[1])){
                                 logMe("Лучшего нашего продукта " +productTitle+" нигде нет!");
                                 isOtherHasBetterProduct=false;
                             }else{
                                 logMe("У других компаний есть продукт "+productTitle+" лучше чем у нас!");
                                 isOtherHasBetterProduct=true;
                                 otherHasBetterProducts.add(productTitle+";"+productOffer);
+                                logMe("для продукта "+productTitle+" кладем в массив оффер "+productOffer);
                             }
 
 
@@ -759,8 +810,10 @@ public class WareHousePage extends Page {
                             driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).clear();
                             driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).sendKeys(Double.valueOf(productsToBuy.get(counter).split(";")[1])*1.2+"");
                             action=true;
+                            isOtherHasBetterProduct=false;
                         }
                         if(isOtherHasBetterProduct){
+                            logMe("обнуляем продукт "+productTitle+" потому что нашли лучше саплаера");
                             driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).clear();
                             driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).clear();
                             driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[2]/input[1]")).sendKeys("0");
@@ -843,7 +896,7 @@ public class WareHousePage extends Page {
     }
 
     //возвращаем "номер позиции;коэфф" лучшего продукта
-    public String getTheBestSupplier(String myProductTitle){
+    public String getTheBestLocalSupplier(String myProductTitle){
         int i = 1;//счетчик парентов
         int j = 1;//счетчик детей
         String productStore ="";
@@ -866,10 +919,9 @@ public class WareHousePage extends Page {
                 // на складе
                 productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
                 // отгрузки
-                if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).size()==0)
-                    productOffer="0";
-                else
-                    productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[3]/td[2]")).getText().replaceAll(" ", "");
+                if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).size()!=0)
+                    productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).getText().replaceAll(" ", "");
+                else productOffer="0";
 
                 if(myProductTitle.equals(productTitle)){
                     action=true;

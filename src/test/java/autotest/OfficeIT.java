@@ -44,7 +44,7 @@ public class OfficeIT extends Page {
             new CreateDB().createPlant();
         }
 
-        List<String> list = new LoginPage(driver).openVirtUrl().login().selectOffice().getListAllUnit();
+        List<String> list = new LoginPage(driver).openVirtUrl().login().selectOffice().getListAllUnit();x
         logMe("go");
 
         String currentUrl = new String();

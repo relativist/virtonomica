@@ -185,7 +185,7 @@ public class PlantPage extends Page {
                     logMe(title+"\t\t"+error);
             }
             else {
-                logMe("Нет поставщика "+title);
+                logMe("ERROR          Нет поставщика "+title);
             }
 
 
