@@ -38,8 +38,8 @@ public class Tmp4 extends Page {
     public void test() throws Throwable {
         new LoginPage(driver)
                 .openVirtUrl()
-                .login();
-        new HelpPage(driver).createStore("Вильнюс");
+                .login().selectPlantByUnitId("5177168");
+        new HelpPage(driver).createAdvertising();
 
     }
 
