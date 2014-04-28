@@ -3,10 +3,11 @@ package help;
 
 import general.Page;
 import general.virt.LoginPage;
-import general.virt.PlantPage;
+import general.virt.OfficePage;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * Created by a.sitnikov on 18.02.14.
@@ -45,23 +46,17 @@ public class Tmp3 extends Page {
             new CreateDB().createPlant();
         }
 
-        new LoginPage(driver)
-                .openVirtUrl()
-                .login()
-                .selectPlantByUnitId("4249107");
-        //new StorePage(driver).trading();
-        String currentURL = driver.getCurrentUrl();
-        if(! new PlantPage(driver).isDepProcessed(currentURL)){
-            if(!new PlantPage(driver).isSlaveOnVacation()) {
-                new PlantPage(driver).repairIt();
-                new PlantPage(driver).setAutoQaSlave().educate().supply().sales();
-            }
-            new PlantPage(driver).recordDepartment(currentURL);
+        List<String> list = new LoginPage(driver).openVirtUrl().login().selectOffice().getListAllUnit();
+        logMe("go");
+
+        String currentUrl = new String();
+        for(int i=0; i< list.size(); i++){
+            currentUrl = list.get(i);
+            logMe(i+" of "+list.size()+" )"+currentUrl);
+            logMe(currentUrl);
+            driver.get(currentUrl);
+            new OfficePage(driver).createAdvertising();
         }
-        else logMe("Already processed");
-
-        //new StorePage(driver).autoBuyProducts();
-
     }
 
 

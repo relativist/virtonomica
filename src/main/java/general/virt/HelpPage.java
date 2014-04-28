@@ -47,7 +47,7 @@ public class HelpPage extends Page {
         return "";
     }
 
-    public boolean generateStoreBaseToBuild() throws ClassNotFoundException, SQLException {
+    public LinkedHashSet generateStoreBaseToBuild() throws ClassNotFoundException, SQLException {
         Connection c = null;
         Statement stmt = null;
         boolean result=false;
@@ -197,7 +197,8 @@ public class HelpPage extends Page {
             System.out.println(content);
         }
 
-        return result;
+
+        return shopWithDep;
     }
 
     public boolean createStore(String cityName) throws IOException, InterruptedException {
@@ -292,7 +293,7 @@ public class HelpPage extends Page {
         driver.findElement(By.xpath("//tr[td/label[text()='Радио']]/td[1]/input")).click();
         driver.findElement(By.xpath("//input[contains(@value,'Начать рекламную кампанию')]")).click();
         driver.findElement(By.xpath("//a[text()='Магазин']")).click();
-
+        logMe("Поздразделение создано в городе "+cityName);
         return true;
     }
 
@@ -311,173 +312,6 @@ public class HelpPage extends Page {
 //        ставим в базе пометку что закуплено
     }
 
-    public void createAdvertising() throws InterruptedException {
-//        заходим в подразделения
-//        составляем массив из товар;город по всем подразделениям типа Магазин.
-//
-//        идем в реклама
-//        составляем второй массив товар;город
-//
-//        запоминаем текущий урл
-//
-//        1. удаляем лишнюю рекламу
-//        второй сравниваем с первым массимвом. (перебираем второй массив)
-//        если в первом не окажится элемента - кладем в третий массив.
-//
-//                функция нахождения элемента в массиве - булевая.
-//
-//                перебираем третий массив -
-//                товар - идем в товар
-//        город - кликаем на галку города
-//
-//        Остановить или изменить рекламную компанию.
-//
-//        2. добавляем новую рекламу
-//        первый сравниваем со вторым (перебираем первый массив)
-//        если во втором не окажится элемента - кладем в четвертый массив
-//
-//        функция нахождения элемента в массиве - булевая.
-//
-//                перебираем четвертый массив -
-//                товар - идем в товар
-//        город - кликаем на галку города
-//
-//        Начать или изменить рекламную компанию.
-        ArrayList<String> first = new ArrayList<String>();
-        ArrayList<String> second = new ArrayList<String>();
-        ArrayList<String> third = new ArrayList<String>();
-        ArrayList<String> firth = new ArrayList<String>();
-        driver.findElement(By.xpath("//a[text()='Подразделения']")).click();
-
-        // Step 1
-        for(int i=0; i<driver.findElements(By.xpath("//tr[@class='odd' or @class = 'even']/td[2]/a[contains(text(),'Магазин')]")).size();i++){
-            String cityName = driver.findElement(By.xpath("//tr[@class='odd' or @class = 'even'][td[2]/a[contains(text(),'Магазин')]]["+(i+1)+"]/td[1]")).getText();
-            for(int j=0; j<driver.findElements(By.xpath("//tr[@class='odd' or @class = 'even'][td[2]/a[contains(text(),'Магазин')]]["+(i+1)+"]/td[4]//img")).size();j++){
-                String productName = driver.findElements(By.xpath("//tr[@class='odd' or @class = 'even'][td[2]/a[contains(text(),'Магазин')]]["+(i+1)+"]/td[4]//img")).get(j).getAttribute("alt");
-                first.add(productName+";"+cityName.trim());
-                logMe(productName+";"+cityName.trim());
-            }
-        }
-        logMe("");
-        // Step 2
-        driver.findElement(By.xpath("//a[text()='Реклама']")).click();
-        for(int i=0; i<driver.findElements(By.xpath("//tr[contains(@class,'hand')]")).size();i++){
-            String productName = driver.findElements(By.xpath("//tr[contains(@class,'hand')]/td[1]/img")).get(i).getAttribute("alt");
-            //logMe("productName = "+productName);
-            if(driver.findElements(By.xpath("//tr[contains(@class,'hand')]/td[2]")).get(i).getText().length()==0){
-                //logMe("пропускаем");
-                continue;
-            }
-            //logMe("cities : "+driver.findElement(By.xpath("//tr[contains(@class,'hand')]["+(i+1)+"]/td[2]")).getText());
-            for(String city: driver.findElement(By.xpath("//tr[contains(@class,'hand')]["+(i+1)+"]/td[2]")).getText().split(",")){
-                second.add(productName+";"+city.trim());
-                logMe(productName+";"+city.trim());
-            }
-        }
-        logMe("");
-
-        // Step 3 Лишняя реклама
-        for(int i=0; i<second.size();i++){
-            String item = second.get(i);
-            if(!isContains(first,item)){
-                third.add(second.get(i));
-                logMe("лишний : "+ second.get(i));
-            }
-        }
-        logMe("");
-
-        // Step 4 Добавление рекламы
-        for(int i=0; i<first.size();i++){
-            String item = first.get(i);
-            if(!isContains(second,first.get(i))){
-                firth.add(first.get(i));
-                logMe("добавляем : "+ first.get(i));
-            }
-        }
-        logMe("");
-
-        // Step 5 Настоящее удаление рекламы.
-        for(int p=0; p<third.size();p++){
-            for(int i=0; i<driver.findElements(By.xpath("//tr[contains(@class,'hand')]")).size();i++){
-                String productName = driver.findElements(By.xpath("//tr[contains(@class,'hand')]/td[1]/img")).get(i).getAttribute("alt");
-                //logMe("productName = "+productName);
-                if(driver.findElements(By.xpath("//tr[contains(@class,'hand')]/td[2]")).get(i).getText().length()==0){
-                    //logMe("пропускаем");
-                    continue;
-                }
-
-                //встретили на ненулевой продукт, заходим в него и отменяем рекламу!
-                if(productName.equals(third.get(p).split(";")[0])){
-                    logMe("кликнули.");
-                    driver.findElements(By.xpath("//tr[contains(@class,'hand')]/td[1]/img")).get(i).click();
-
-                    //удаляем ставя галки
-                    String myCitytoDell = third.get(p).split(";")[1].trim();
-                    logMe("удалили город: "+myCitytoDell);
-                    String myXpath = "//tr[td[2]/label[text()='" + myCitytoDell + "']]/td[1]/input";
-                    waitForElement(myXpath);
-                    waitForElementVisible("//tr[td[2]/label[text()='" + myCitytoDell + "']]/td[1]/input");
-                    Thread.sleep(1000);
-                    driver.findElement(By.xpath("//tr[td[2]/label[text()='"+myCitytoDell+"']]/td[1]/input")).click();
-
-                    //кликаем сохранить
-                    Thread.sleep(1000);
-                    if(driver.findElements(By.xpath("//input[contains(@value,'Изменить условия рекламной кампании') and @disabled]")).size()>0){
-                        driver.findElement(By.xpath("//input[contains(@value,'Остановить рекламную кампанию')]")).click();
-                    }
-                    else driver.findElement(By.xpath("//input[contains(@value,'Изменить условия рекламной кампании')]")).click();
-                }
-            }
-        }
-
-
-        // Step 6 Настоящее добавление рекламы.
-        for(int p=0; p<firth.size();p++){
-            for(int i=0; i<driver.findElements(By.xpath("//tr[contains(@class,'hand')]")).size();i++){
-                String productName = driver.findElements(By.xpath("//tr[contains(@class,'hand')]/td[1]/img")).get(i).getAttribute("alt");
-                //logMe("productName = "+productName);
-//                if(driver.findElements(By.xpath("//tr[contains(@class,'hand')]/td[2]")).get(i).getText().length()==0){
-//                    //logMe("пропускаем");
-//                    continue;
-//                }
-
-                //встретили на ненулевой продукт, заходим в него и отменяем рекламу!
-                if(productName.equals(firth.get(p).split(";")[0])){
-                    //logMe("кликнули.");
-                    driver.findElements(By.xpath("//tr[contains(@class,'hand')]/td[1]/img")).get(i).click();
-
-                    //удаляем ставя галки
-                    String myCitytoDell = firth.get(p).split(";")[1].trim();
-                    logMe("Добавили город: "+myCitytoDell);
-                    String myXpath = "//tr[td[2]/label[text()='" + myCitytoDell + "']]/td[1]/input";
-                    waitForElement(myXpath);
-                    waitForElementVisible("//tr[td[2]/label[text()='" + myCitytoDell + "']]/td[1]/input");
-                    Thread.sleep(1000);
-                    driver.findElement(By.xpath("//tr[td[2]/label[text()='"+myCitytoDell+"']]/td[1]/input")).click();
-
-                    //кликаем сохранить
-                    Thread.sleep(1000);
-                    if(driver.findElements(By.xpath("//input[contains(@value,'Изменить условия рекламной кампании') and not(@disabled)]")).size()>0){
-                        driver.findElement(By.xpath("//input[contains(@value,'Изменить условия рекламной кампании')]")).click();
-                    }
-                    else if(driver.findElements(By.xpath("//input[contains(@value,'Начать рекламную кампанию') and @disabled]")).size()>0){
-                        driver.findElement(By.xpath("//tr[td[2]/label[text()='Радио']]/td[1]/input")).click();
-                        Thread.sleep(500);
-                        driver.findElement(By.xpath("//input[contains(@value,'Начать рекламную кампанию')]")).click();
-                    }
-                    else{
-                        logMe("Непредвиденная хрень");
-                        assertTrue(false);
-                    }
-                }
-            }
-        }
-
-
-
-
-    }
-
     public boolean isContains(ArrayList<String> mass , String string){
         for(int i=0; i<mass.size(); i++){
             String item = mass.get(i);
@@ -485,6 +319,123 @@ public class HelpPage extends Page {
                 return true;
         }
         return false;
+    }
+
+    public boolean isContains(List<String> mass , String string){
+        for(int i=0; i<mass.size(); i++){
+            String item = mass.get(i);
+            if(mass.get(i).equals(string))
+                return true;
+        }
+        return false;
+    }
+
+
+
+    public void recordToBaseStoreBuild(String city,String department){
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:storeBuild.db");
+            c.setAutoCommit(false);
+
+            stmt = c.createStatement();
+            String sql = "INSERT INTO DEPARTMENT (CITY,DEPNAME,ISBUILD) " +
+                    "VALUES (" +
+                    "'"+city +"'"+
+                    ",'"+department +"'"+
+                    ",'"+false +"'"+
+                    ");";
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.commit();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        //System.out.println("Records created successfully");
+    }
+
+    public void updateBaseStoreBuild(String city,String department,boolean result){
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:storeBuild.db");
+            c.setAutoCommit(false);
+
+            stmt = c.createStatement();
+            String sql = "UPDATE DEPARTMENT SET ISBUILD='"+result+"' " +
+                    "WHERE" +
+                    "CITY='"+city+"' and"+
+                    "DEPNAME='"+department+"'"+
+                    ";";
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.commit();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        System.out.println("Records updated successfully");
+    }
+
+    public void deleteBaseStoreBuild(){
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:storeBuild.db");
+            c.setAutoCommit(false);
+
+            stmt = c.createStatement();
+            String sql = "DELETE FROM DEPARTMENT  " +
+                    ";";
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.commit();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        logMe("database is clean");
+        //System.out.println("Records created successfully");
+    }
+
+    public ArrayList<String> getAllDataFromDbStoreBuild(){
+        ArrayList<String> mass = new ArrayList<String>();
+        Connection c = null;
+        Statement stmt = null;
+        boolean result=false;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:storeBuild.db");
+            c.setAutoCommit(false);
+
+            stmt = c.createStatement();
+            String sql = "select * from department where isbuild='false'; ";
+            ResultSet rs =  stmt.executeQuery(sql);
+
+            while ( rs.next() ) {
+                String city = rs.getString("city");
+                String depname = rs.getString("depname");
+                mass.add(city+";"+depname);
+            }
+
+            rs.close();
+            stmt.close();
+            c.commit();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        //logMe("result is "+result);
+        return mass;
     }
 
 

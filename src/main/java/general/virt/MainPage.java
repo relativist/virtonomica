@@ -78,6 +78,24 @@ public class MainPage extends Page {
         return myList;
     }
 
+    // возвращает  город : урл магазина в этом городе
+    public List getListAllUnitWithCity(){
+        List<WebElement> assetList1 = new ArrayList();
+        List<WebElement> assetList2 = new ArrayList();
+        List<String> myList = new ArrayList();
+        Collections.addAll(assetList1, driver.findElements(By.xpath("//table[@class='unit-list']//tr//td[3]/a")).toArray(new WebElement[]{}));
+        Collections.addAll(assetList2, driver.findElements(By.xpath("//table[@class='unit-list']//tr//td[2]/b")).toArray(new WebElement[]{}));
+
+        if(assetList1.size()!=assetList2.size())
+            assertTrue(false);
+
+        for(int i=0; i<assetList1.size(); i++){
+            myList.add(assetList2.get(i).getText()+";"+assetList1.get(i).getAttribute("href"));
+        }
+        return myList;
+    }
+
+
     public MainPage createNewDivision(String type1,String type2,String type3,String type4,String type5,String type6){
         String mainUrl = driver.getCurrentUrl();
         driver.findElement(By.xpath("//a[contains(text(),'Создать подразделение')]")).click();

@@ -60,6 +60,243 @@ public class StorePage extends Page {
         return "";
     }
 
+    //автоматическая закупка в магазине при заданном отделе
+    public StorePage autoBuyWithDep(String department) throws InterruptedException {
+        int maxDepSize = Integer.valueOf(getParameter("StoreSize"
+                + driver.findElement(By.xpath("//tr[td[text()='Торговая площадь']]/td[2]")).getText().replaceAll(" ", "").split("м")[0]));
+        ArrayList<String> companyDepSellProducts = getMyProductsDepToSell();
+        driver.findElement(By.xpath("//a[text()='Торговый зал']")).click();
+        ArrayList <String> currentTypesDep = getCurrentTypesDepFromSalesRoom();
+        ArrayList <String> companyProductsToSell = getMyProductsToSell();
+        int depCount = Integer.valueOf(currentTypesDep.size());
+        driver.findElement(By.xpath("//a[text()='Снабжение']")).click();
+
+
+        //идем в снабжение и по выясненым отделам закупаем продукты. (смотрим на кретерий в конфиге)
+        //если встречаются в снабжении продукты пропускаем идем дальше
+        //если размер
+        String productInfo=new String();
+        org.openqa.selenium.support.ui.Select s = null;
+        for(String companyProduct: companyDepSellProducts){
+            if(isDepToSell(companyProduct.split(";")[0],currentTypesDep)) {
+                logMe("покупаем продукцию: " + companyProduct.split(";")[0]);
+                for(int i=1; i<companyProduct.split(";").length;i++){
+
+
+                    productInfo = getProductDataFromCompanyConfig(companyProduct.split(";")[i],companyProductsToSell);
+
+
+                    //этого продукта не должно быть на странице снабжения.
+                    if(isThisProductSellOnSellPage(productInfo.split(";")[0]))
+                        continue;
+
+                    logMe(productInfo);
+                    s = new org.openqa.selenium.support.ui.Select(driver.findElement(By.name("productCategory")));
+                    s.selectByVisibleText(companyProduct.split(";")[0]);
+                    Thread.sleep(500);
+                    driver.findElement(By.xpath("//span[label/img[@alt='"+productInfo.split(";")[0]+"']]/input")).click();
+
+
+                    String handle1 = driver.getWindowHandle();
+                    driver.findElement(By.xpath("//input[@value='Добавить поставщика']")).click();
+                    Set<String> handles=driver.getWindowHandles();
+                    Iterator<String> it =handles.iterator();
+                    while (it.hasNext()) {
+                        String popupHandle = it.next().toString();
+                        if (!popupHandle.contains(handle1)) {
+                            driver.switchTo().window(popupHandle);
+                            //System.out.println("Pop Up Title: " + driver.switchTo().window(popupHandle).getTitle());
+                        }
+                    }
+                    //#myPro#=title;volume;localsales;qa;brand;price;base_value_to_buy
+                    //параметры: бренд прайс качество
+                    Double price=Double.valueOf(driver.findElement(By.xpath("//table[@class='right_corner']//tr[2]/td[1]")).getText().split(":")[1].replaceAll(" ","").replaceAll("\\$",""));
+                    Double qa=Double.valueOf(driver.findElement(By.xpath("//table[@class='right_corner']//tr[2]/td[2]")).getText().split(" ")[1].replaceAll(" ","").replaceAll("\\$",""));
+                    Double brand=Double.valueOf(driver.findElement(By.xpath("//table[@class='right_corner']//tr[2]/td[3]")).getText().split(" ")[1].replaceAll(" ","").replaceAll("\\$",""));
+                    Double confPrice = Double.valueOf(productInfo.split(";")[5]);
+                    Double confQa = Double.valueOf(productInfo.split(";")[3]);
+                    Double confBrand = Double.valueOf(productInfo.split(";")[4]);
+                    String valueToSet = productInfo.split(";")[6];
+
+                    logMe(""+price+">="+confPrice);
+                    logMe(""+qa+"<"+confQa);
+                    logMe(""+brand+"<"+confBrand);
+
+                    logMe(valueToSet);
+
+                    //если наши параметры подходят для покупки в этом городе - покупаем
+                    if(price>=confPrice && confBrand>brand && confQa>qa) {
+                        logMe("Ура, продукт подошел!");
+
+                        driver.findElement(By.xpath("//a[text()='Свои']")).click();
+                        if (driver.findElements(By.xpath("//a[contains(text(),'Отменить фильтр')]")).size() != 0)
+                            if (driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).isDisplayed())
+                                driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).click();
+
+                        //если нету своих - то ничего не покупаем
+                        if (driver.findElements(By.xpath("//tr[td[text()='Cвободно']]/td[2]/a[2]/img")).size() != 0) {
+
+                            //сортировка
+                            Thread.sleep(500);
+                            driver.findElement(By.xpath("//tr[td[text()='Cвободно']]/td[2]/a[2]/img")).click();
+
+                            String goodId = driver.findElement(By.xpath("//table//tr[@class='friendlyHighLight']/td[@class='choose']/span")).getAttribute("id");
+                            ((JavascriptExecutor) driver).executeScript("document.getElementById(" + goodId + ").click();");
+                            driver.findElement(By.id("amountInput")).clear();
+                            driver.findElement(By.id("amountInput")).clear();
+                            driver.findElement(By.id("amountInput")).sendKeys(valueToSet);
+                            ((JavascriptExecutor) driver).executeScript("document.getElementById('submitLink').click();");
+
+                            driver.findElement(By.xpath("//span[text()='Закрыть окно']")).click();
+                            driver.switchTo().window(handle1);
+                            logMe("Закупились " + productInfo.split(";")[0]);
+                        }
+                        else {
+                            logMe("Продукта нет!");
+                            driver.findElement(By.xpath("//span[text()='Закрыть окно']")).click();
+                            driver.switchTo().window(handle1);
+                        }
+                    }
+                    else {
+                        logMe("Продукт не подошел!");
+                        driver.findElement(By.xpath("//span[text()='Закрыть окно']")).click();
+                        driver.switchTo().window(handle1);
+                    }
+                }
+            }
+        }
+
+        // второй заход, допокупаем отделы продуктов если позволяет магазин
+        for(String companyProduct: companyDepSellProducts){
+            //если размер магазина больше или равен дозволенного размера магазинов - прекращаем закупку!
+            if(depCount>=maxDepSize)
+                break;
+
+            if(!isDepToSell(companyProduct.split(";")[0],currentTypesDep)) {
+                logMe("Докупаем продукцию: " + companyProduct.split(";")[0]);
+
+                for(int i=1; i<companyProduct.split(";").length;i++){
+
+
+                    productInfo = getProductDataFromCompanyConfig(companyProduct.split(";")[i],companyProductsToSell);
+
+
+                    //этого продукта не должно быть на странице снабжения.
+                    if(isThisProductSellOnSellPage(productInfo.split(";")[0]))
+                        continue;
+
+                    logMe(productInfo);
+                    s = new org.openqa.selenium.support.ui.Select(driver.findElement(By.name("productCategory")));
+                    s.selectByVisibleText(companyProduct.split(";")[0]);
+                    Thread.sleep(500);
+                    driver.findElement(By.xpath("//span[label/img[@alt='"+productInfo.split(";")[0]+"']]/input")).click();
+
+
+                    String handle1 = driver.getWindowHandle();
+                    driver.findElement(By.xpath("//input[@value='Добавить поставщика']")).click();
+                    Set<String> handles=driver.getWindowHandles();
+                    Iterator<String> it =handles.iterator();
+                    while (it.hasNext()) {
+                        String popupHandle = it.next().toString();
+                        if (!popupHandle.contains(handle1)) {
+                            driver.switchTo().window(popupHandle);
+                            //System.out.println("Pop Up Title: " + driver.switchTo().window(popupHandle).getTitle());
+                        }
+                    }
+                    //#myPro#=title;volume;localsales;qa;brand;price;base_value_to_buy
+                    //параметры: бренд прайс качество
+                    Double price=Double.valueOf(driver.findElement(By.xpath("//table[@class='right_corner']//tr[2]/td[1]")).getText().split(":")[1].replaceAll(" ","").replaceAll("\\$",""));
+                    Double qa=Double.valueOf(driver.findElement(By.xpath("//table[@class='right_corner']//tr[2]/td[2]")).getText().split(" ")[1].replaceAll(" ","").replaceAll("\\$",""));
+                    Double brand=Double.valueOf(driver.findElement(By.xpath("//table[@class='right_corner']//tr[2]/td[3]")).getText().split(" ")[1].replaceAll(" ","").replaceAll("\\$",""));
+                    Double confPrice = Double.valueOf(productInfo.split(";")[5]);
+                    Double confQa = Double.valueOf(productInfo.split(";")[3]);
+                    Double confBrand = Double.valueOf(productInfo.split(";")[4]);
+                    String valueToSet = productInfo.split(";")[6];
+
+                    logMe(""+price+">="+confPrice);
+                    logMe(""+qa+"<"+confQa);
+                    logMe(""+brand+"<"+confBrand);
+
+                    logMe(valueToSet);
+
+                    //если наши параметры подходят для покупки в этом городе - покупаем
+                    if(price>=confPrice && confBrand>brand && confQa>qa){
+                        logMe("Ура, продукт подошел!");
+
+                        driver.findElement(By.xpath("//a[text()='Свои']")).click();
+                        if (driver.findElements(By.xpath("//a[contains(text(),'Отменить фильтр')]")).size() !=0)
+                            if (driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).isDisplayed() )
+                                driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).click();
+                        if(driver.findElements(By.xpath("//tr[td[text()='Cвободно']]/td[2]/a[2]/img")).size()!=0){
+                            Thread.sleep(500);
+                            //сортировка
+                            driver.findElement(By.xpath("//tr[td[text()='Cвободно']]/td[2]/a[2]/img")).click();
+
+                            String goodId = driver.findElement(By.xpath("//table//tr[@class='friendlyHighLight']/td[@class='choose']/span")).getAttribute("id");
+                            ((JavascriptExecutor) driver).executeScript("document.getElementById(" + goodId + ").click();");
+                            driver.findElement(By.id("amountInput")).clear();
+                            driver.findElement(By.id("amountInput")).clear();
+                            driver.findElement(By.id("amountInput")).sendKeys(valueToSet);
+                            ((JavascriptExecutor) driver).executeScript("document.getElementById('submitLink').click();");
+
+                            driver.findElement(By.xpath("//span[text()='Закрыть окно']")).click();
+                            driver.switchTo().window(handle1);
+                            logMe("Закупились "+productInfo.split(";")[0]);
+                        }
+                        else {
+                            logMe("Продукта не нашли!!");
+                            driver.findElement(By.xpath("//span[text()='Закрыть окно']")).click();
+                            driver.switchTo().window(handle1);
+                        }
+
+                    }
+                    else {
+                        logMe("Продукт не подошел!");
+                        driver.findElement(By.xpath("//span[text()='Закрыть окно']")).click();
+                        driver.switchTo().window(handle1);
+                    }
+                }
+                depCount++;
+            }
+        }
+
+
+
+
+        // Идем в зал продаж и ставим цены. на 30% дороже чем средняя цена по городу
+        boolean action=false;
+        Thread.sleep(3000);
+        waitForElementVisible("//a[text()='Торговый зал']");
+        waitForElement("//a[text()='Торговый зал']");
+        driver.findElement(By.xpath("//a[text()='Торговый зал']")).click();
+        for(int i=0; i<driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).size();i++){
+            String salePrice=driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).getAttribute("value");
+            if(salePrice.equals("0.00")){
+                Double setupvalue = Double.valueOf(driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[12]")).get(i).getText().replaceAll(" ","").replaceAll("\\$",""));
+                setupvalue=setupvalue*1.3;
+                driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
+                driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(String.valueOf(setupvalue));
+                action=true;
+            }
+        }
+        if(action) {
+//            waitForElement("//input[@value='Установить цены']");
+//            waitForElementVisible("//input[@value='Установить цены']");
+//            driver.findElement(By.xpath("//input[@value='Установить цены']")).click();
+            driver.findElement(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).sendKeys(Keys.RETURN);
+        }
+
+        driver.findElement(By.xpath("//a[text()='Магазин']")).click();
+
+
+
+
+
+
+        return new StorePage(driver);
+    }
+
     //автоматическая закупка в магазинах
     public StorePage autoBuyProducts() throws InterruptedException {
         int maxDepSize = Integer.valueOf(getParameter("StoreSize"
@@ -261,6 +498,8 @@ public class StorePage extends Page {
         }
 
 
+
+
         // Идем в зал продаж и ставим цены. на 30% дороже чем средняя цена по городу
         boolean action=false;
         Thread.sleep(3000);
@@ -295,6 +534,19 @@ public class StorePage extends Page {
         return new StorePage(driver);
     }
 
+    public StorePage goToTradingRoom() throws InterruptedException {
+        waitForElementVisible("//a[text()='Торговый зал']");
+        waitForElement("//a[text()='Торговый зал']");
+        driver.findElement(By.xpath("//a[text()='Торговый зал']")).click();
+        return new StorePage(driver);
+    }
+
+    public StorePage goToMainStorePage() throws InterruptedException {
+        waitForElementVisible("//a[text()='Магазин']");
+        waitForElement("//a[text()='Магазин']");
+        driver.findElement(By.xpath("//a[text()='Магазин']")).click();
+        return new StorePage(driver);
+    }
 
 
     public StorePage educate(){

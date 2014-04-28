@@ -139,4 +139,29 @@ public class CreateDB
         System.out.println("Table created successfully");
     }
 
+    public void createStoreBuild(){
+
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:storeBuild.db");
+            System.out.println("Opened database successfully");
+
+            stmt = c.createStatement();
+            String sql = "CREATE TABLE DEPARTMENT " +
+                    "(CITY        TEXT     NOT NULL," +
+                    " DEPNAME           TEXT    NOT NULL, " +
+                    " ISBUILD           BLOB    NOT NULL) " ;
+
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        System.out.println("Table created successfully");
+    }
+
 }

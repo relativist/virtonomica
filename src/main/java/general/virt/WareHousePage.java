@@ -945,8 +945,12 @@ public class WareHousePage extends Page {
 
                 if(action){
                     supplierPrice=driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[4]")).getText().trim().replaceAll(" ", "").replaceAll("\\$","");
+                    if(supplierPrice.contains("/"))
+                        supplierPrice=supplierPrice.split("/")[1];
                     supplierQuality=driver.findElement(By.xpath("//table//tr[@class='odd' or @class='even']["+j+"]/td[6]")).getText().trim().replaceAll(" ", "").replaceAll("\\$","");
-                    koeff.add(String.valueOf(Double.valueOf(supplierPrice) / Double.valueOf(supplierQuality)) + ";" + j);
+                    logMe("suppPrice: "+supplierPrice);
+                    logMe("suppQa: "+supplierQuality);
+                    koeff.add(String.valueOf((Double.valueOf(supplierPrice) / Double.valueOf(supplierQuality))) + ";" + j);
                 }
 
                 j++;

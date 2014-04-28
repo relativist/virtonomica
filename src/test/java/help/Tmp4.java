@@ -2,8 +2,8 @@ package help;
 
 
 import general.Page;
-import general.virt.HelpPage;
 import general.virt.LoginPage;
+import general.virt.OfficePage;
 import org.junit.Test;
 
 /**
@@ -39,7 +39,7 @@ public class Tmp4 extends Page {
         new LoginPage(driver)
                 .openVirtUrl()
                 .login().selectPlantByUnitId("5177168");
-        new HelpPage(driver).createAdvertising();
+        new OfficePage(driver).createAdvertising();
 
     }
 

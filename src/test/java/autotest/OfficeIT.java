@@ -44,7 +44,7 @@ public class OfficeIT extends Page {
             new CreateDB().createPlant();
         }
 
-        List<String> list = new LoginPage(driver).openVirtUrl().login().selectOffice().getListAllUnit();x
+        List<String> list = new LoginPage(driver).openVirtUrl().login().selectOffice().getListAllUnit();
         logMe("go");
 
         String currentUrl = new String();
@@ -59,7 +59,7 @@ public class OfficeIT extends Page {
 
             logMe(currentUrl);
             driver.get(currentUrl);
-            new OfficePage(driver).setAutoQaSlave().educate().checkOfficeLoad().repairIt();
+            new OfficePage(driver).setAutoQaSlave().educate().checkOfficeLoad().createAdvertising().repairIt();
 
             new PlantPage(driver).recordDepartment(currentUrl);
         }

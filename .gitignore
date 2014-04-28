@@ -6,3 +6,5 @@ market.db
 store.db
 plant.db
 passFile
+shopBuild.db
+storeBuild.db
