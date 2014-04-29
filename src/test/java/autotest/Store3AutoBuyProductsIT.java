@@ -43,7 +43,7 @@ public class Store3AutoBuyProductsIT extends Page {
             logMe(currenUrl);
 
             driver.get(currenUrl);
-            new StorePage(driver).setAutoQaSlave().educate().autoBuyProducts();
+            new StorePage(driver).autoBuyProducts();
         }
     }
 }

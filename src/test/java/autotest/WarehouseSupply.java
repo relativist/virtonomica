@@ -44,6 +44,12 @@ public class WarehouseSupply extends Page {
             new CreateDB().createPlant();
         }
 
+        file = new File("report.db");
+        if(!file.exists()) {
+            logMe("creating new database table!");
+            new CreateDB().createReport();
+        }
+
         List<String> list = new LoginPage(driver).openVirtUrl().login().selectWareHouse().getListAllUnit();
         logMe("go");
 

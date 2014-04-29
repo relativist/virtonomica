@@ -48,6 +48,12 @@ public class Store2tradingIT extends Page {
             logMe("creating new database table!");
             new CreateDB().createStore();
         }
+        file = new File("report.db");
+        if(!file.exists()) {
+            logMe("creating new database table!");
+            new CreateDB().createReport();
+        }
+
         List<String> list = new LoginPage(driver).openVirtUrl().login().selectStore().getListAllUnit();
         logMe("go");
 

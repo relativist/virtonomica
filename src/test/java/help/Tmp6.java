@@ -2,7 +2,6 @@ package help;
 
 
 import general.Page;
-import general.virt.HelpPage;
 import org.junit.Test;
 
 import java.io.File;
@@ -71,7 +70,9 @@ public class Tmp6 extends Page {
 //
 //        new PlantPage(driver).supply();
         //new WareHousePage(driver).supply();
-        logMe(new HelpPage().getTodayReport());
+
+        if(System.getProperty("user.dir").contains("rest"))
+            logMe("rest");
 
     }
 
