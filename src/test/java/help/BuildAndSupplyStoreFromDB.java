@@ -4,6 +4,7 @@ package help;
 import general.Page;
 import general.virt.HelpPage;
 import general.virt.LoginPage;
+import general.virt.MainPage;
 import general.virt.StorePage;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ import java.util.List;
     Simple Soap import product and verify them to correct import to MPO ( SP )
 */
 
-public class Tmp2 extends Page {
+public class BuildAndSupplyStoreFromDB extends Page {
 
 //    @Override
 //    protected void setUp() throws Exception {
@@ -42,20 +43,17 @@ public class Tmp2 extends Page {
     public void test() throws Throwable {
 
         List<String> list = new LoginPage(driver).openVirtUrl().login().selectStore().getListAllUnitWithCity();// город урл
-//        logMe("go");
-//
-//        String currenUrl = new String();
-//        for(int i=0; i< list.size(); i++){
-//            currenUrl = list.get(i);
-//            logMe(currenUrl);
-//            driver.get(currenUrl);
-//            new StorePage(driver).autoBuyProducts();
-//        }
+
         ArrayList<String> subListStore = new ArrayList<String>();
         ArrayList<String> storesToBuild = new HelpPage().getAllDataFromDbStoreBuild(); // город : отдел
         String currentUrl = driver.getCurrentUrl();
+        boolean isFoundStore=false;
 
         for(String storeTobuild: storesToBuild) {
+            isFoundStore=false;
+            String cityToBuild = storeTobuild.split(";")[0];
+            String departmentToBuild = storeTobuild.split(";")[1];
+            logMe("");
             logMe(" !!!  Нужно закупить: "+storeTobuild);
             if(isContainsLocalTest(list,storeTobuild)){
                 logMe("Ура, есть магазин в городе "+ storeTobuild);
@@ -65,36 +63,45 @@ public class Tmp2 extends Page {
                     driver.get(localStore.split(";")[1]);
 
                     //есть ли отдел для закупок в этом магазине?
-                    if(new StorePage(driver).goToTradingRoom().isDepToSell(storeTobuild.split(";")[1],new StorePage(driver).getCurrentTypesDepFromSalesRoom())){
+                    if(new StorePage(driver).goToTradingRoom().isDepToSell(departmentToBuild,new StorePage(driver).getCurrentTypesDepFromSalesRoom())){
                         logMe("Есть! Апдейтим базу!");
-                        new HelpPage().updateBaseStoreBuild(storeTobuild.split(";")[0],storeTobuild.split(";")[1],true);
+                        new HelpPage().updateBaseStoreBuild(cityToBuild,departmentToBuild,true);
                         new StorePage(driver).goToMainStorePage();
                     }
                     else {
                         // отдела такого нет, мы должны узнать
                         // можно ли добавить отдел?
                         // если да - закупаемся
-                        // если нет - создаем новый магазин и там закупаемся.
                         new StorePage(driver).goToMainStorePage();
-                        assertTrue(false);
+                        if(new StorePage(driver).getStoreDepMaxSize()>new StorePage(driver).getStoreDepMaxSize()){
+                            logMe("Добавляем новый отдел: "+departmentToBuild);
+                            new StorePage(driver).autoBuyWithDep(departmentToBuild);
+                            logMe("Есть! Апдейтим базу!");
+                            isFoundStore=true;
+                            new HelpPage().updateBaseStoreBuild(cityToBuild,departmentToBuild,true);
+                        }
                     }
+                }
 
-
-
+                if(isFoundStore){
+                    logMe("Магазин переполнен, создаем новый магазин!");
+                    if(new HelpPage(driver).createStore(cityToBuild)){
+                        new StorePage(driver).autoBuyWithDep(departmentToBuild);
+                        logMe("Есть! Апдейтим базу!");
+                        new HelpPage().updateBaseStoreBuild(cityToBuild,departmentToBuild,true);
+                    }
                 }
             }
             else {
                 logMe("Нужно построить новый магазин в городе "+ storeTobuild);
-                new HelpPage(driver).createStore(storeTobuild.split(";")[0]);
-                // закупаемся в магазине нашим отделом.
-                new StorePage(driver).autoBuyWithDep(storeTobuild.split(";")[1]);
-                //!!! новосозданный магазин нужно добавить в базу!!!
+                if(new HelpPage(driver).createStore(cityToBuild)){
+                    new StorePage(driver).autoBuyWithDep(departmentToBuild);
+                    logMe("Есть! Апдейтим базу!");
+                    new HelpPage().updateBaseStoreBuild(cityToBuild,departmentToBuild,true);
+                }
             }
-
+            list = new MainPage(driver).goToGeneralPlantList().getListAllUnitWithCity();
         }
-
-
-
     }
 
     public boolean isContainsLocalTest(List<String> mass , String string){

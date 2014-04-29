@@ -2,6 +2,7 @@ package autotest;
 
 
 import general.Page;
+import general.virt.HelpPage;
 import general.virt.LoginPage;
 import help.CreateDB;
 import org.junit.Test;
@@ -48,6 +49,9 @@ public class AnalyzemarketIT extends Page {
         }
 
     logMe("today session: "+session);
+
+    new HelpPage(driver).deleteBase("market.db","MARKET");
+
     new LoginPage(driver).openVirtUrl().login()
             .getAnalyzeMarket("Лекарственные травы", "Аптека", session)
             .getAnalyzeMarket("Природные лекарства", "Аптека", session)
@@ -59,7 +63,6 @@ public class AnalyzemarketIT extends Page {
             .getAnalyzeMarket("Консервированные оливки", "Продукты питания", session)
             .getAnalyzeMarket("Оливковое масло", "Продукты питания", session)
             .getAnalyzeMarket("Специи", "Продукты питания", session)
-            .getAnalyzeMarket("Сыр фета", "Продукты питания", session)
             .getAnalyzeMarket("Электроинструмент", "Промышленные товары", session)
     ;
 

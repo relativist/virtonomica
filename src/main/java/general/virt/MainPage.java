@@ -78,6 +78,13 @@ public class MainPage extends Page {
         return myList;
     }
 
+
+    public MainPage goToGeneralPlantList(){
+        String myId = getParameter("myId");
+        driver.get("http://virtonomica.ru/vera/main/company/view/"+myId+"/unit_list");
+        return new MainPage(driver);
+    }
+
     // возвращает  город : урл магазина в этом городе
     public List getListAllUnitWithCity(){
         List<WebElement> assetList1 = new ArrayList();
@@ -186,7 +193,7 @@ public class MainPage extends Page {
 
         driver.get(mainUrl);
         logMe("Wait 11 minutes...");
-        Thread.sleep(11*60*1000);
+        Thread.sleep(5*60*1000);
         return new MainPage(driver);
     }
 

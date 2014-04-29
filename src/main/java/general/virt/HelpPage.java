@@ -239,6 +239,14 @@ public class HelpPage extends Page {
                 logMe("Нужно создать офис в "+item);
                 return false;
             }
+
+            // На случай Великобритания == Англия (Англия пропускается)
+            // если не нашли элемент continue
+            if(driver.findElements(By.xpath("//tr[td[contains(text(),'"+item+"')]]/td[1]/input")).size()==0){
+                logMe("Вероятно Великобритания==Англия, элемента не нашли перешли к следущему.");
+                continue;
+            }
+
             driver.findElement(By.xpath("//tr[td[contains(text(),'"+item+"')]]/td[1]/input")).click();
             driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
             prevValue=item;
@@ -262,9 +270,6 @@ public class HelpPage extends Page {
 
         logMe("Done");
         driver.findElement(By.xpath("//input[contains(@value,'Создать подразделение')]")).click();
-
-        //удалить нижнюю строку!!!!!
-        //driver.get("http://virtonomica.ru/vera/main/unit/view/5483861");
 
         String shopUrl = driver.getCurrentUrl();
         String shopId = getUnitIdByUrl(shopUrl);
@@ -368,8 +373,8 @@ public class HelpPage extends Page {
 
             stmt = c.createStatement();
             String sql = "UPDATE DEPARTMENT SET ISBUILD='"+result+"' " +
-                    "WHERE" +
-                    "CITY='"+city+"' and"+
+                    "WHERE " +
+                    "CITY='"+city+"' and "+
                     "DEPNAME='"+department+"'"+
                     ";";
             stmt.executeUpdate(sql);
@@ -394,6 +399,28 @@ public class HelpPage extends Page {
             stmt = c.createStatement();
             String sql = "DELETE FROM DEPARTMENT  " +
                     ";";
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.commit();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        logMe("database is clean");
+        //System.out.println("Records created successfully");
+    }
+
+    public void deleteBase(String dbName,String table){
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:"+dbName);
+            c.setAutoCommit(false);
+
+            stmt = c.createStatement();
+            String sql = "DELETE FROM "+table + ";";
             stmt.executeUpdate(sql);
             stmt.close();
             c.commit();
