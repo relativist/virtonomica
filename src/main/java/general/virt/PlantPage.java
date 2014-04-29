@@ -170,8 +170,10 @@ public class PlantPage extends Page {
                 }
                 if(sklad.equals("Неогр."))
                     sklad="100000000";
-                if(Integer.valueOf(sklad)<2*Integer.valueOf(need))
-                    error+=" Поставщик обосрётся.";
+                if(Integer.valueOf(sklad)<2*Integer.valueOf(need)) {
+                    error += " Поставщик обосрётся.";
+                    new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Завод. поставщик имеет мало товара на складе: "+title);
+                }
 
                 if(Integer.valueOf(have)<2*Integer.valueOf(need)){
                     driver.findElement(By.xpath("//tr[contains(@id,'product_row')]["+(i+1)+"]/td[4]//input")).clear();
@@ -186,6 +188,7 @@ public class PlantPage extends Page {
             }
             else {
                 logMe("ERROR          Нет поставщика "+title);
+                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Завод. Нет поставщика :"+title);
             }
 
 
@@ -252,10 +255,14 @@ public class PlantPage extends Page {
         if(driver.findElements(By.xpath("//*[@id='mainContent']/fieldset")).size()!=0){
             String tempoS = driver.findElement(By.xpath("//fieldset")).getText().trim().split("\\s")[1];
             logMe(tempoS);
-            if(tempoS.contains("ForOtherSales"))
-                isForOther=true;
-            if(tempoS.contains("ColdPrice"))
-                isColdPrice=true;
+            if(tempoS.contains("ForOtherSales")) {
+                isForOther = true;
+                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Завод. продажа другим игрокам: ForOtherSales");
+            }
+            if(tempoS.contains("ColdPrice")) {
+                isColdPrice = true;
+                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Завод. цена продажи заморожена: ColdPrice");
+            }
         }
 
         if(isColdPrice)

@@ -655,6 +655,10 @@ public class StorePage extends Page {
                 driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(price);
             }
 
+            //если продажи =0 Новый магазин, пусть цены и продажи устаканяться
+            if(Double.valueOf(saled) == 0)
+                continue;
+
             //3
             if(Double.valueOf(store)/Double.valueOf(saled)>3){
                 if(Double.valueOf(price)<Double.valueOf(basicCost) && !getParameter("ShopGoodsLessSelfCost").contains(productName)){
@@ -674,7 +678,7 @@ public class StorePage extends Page {
             else{
                 if(Double.valueOf(price)<Double.valueOf(basicCost) && !getParameter("ShopGoodsLessSelfCost").contains(productName)){
                     if(saled.equals(store)){
-                        price = String.valueOf(Double.valueOf(price)*1.1);
+                        price = String.valueOf(Double.valueOf(price)*1.05);
                         driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
                         driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
                         driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(price);
@@ -688,14 +692,14 @@ public class StorePage extends Page {
                     }
                 }
                 else {
-                    price = String.valueOf(Double.valueOf(price)*1.1);
+                    price = String.valueOf(Double.valueOf(price)*1.05);
                     driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
                     driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
                     driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(price);
                 }
 
                 if(saled.equals(store)){
-                    price = String.valueOf(Double.valueOf(price)*1.1);
+                    price = String.valueOf(Double.valueOf(price)*1.05);
                     driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
                     driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
                     driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(price);
@@ -704,7 +708,7 @@ public class StorePage extends Page {
 //          4. market>20
 //               price=price*1.10
             if(Double.valueOf(market)>30){
-                price = String.valueOf(Double.valueOf(price)*1.2);
+                price = String.valueOf(Double.valueOf(price)*1.05);
                 driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
                 driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).clear();
                 driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[10]/input")).get(i).sendKeys(price);
@@ -842,6 +846,7 @@ public class StorePage extends Page {
             if(Double.valueOf(retailerStore)/Double.valueOf(saled)<3){
                 logMe("Warning! " + productName + " МАЛО!");
                 result+="Мало "+productName+" "+retailerStore+"; ";
+                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Магазин. У поставщика мало на складе: "+productName);
             }
             recordDepartment(productName, result);
         }

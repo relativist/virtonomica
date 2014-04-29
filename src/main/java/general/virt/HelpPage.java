@@ -363,6 +363,33 @@ public class HelpPage extends Page {
         //System.out.println("Records created successfully");
     }
 
+    public void recordReport(String url,String problem){
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:report.db");
+            c.setAutoCommit(false);
+            int session = Integer.valueOf(formattedDate("MMdd"));
+
+            stmt = c.createStatement();
+            String sql = "INSERT INTO REPORT (SESSION,DEPURL,PROBLEM) " +
+                    "VALUES (" +
+                    session +
+                    ",'"+url +"'"+
+                    ",'"+problem +"'"+
+                    ");";
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.commit();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        //System.out.println("Records created successfully");
+    }
+
     public void updateBaseStoreBuild(String city,String department,boolean result){
         Connection c = null;
         Statement stmt = null;
@@ -463,6 +490,39 @@ public class HelpPage extends Page {
         }
         //logMe("result is "+result);
         return mass;
+    }
+    public String getTodayReport(){
+        Connection c = null;
+        Statement stmt = null;
+        String returnString = new String();
+        returnString="";
+        boolean result=false;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:report.db");
+            c.setAutoCommit(false);
+            int session = Integer.valueOf(formattedDate("MMdd"));
+
+            stmt = c.createStatement();
+            String sql = "select * from report where session="+session+"; ";
+            ResultSet rs =  stmt.executeQuery(sql);
+
+            while ( rs.next() ) {
+                String depurl = rs.getString("depurl");
+                String problem = rs.getString("problem");
+                returnString+=depurl+"\t"+problem+"\n";
+            }
+
+            rs.close();
+            stmt.close();
+            c.commit();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        //logMe("result is "+result);
+        return returnString;
     }
 
 

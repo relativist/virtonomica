@@ -60,10 +60,15 @@ public class Page extends TestCase {
     public static String getLogin() {
         return Passwd.getInstance().getLogin();
     }
+    public static String getMailLogin() {
+        return Passwd.getInstance().getMailLogin();
+    }
     public static String getPasswd() {
         return Passwd.getInstance().getPasswd();
     }
-
+    public static String getMailPasswd() {
+        return Passwd.getInstance().getMailPasswd();
+    }
     public static ArrayList<String> getWproducts() {
         return Configuration.getInstance().getWProducts();
     }

@@ -52,6 +52,10 @@ public class RepairPage extends Page {
             EQ=Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Качество оборудования']]/td[2]")).getText());
             eqNeed=EQ;
             toRepair=Integer.valueOf(driver.findElement(By.xpath("//tr[td[text()='Износ оборудования']]/td[2]//td[2]")).getText().split(" % ")[1].split("\\+")[0].replaceAll("\\D+",""))+1;
+            if(toRepair<5){
+                logMe("No need repair! ");
+                return 0;
+            }
             fix=0.2;
         }
         else if (driver.findElement(By.xpath("//div[@class='officePlace']")).getText().split(" ")[0].equals("Офис")){
@@ -59,6 +63,10 @@ public class RepairPage extends Page {
             EQ=Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Качество компьютеров']]/td[2]")).getText());
             eqNeed=EQ;
             toRepair=Integer.valueOf(driver.findElement(By.xpath("//tr[td[text()='Износ компьютеров']]/td[2]//td[2]")).getText().split(" % ")[1].split("\\+")[0].replaceAll("\\D+",""))+1;
+            if(toRepair<5){
+                logMe("No need repair! ");
+                return 0;
+            }
             fix=0.2;
         }
         else{
@@ -79,6 +87,10 @@ public class RepairPage extends Page {
             //logMe(tempos);
 
             toRepair=Integer.valueOf(driver.findElement(By.xpath("//tr[td[text()='Износ оборудования']]/td[2]//td[2]")).getText().split(" % ")[1].split("\\+")[0].replaceAll("\\D+",""))+1;
+            if(toRepair<20){
+                logMe("No need repair! ");
+                return 0;
+            }
             //toRepair=Integer.valueOf(tempos)+1;
         }
         logMe("NEED: " + eqNeed);

@@ -2,9 +2,10 @@ package help;
 
 
 import general.Page;
-import general.virt.LoginPage;
-import general.virt.PlantPage;
+import general.virt.HelpPage;
 import org.junit.Test;
+
+import java.io.File;
 
 /**
  * Created by a.sitnikov on 18.02.14.
@@ -18,10 +19,10 @@ import org.junit.Test;
 
 public class Tmp6 extends Page {
 
-//    @Override
-//    protected void setUp() throws Exception {
-//
-//    }
+    @Override
+    protected void setUp() throws Exception {
+
+    }
 //
     @Override
     protected void tearDown() throws Exception {
@@ -36,6 +37,11 @@ public class Tmp6 extends Page {
 
     @Test
     public void test() throws Throwable {
+        File file = new File("report.db");
+        if(!file.exists()) {
+            logMe("creating new database table!");
+            new CreateDB().createReport();
+        }
 //        List<String> list = new LoginPage(driver).openVirtUrl().login().selectPlant().getListAllUnit();
 //        logMe("go");
 //
@@ -58,13 +64,14 @@ public class Tmp6 extends Page {
 //        }
 
 
-        new LoginPage(driver)
-                .openVirtUrl()
-                .login()
-                .selectPlantByUnitId("5454877");
-
-        new PlantPage(driver).supply();
+//        new LoginPage(driver)
+//                .openVirtUrl()
+//                .login()
+//                .selectPlantByUnitId("5454877");
+//
+//        new PlantPage(driver).supply();
         //new WareHousePage(driver).supply();
+        logMe(new HelpPage().getTodayReport());
 
     }
 

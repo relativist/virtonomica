@@ -2,6 +2,7 @@ package autotest;
 
 
 import general.Page;
+import general.virt.HelpPage;
 import general.virt.LoginPage;
 import general.virt.PlantPage;
 import help.CreateDB;
@@ -63,6 +64,9 @@ public class PlantIT extends Page {
                 //new PlantPage(driver).setAutoQaSlave().educate().sales();
                 //new PlantPage(driver).supply();
                 new PlantPage(driver).setAutoQaSlave().educate().supply().sales();
+            }
+            else {
+                new HelpPage(driver).recordReport(currentUrl,"Завод в отпуске");
             }
             new PlantPage(driver).recordDepartment(currentUrl);
 

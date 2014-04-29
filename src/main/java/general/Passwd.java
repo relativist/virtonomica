@@ -34,6 +34,14 @@ public class Passwd {
         return (String) properties.get("login");
     }
 
+    public String getMailLogin() {
+        return (String) properties.get("mailLogin");
+    }
+
+    public String getMailPasswd() {
+        return (String) properties.get("mailPasswd");
+    }
+
     public String getPasswd() {
         return (String) properties.get("passwd");
     }

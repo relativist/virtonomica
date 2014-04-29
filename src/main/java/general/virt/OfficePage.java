@@ -197,6 +197,7 @@ public class OfficePage extends Page {
         logMe("Загрузка офиса: "+load);
         if(load > 80 ){
             logMe("TOO HUGE LOAD OFFICE!!!");
+            new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Загрузка офиса :"+load);
         }
 
         return new OfficePage(driver);

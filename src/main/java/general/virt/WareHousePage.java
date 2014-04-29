@@ -529,6 +529,7 @@ public class WareHousePage extends Page {
                 //logMe("result = "+result);
                 if(!result){
                     logMe("ОШИБКА!!!! НУЖНО ВНЕСТИ В БАЗУ НАШ ПРОДУКТ!");
+                    new HelpPage(driver).recordReport(driver.getCurrentUrl(),"WAREHOUSE. нужно внести в базу продукт: "+productTitle);
                     logMe(productTitle);
                     assertTrue(false);
                 }
@@ -686,6 +687,7 @@ public class WareHousePage extends Page {
             if(Double.valueOf(productStore)<Double.valueOf(productOffer)*2){
                 logMe(productTitle+" закупаем. Нехватка товара!");
                 productsToBuy.add(productTitle+";"+productOffer);
+                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"WAREHOUSE. Закупаем: "+productTitle);
                 isNeedToBuy=true;
             }
         }
@@ -776,7 +778,8 @@ public class WareHousePage extends Page {
 
 
                             logMe("Сравниваем продукт у нас и у них "+productTitle);
-                            if(Double.valueOf(getTheBestLocalSupplier(productTitle).split(";")[1])<Double.valueOf(bestOtherValue.split(";")[1])){
+                            String ourBestKoeff = getTheBestLocalSupplier(productTitle).split(";")[1];
+                            if(Double.valueOf(ourBestKoeff)<Double.valueOf(bestOtherValue.split(";")[1])){
                                 logMe("Лучшего нашего продукта " +productTitle+" нигде нет!");
                                 isOtherHasBetterProduct=false;
                             }else{
@@ -1069,6 +1072,8 @@ public class WareHousePage extends Page {
 
                 Select s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/select")).get(i));
                 s1.selectByVisibleText("Только своей компании");
+            }{
+                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"WAREHOUSE SALE. зафиксирована цена: "+productTitle);
             }
         }
         driver.findElement(By.xpath("//input[@value='Сохранить изменения']")).click();
