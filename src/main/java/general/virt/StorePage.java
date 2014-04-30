@@ -685,8 +685,11 @@ public class StorePage extends Page {
             }
 
             //если продажи =0 Новый магазин, пусть цены и продажи устаканяться
-            if(Double.valueOf(saled) == 0)
+            if(Double.valueOf(saled) == 0) {
+                logMe("Новый продукт, еще не продавался");
+                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Новый продукт еще не продавался, цену не трогали: "+productName);
                 continue;
+            }
 
             //3
             if(Double.valueOf(store)/Double.valueOf(saled)>3){
@@ -798,6 +801,7 @@ public class StorePage extends Page {
 //      1. store==0
 //      удаляем дублируемые саплаерные заказы
         //Thread.sleep(15000);
+        action=false;
         int rows = driver.findElements(By.xpath("//tr[contains(@id,'product_row')]")).size();
         waitForElement("//tr[contains(@id,'product_row')]/td[10]/input["+rows+"]");
         for(int i=0; i< rows;i++){
@@ -808,6 +812,7 @@ public class StorePage extends Page {
                 try {
                     driver.findElements(By.xpath("//tr[contains(@id,'product_row')]/td[10]/input")).get(i).click();
                     logMe("удалили того саплаера если у нас на складе ноль и у него на складе ноль.");
+                    action=true;
                 } catch (WebDriverException e) {
                     System.out.println(e.getMessage());
                     //System.out.println(driver.getPageSource());
@@ -832,6 +837,12 @@ public class StorePage extends Page {
 
             //если новый продукт: офер не ноль, на складе поставщика не ноль, у нас на складе ноль, продажи = ноль
             if(Double.valueOf(offer)>1 && Double.valueOf(retailerStore)>1 && Double.valueOf(store)<1 && Double.valueOf(saled)<1){
+                continue;
+            }
+
+            if(Double.valueOf(saled)==0){
+                logMe("Новый продукт для продажи, не трогаем оффер");
+                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Оффер не изменен, продукт еще не продавался: "+productName);
                 continue;
             }
 

@@ -49,8 +49,8 @@ public class Tmp6 extends Page {
         new LoginPage(driver)
                 .openVirtUrl()
                 .login()
-                .selectPlantByUnitId("5177166");
-        new StorePage(driver).getTop3Report();
+                .selectPlantByUnitId("5487758");
+        new StorePage(driver).trading();
 
 
     }

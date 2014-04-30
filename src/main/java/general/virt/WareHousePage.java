@@ -697,10 +697,16 @@ public class WareHousePage extends Page {
             productStore = driver.findElement(By.xpath("//tr[@class='odd' or @class='even']["+counter+"]/td[2]")).getText().replaceAll(" ", "");
             productOffer = driver.findElement(By.xpath("//tr[@class='odd' or @class='even']["+counter+"]/td[6]")).getText().replaceAll(" ", "");
             if(Double.valueOf(productStore)<Double.valueOf(productOffer)*2){
-                logMe(productTitle+" закупаем. Нехватка товара!");
-                productsToBuy.add(productTitle+";"+productOffer);
-                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"WAREHOUSE. Закупаем: "+productTitle);
-                isNeedToBuy=true;
+                if(isMyProduct(wProducts,productTitle)){
+                    logMe("Большой оффер для моего продукта!");
+                    new HelpPage(driver).recordReport(driver.getCurrentUrl(),"WAREHOUSE. Большой оффер для моего продукта: "+productTitle);
+                }
+                else {
+                    logMe(productTitle + " закупаем. Нехватка товара!");
+                    productsToBuy.add(productTitle + ";" + productOffer);
+                    new HelpPage(driver).recordReport(driver.getCurrentUrl(), "WAREHOUSE. Закупаем: " + productTitle);
+                    isNeedToBuy = true;
+                }
             }
         }
         if(isNeedToBuy){
