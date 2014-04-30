@@ -2,7 +2,7 @@ package help;
 
 
 import general.Page;
-import general.virt.HelpPage;
+import general.virt.StorePage;
 import org.junit.Test;
 
 /**
@@ -36,7 +36,7 @@ public class Tmp5 extends Page {
     @Test
     public void test() throws Throwable {
 
-        new HelpPage().generateStoreBaseToBuild();
+        logMe(new StorePage(driver).roundResult(2.3323423523452345)+"");
 
 
     }

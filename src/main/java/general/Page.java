@@ -1,6 +1,7 @@
 package general;
 
 import general.virt.RepairPage;
+import general.virt.StorePage;
 import junit.framework.TestCase;
 import org.junit.After;
 import org.junit.Before;
@@ -155,6 +156,46 @@ public class Page extends TestCase {
         if(p==0) return 0.00;
         return Math.rint(100.0 * Math.log(0.2*14*getK(type)*q*q/p)/Math.log(1.4)- 1) / 100.0 ;
     }//end calcQualTop1()
+
+    public double calcQualTop3(double q){
+        return Math.rint((q*q*2+6*q)*getK(getTypeUnit()));
+    }
+
+    public int getPlayerQA(){
+        return Integer.valueOf(driver.findElement(By.xpath("//tr[td[text()='Квалификация игрока']]/td[2]")).getText().replaceAll("\\D+",""));
+    }
+
+    public int getTotalCountEmployeeOfAllDepartments(){
+        return Integer.valueOf(driver.findElement(By.xpath("//tr[td[contains(text(),'Суммарное количество подчинённых')]]/td[2]")).getText().replaceAll("\\D+",""));
+    }
+
+    public String getTop3Report(double maxTop3,double currentTop3){
+        double percentUsed = Double.valueOf(currentTop3)*100/Double.valueOf(maxTop3);
+        double freeTop3 = Double.valueOf(maxTop3)-Double.valueOf(currentTop3);
+        return "Used: "+percentUsed+" Free : "+freeTop3;
+    }
+
+    public String getTop3Report(){
+        double q = Double.valueOf(new StorePage(driver).getPlayerQA());
+        double maxTop3= new StorePage(driver).calcQualTop3(q);
+        double currentTop3=new StorePage(driver).getTotalCountEmployeeOfAllDepartments();
+        double percentUsed = Double.valueOf(currentTop3)*100/Double.valueOf(maxTop3);
+        percentUsed=roundResult(percentUsed);
+        double freeTop3 = Double.valueOf(maxTop3)-Double.valueOf(currentTop3);
+        String reportString = "Used: "+percentUsed+"% Free : "+freeTop3;
+        logMe(reportString);
+        return reportString;
+    }
+
+    public double roundResult (double d) {
+        //precise = 10^precise;
+        int precise=100;
+        d = d*precise;
+        int i = (int) Math.round(d);
+        return (double) i/precise;
+    }
+
+
 
 
     ///////////////////////////////////////////////////////////////////////////

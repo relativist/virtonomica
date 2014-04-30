@@ -71,6 +71,8 @@ public class StorePage extends Page {
         return Integer.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество отделов']]/td[2]")).getText());
     }
 
+
+
     //автоматическая закупка в магазине при заданном отделе
     public StorePage autoBuyWithDep(String department) throws InterruptedException {
         int maxDepSize = getStoreDepMaxSize();
@@ -473,6 +475,33 @@ public class StorePage extends Page {
             driver.findElement(By.xpath("//input[@value='Обучить']")).click();
             driver.get(currentUrl);
         }
+        return new StorePage(driver);
+    }
+
+    public StorePage statusStore(){
+        String status = driver.findElement(By.xpath("//div[@class='productivity_hint']//div")).getText();
+        if(!status.contains("Элитный")){
+            logMe("Магазин не Элитный!!!");
+            new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Магазин. Статус магазина: "+status);
+        }
+        return new StorePage(driver);
+    }
+
+    public StorePage getStoreInfo() throws InterruptedException {
+        String depId = getUnitIdByUrl(driver.getCurrentUrl());
+        String currentUrl = driver.getCurrentUrl();
+        String status = driver.findElement(By.xpath("//div[@class='productivity_hint']//div")).getText();
+        String famous = driver.findElement(By.xpath("//tr[td[text()='Известность']]/td[2]")).getText().replaceAll(" ","");
+        String depCount = String.valueOf(getStoreDepSize());
+        String storeSize = driver.findElement(By.xpath("//tr[td[text()='Торговая площадь']]/td[2]")).getText().replaceAll(" ", "").split("м")[0];
+        String employee = driver.findElement(By.xpath("//tr[td[text()='Количество сотрудников']]/td[2]")).getText().replaceAll(" ", "").split("\\(")[0];
+        String visitors = driver.findElement(By.xpath("//tr[td[text()='Количество посетителей']]/td[2]")).getText().replaceAll(" ", "").replaceAll("\\D+","");
+        driver.findElement(By.xpath("//a[text()='Маркетинг и Реклама']")).click();
+        Thread.sleep(2000);
+        String population = driver.findElement(By.xpath("//tr[td[text()='Население города']]/td[2]/input")).getAttribute("value");
+
+        logMe(depId+"\t\t\t\t"+employee+"\t\t\t\t"+storeSize+"\t\t\t\t"+depCount+"\t\t\t\t"+visitors+"\t\t\t\t"+famous+"\t\t\t\t"+population+"\t\t\t\t"+status);
+        driver.get(currentUrl);
         return new StorePage(driver);
     }
 

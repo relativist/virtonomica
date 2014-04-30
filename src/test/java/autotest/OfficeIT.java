@@ -2,9 +2,7 @@ package autotest;
 
 
 import general.Page;
-import general.virt.LoginPage;
-import general.virt.OfficePage;
-import general.virt.PlantPage;
+import general.virt.*;
 import help.CreateDB;
 import org.junit.Test;
 
@@ -49,7 +47,7 @@ public class OfficeIT extends Page {
             logMe("creating new database table!");
             new CreateDB().createReport();
         }
-
+        boolean processed=false;
         List<String> list = new LoginPage(driver).openVirtUrl().login().selectOffice().getListAllUnit();
         logMe("go");
 
@@ -65,6 +63,14 @@ public class OfficeIT extends Page {
 
             logMe(currentUrl);
             driver.get(currentUrl);
+
+            //top-3
+            if(!processed){
+                new HelpPage(driver).recordReport("Store",new StorePage(driver).getTop3Report());
+                processed=true;
+            }
+
+
             new OfficePage(driver).setAutoQaSlave().educate().checkOfficeLoad().createAdvertising().repairIt();
 
             new PlantPage(driver).recordDepartment(currentUrl);

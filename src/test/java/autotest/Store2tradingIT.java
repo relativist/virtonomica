@@ -2,6 +2,7 @@ package autotest;
 
 
 import general.Page;
+import general.virt.HelpPage;
 import general.virt.LoginPage;
 import general.virt.StorePage;
 import help.CreateDB;
@@ -56,6 +57,7 @@ public class Store2tradingIT extends Page {
 
         List<String> list = new LoginPage(driver).openVirtUrl().login().selectStore().getListAllUnit();
         logMe("go");
+        boolean processed = false;
 
         String currenUrl = new String();
         for(int i=0; i< list.size(); i++){
@@ -66,7 +68,14 @@ public class Store2tradingIT extends Page {
                 continue;
             }
             driver.get(currenUrl);
-            new StorePage(driver).setAutoQaSlave().educate().trading();
+
+            //top-3
+            if(!processed){
+                new HelpPage(driver).recordReport("Store",new StorePage(driver).getTop3Report());
+                processed=true;
+            }
+
+            new StorePage(driver).statusStore().setAutoQaSlave().educate().trading();
         }
     }
 }

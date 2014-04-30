@@ -492,6 +492,18 @@ public class WareHousePage extends Page {
     3. если на складе меньше двух требования и больше одного - перезаказать сумму
     */
     public WareHousePage supply() throws InterruptedException {
+        boolean DoNotTouch=false; //даже не трогать его!!!!
+
+        if(driver.findElements(By.xpath("//*[@id='mainContent']/fieldset")).size()!=0){
+            String tempoS = driver.findElement(By.xpath("//fieldset")).getText().trim().split("\\s")[1];
+            logMe(tempoS);
+            if(tempoS.contains("DoNotTouch")) {
+                DoNotTouch = true;
+                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"WAREHOUSE. не трогаем: DoNotTouch");
+                return new WareHousePage(driver);
+            }
+
+        }
         //Step1
         driver.findElement(By.xpath("//a[text()='Снабжение']")).click();
         int i = 1;//счетчик парентов

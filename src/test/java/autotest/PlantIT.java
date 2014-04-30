@@ -5,6 +5,7 @@ import general.Page;
 import general.virt.HelpPage;
 import general.virt.LoginPage;
 import general.virt.PlantPage;
+import general.virt.StorePage;
 import help.CreateDB;
 import org.junit.Test;
 
@@ -49,9 +50,10 @@ public class PlantIT extends Page {
             logMe("creating new database table!");
             new CreateDB().createReport();
         }
-
+        boolean processed=false;
         List<String> list = new LoginPage(driver).openVirtUrl().login().selectPlant().getListAllUnit();
         logMe("go");
+
 
         String currentUrl = new String();
         for(int i=0; i< list.size(); i++){
@@ -64,6 +66,14 @@ public class PlantIT extends Page {
             }
 
             driver.get(currentUrl);
+
+            //top-3
+            if(!processed){
+                new HelpPage(driver).recordReport("Plant",new StorePage(driver).getTop3Report());
+                processed=true;
+            }
+
+
 
             if(!new PlantPage(driver).isSlaveOnVacation()) {
                 new PlantPage(driver).repairIt();
