@@ -103,7 +103,7 @@ public class MainPage extends Page {
     }
 
 
-    public MainPage createNewDivision(String type1,String type2,String type3,String type4,String type5,String type6){
+    public MainPage createPlant(String type1,String type2,String type3,String type4,String type5,String type6){
         String mainUrl = driver.getCurrentUrl();
         driver.findElement(By.xpath("//a[contains(text(),'Создать подразделение')]")).click();
         driver.findElement(By.xpath("//tr[td[contains(text(),'"+type1+"')]]/td[1]/input")).click();

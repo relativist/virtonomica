@@ -499,7 +499,7 @@ public class WareHousePage extends Page {
             logMe(tempoS);
             if(tempoS.contains("DoNotTouch")) {
                 DoNotTouch = true;
-                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"WAREHOUSE. не трогаем: DoNotTouch");
+                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"WAREHOUSE. не трогаем снабжение: DoNotTouch");
                 return new WareHousePage(driver);
             }
 
@@ -1054,6 +1054,20 @@ public class WareHousePage extends Page {
 
 //продавать по себестоимости и только своим.
     public WareHousePage sales() throws InterruptedException {
+
+        boolean DoNotTouch=false; //даже не трогать его!!!!
+
+        if(driver.findElements(By.xpath("//*[@id='mainContent']/fieldset")).size()!=0){
+            String tempoS = driver.findElement(By.xpath("//fieldset")).getText().trim().split("\\s")[1];
+            logMe(tempoS);
+            if(tempoS.contains("DoNotTouch")) {
+                DoNotTouch = true;
+                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"WAREHOUSE. не трогаем сбыт: DoNotTouch");
+                return new WareHousePage(driver);
+            }
+
+        }
+
         Thread.sleep(1000);
         String wareHouseFixedPrice=getParameter("WareHouseFixedPrice");
         logMe("param is : "+wareHouseFixedPrice);

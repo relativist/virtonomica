@@ -9,3 +9,7 @@ passFile
 shopBuild.db
 storeBuild.db
 report.db
+fitnes.db
+laundry.db
+medical.db
+rest.db

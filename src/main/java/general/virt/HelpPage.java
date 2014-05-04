@@ -201,6 +201,104 @@ public class HelpPage extends Page {
         return shopWithDep;
     }
 
+    public boolean createRestorun(String cityName) throws IOException, InterruptedException {
+        //открываем файл с городами
+        //ищем наш город, берем эту строку
+        //
+        //логинимся
+        //тыкаем создать подразделение
+        //строку сплитуем по ; и поехали создавать:
+
+        //если наткнулись на элемент который disabled:
+        //  пишем что не можем создать потому что в этой местности нет офиса
+
+        //размер максимальный
+
+        //в завимимости от размера - количество рабов.
+        //реклама.
+        File file = new File("city");
+        String followString = new String();
+        BufferedReader in = new BufferedReader(new FileReader( file.getAbsoluteFile()));
+        while ((followString = in.readLine()) != null) {
+            if(followString.contains(cityName))
+                break;
+
+        }
+        in.close();
+        logMe(followString);
+
+        driver.findElement(By.xpath("//a[contains(text(),'Создать подразделение')]")).click();
+        driver.findElement(By.xpath("//tr[td[contains(text(),'Ресторан')]]/td[1]/input")).click();
+        driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+        String prevValue = new String();
+
+        for(String item: followString.split(";")){
+            if(item.equals(prevValue))
+                continue;
+            if(driver.findElements(By.xpath("//tr[td[contains(text(),'"+item+"')]]/td[1]/input[@disabled]")).size()!=0){
+                logMe("Нужно создать офис в "+item);
+                return false;
+            }
+
+            // На случай Великобритания == Англия (Англия пропускается)
+            // если не нашли элемент continue
+            if(driver.findElements(By.xpath("//tr[td[contains(text(),'"+item+"')]]/td[1]/input")).size()==0){
+                logMe("Вероятно Великобритания==Англия, элемента не нашли перешли к следущему.");
+                continue;
+            }
+
+            driver.findElement(By.xpath("//tr[td[contains(text(),'"+item+"')]]/td[1]/input")).click();
+            driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+            prevValue=item;
+        }
+
+        driver.findElement(By.xpath("//tr[td[contains(text(),'Центр города')]]/td[1]/input")).click();
+        driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+
+        driver.findElement(By.xpath("//tr[td[contains(text(),'Кофейня')]]/td[1]/input")).click();
+        driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+
+        driver.findElements(By.xpath("//tr//tr[@class='odd' or @class='even']")).get(driver.findElements(By.xpath("//tr//tr[@class='odd' or @class='even']")).size()-1).click();
+        driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+        double arenda = Double.valueOf(driver.findElement(By.xpath("//tr[th[text()='Недельная стоимость аренды']]/td")).getText().replaceAll(" ","").replaceAll("\\$",""));
+
+
+        logMe("arenda = "+arenda);
+
+        if(arenda>1500000){
+            logMe("Too expensive!");
+            return false;
+        }
+
+        logMe("Done");
+        driver.findElement(By.xpath("//input[contains(@value,'Создать подразделение')]")).click();
+
+        String shopUrl = driver.getCurrentUrl();
+        String shopId = getUnitIdByUrl(shopUrl);
+
+        String employee = "200";
+
+
+        driver.get("http://virtonomica.ru/vera/window/unit/employees/engage/"+shopId);
+        driver.findElement(By.id("quantity")).clear();
+        driver.findElement(By.id("quantity")).clear();
+
+        driver.findElement(By.id("quantity")).sendKeys(employee);
+
+
+        driver.findElement(By.xpath("//input[contains(@value,'Сохранить изменения')]")).click();
+        driver.switchTo().alert().accept();
+        driver.get(shopUrl);
+        new StorePage(driver).setAutoQaSlave();
+        driver.findElement(By.xpath("//a[text()='Маркетинг и Реклама']")).click();
+        driver.findElement(By.xpath("//tr[td/label[text()='Телевидение']]/td[1]/input")).click();
+        driver.findElement(By.xpath("//input[contains(@value,'Начать рекламную кампанию')]")).click();
+        driver.findElement(By.xpath("//a[text()='Ресторан']")).click();
+        logMe("Поздразделение создано в городе "+cityName);
+        new MainPage(driver).goToGeneralPlantList();
+        return true;
+    }
+
     public boolean createStore(String cityName) throws IOException, InterruptedException {
         //открываем файл с городами
         //ищем наш город, берем эту строку
@@ -523,6 +621,137 @@ public class HelpPage extends Page {
         }
         //logMe("result is "+result);
         return returnString;
+    }
+
+
+    public void recordMedical(String city,String dc, String pol, String stomk, String cnm,String bol,String price,String volume,String count ){
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:medical.db");
+            c.setAutoCommit(false);
+            int session = Integer.valueOf(formattedDate("MMdd"));
+
+            stmt = c.createStatement();
+            String sql = "INSERT INTO MARKET (SESSION,CITY,DC,POL,STOMK,CNM,BOL,PRICE,VOLUME,COUNT) " +
+                    "VALUES (" +
+                    session +
+                    ",'"+city +"'"+
+                    ","+dc +
+                    ","+pol +
+                    ","+stomk +
+                    ","+cnm +
+                    ","+bol +
+                    ","+price +
+                    ","+volume +
+                    ","+count +
+                    ");";
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.commit();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        //System.out.println("Records created successfully");
+    }
+
+    public void recordRest(String city,String coffee, String greece, String ustr,String price,String volume,String count ){
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:rest.db");
+            c.setAutoCommit(false);
+            int session = Integer.valueOf(formattedDate("MMdd"));
+
+            stmt = c.createStatement();
+            String sql = "INSERT INTO MARKET (SESSION,CITY,COFFEE,GREECE,USTR,PRICE,VOLUME,COUNT) " +
+                    "VALUES (" +
+                    session +
+                    ",'"+city +"'"+
+                    ","+coffee +
+                    ","+greece +
+                    ","+ustr +
+                    ","+price +
+                    ","+volume +
+                    ","+count +
+                    ");";
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.commit();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        //System.out.println("Records created successfully");
+    }
+
+    public void recordLaundry(String city,String prsam, String him, String pr,String price,String volume,String count ){
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:laundry.db");
+            c.setAutoCommit(false);
+            int session = Integer.valueOf(formattedDate("MMdd"));
+
+            stmt = c.createStatement();
+            String sql = "INSERT INTO MARKET (SESSION,CITY,PRSAM,HIM,PR,PRICE,VOLUME,COUNT) " +
+                    "VALUES (" +
+                    session +
+                    ",'"+city +"'"+
+                    ","+prsam +
+                    ","+him +
+                    ","+pr +
+                    ","+price +
+                    ","+volume +
+                    ","+count +
+                    ");";
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.commit();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        //System.out.println("Records created successfully");
+    }
+
+    public void recordFitnes(String city,String health, String tanz, String fitnes,String price,String volume,String count ){
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:fitnes.db");
+            c.setAutoCommit(false);
+            int session = Integer.valueOf(formattedDate("MMdd"));
+
+            stmt = c.createStatement();
+            String sql = "INSERT INTO MARKET (SESSION,CITY,HEALTH,TANZ,FITNES,PRICE,VOLUME,COUNT) " +
+                    "VALUES (" +
+                    session +
+                    ",'"+city +"'"+
+                    ","+health +
+                    ","+tanz +
+                    ","+fitnes +
+                    ","+price +
+                    ","+volume +
+                    ","+count +
+                    ");";
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.commit();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        //System.out.println("Records created successfully");
     }
 
 

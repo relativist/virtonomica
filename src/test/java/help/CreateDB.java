@@ -189,4 +189,134 @@ public class CreateDB
         System.out.println("Table created successfully");
     }
 
+    public void createMedicalDb(){
+
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:medical.db");
+            System.out.println("Opened database successfully");
+
+
+            stmt = c.createStatement();
+            String sql = "CREATE TABLE MARKET " +
+                    "(SESSION        INT     NOT NULL," +
+                    " CITY           TEXT    NOT NULL, " +
+                    " BOL            REAL     NOT NULL, " +
+                    " DC            REAL     NOT NULL, " +
+                    " POL            REAL     NOT NULL, " +
+                    " STOMK            REAL     NOT NULL, " +
+                    " CNM            REAL     NOT NULL, " +
+                    " PRICE            REAL     NOT NULL, " +
+                    " VOLUME            REAL     NOT NULL, " +
+                    " COUNT         REAL      NOT NULL )";
+
+
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        System.out.println("Table created successfully");
+    }
+
+    public void createLaundry(){
+
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:laundry.db");
+            System.out.println("Opened database successfully");
+
+
+            stmt = c.createStatement();
+            String sql = "CREATE TABLE MARKET " +
+                    "(SESSION        INT     NOT NULL," +
+                    " CITY           TEXT    NOT NULL, " +
+                    " PRSAM            REAL     NOT NULL, " +
+                    " HIM            REAL     NOT NULL, " +
+                    " PR            REAL     NOT NULL, " +
+                    " PRICE            REAL     NOT NULL, " +
+                    " VOLUME            REAL     NOT NULL, " +
+                    " COUNT         REAL      NOT NULL )";
+
+
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        System.out.println("Table created successfully");
+    }
+
+    public void createRestDb(){
+
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:rest.db");
+            System.out.println("Opened database successfully");
+
+
+            stmt = c.createStatement();
+            String sql = "CREATE TABLE MARKET " +
+                    "(SESSION        INT     NOT NULL," +
+                    " CITY           TEXT    NOT NULL, " +
+                    " COFFEE            REAL     NOT NULL, " +
+                    " GREECE            REAL     NOT NULL, " +
+                    " USTR            REAL     NOT NULL, " +
+                    " PRICE            REAL     NOT NULL, " +
+                    " VOLUME            REAL     NOT NULL, " +
+                    " COUNT         REAL      NOT NULL )";
+
+
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        System.out.println("Table created successfully");
+    }
+
+    public void createFitnesDb(){
+
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:fitnes.db");
+            System.out.println("Opened database successfully");
+
+
+            stmt = c.createStatement();
+            String sql = "CREATE TABLE MARKET " +
+                    "(SESSION        INT     NOT NULL," +
+                    " CITY           TEXT    NOT NULL, " +
+                    " HEALTH            REAL     NOT NULL, " +
+                    " TANZ            REAL     NOT NULL, " +
+                    " FITNES            REAL     NOT NULL, " +
+                    " PRICE            REAL     NOT NULL, " +
+                    " VOLUME            REAL     NOT NULL, " +
+                    " COUNT         REAL      NOT NULL )";
+
+
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        System.out.println("Table created successfully");
+    }
+
 }
