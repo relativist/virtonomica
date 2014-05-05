@@ -3,8 +3,10 @@ package help;
 
 import general.Page;
 import general.virt.LoginPage;
-import general.virt.StorePage;
+import general.virt.RestorunPage;
 import org.junit.Test;
+
+import java.io.File;
 
 /**
  * Created by a.sitnikov on 18.02.14.
@@ -45,12 +47,18 @@ public class Tmp6 extends Page {
 //            new StorePage(driver).autoBuyProducts();
 //        }
 
+        File file = new File("report.db");
+        if(!file.exists()) {
+            logMe("creating new database table!");
+            new CreateDB().createReport();
+        }
+
 
         new LoginPage(driver)
                 .openVirtUrl()
                 .login()
-                .selectPlantByUnitId("5487758");
-        new StorePage(driver).trading();
+                .selectPlantByUnitId("5493345");
+        new RestorunPage(driver).supply();
 
 
     }
