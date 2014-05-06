@@ -4,7 +4,6 @@ import general.Page;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.Select;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -16,13 +15,13 @@ import java.util.Set;
 /**
  * Created by rest on 3/7/14.
  */
-public class PlantPage extends Page {
-    public PlantPage(WebDriver driver_out) {
+public class AnimalFermPage extends Page {
+    public AnimalFermPage(WebDriver driver_out) {
         super();
         driver = driver_out;
     }
 
-    public PlantPage educate(){
+    public AnimalFermPage educate(){
         if(isStuding() && isNeedtoEducate()){
             logMe("Обучаю персонал");
             String currentUrl = driver.getCurrentUrl();
@@ -32,7 +31,7 @@ public class PlantPage extends Page {
                 driver.findElement(By.xpath("//input[@value='Обучить']")).click();
             driver.get(currentUrl);
         }
-        return new PlantPage(driver);
+        return new AnimalFermPage(driver);
     }
 
     public boolean isDepProcessed(String dep){
@@ -102,13 +101,25 @@ public class PlantPage extends Page {
         //System.out.println("Records created successfully");
     }
 
+   public AnimalFermPage finans(){
+       driver.findElement(By.xpath("//a[text()='Финансовый отчёт']")).click();
+       double profit = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Прибыль']]/td[2]")).getText().replaceAll(" ","").replaceAll("\\$",""));
+
+       if(profit>0){
+           new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Profit = "+profit);
+           logMe("Profit = "+profit);
+       }
+       driver.findElement(By.xpath("//a[text()='Ферма']")).click();
+       return new AnimalFermPage(driver);
+   }
+
 
     /*
     1. если на складе больше в три раза чем требуется. обнуляем оффер. ждем
     2. если у поставщика меньше чем два моих требования - бить тревогу
     3. если на складе меньше двух требования и больше одного - перезаказать сумму
     */
-    public PlantPage supply(){
+    public AnimalFermPage supply(){
         driver.findElement(By.xpath("//a[text()='Снабжение']")).click();
         String title="";
         String need="";
@@ -202,11 +213,11 @@ public class PlantPage extends Page {
             change=false;
         }
 
-        driver.findElement(By.xpath("//a[text()='Завод']")).click();
-        return new PlantPage(driver);
+        driver.findElement(By.xpath("//a[text()='Ферма']")).click();
+        return new AnimalFermPage(driver);
     }
 
-    public PlantPage supplyProductsWithSuppliers(){
+    public AnimalFermPage supplyProductsWithSuppliers(){
         String need = new String();
         String title = new String();
         //если нет поставщика данного товара, то идем и закупаем из своих. если нет своих - тревога.
@@ -246,91 +257,20 @@ public class PlantPage extends Page {
 
         }
         driver.navigate().refresh();
-        return new PlantPage(driver);
+        return new AnimalFermPage(driver);
     }
 
-    // продавать по ценам себестоимости и только своим.
-    public PlantPage sales(){
-        boolean isForOther=false; //менять цену, но продажу для кого не менять!!!
-        boolean isColdPrice=false; // вообще нихуа не менять!!!
-
-        if(driver.findElements(By.xpath("//*[@id='mainContent']/fieldset")).size()!=0){
-            String tempoS = driver.findElement(By.xpath("//fieldset")).getText().trim().split("\\s")[1];
-            logMe(tempoS);
-            if(tempoS.contains("ForOtherSales")) {
-                isForOther = true;
-                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Завод. продажа другим игрокам: ForOtherSales");
-            }
-            if(tempoS.contains("ColdPrice")) {
-                isColdPrice = true;
-                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Завод. цена продажи заморожена: ColdPrice");
-            }
-        }
-
-        if(isColdPrice)
-            return new PlantPage(driver);
-
-        driver.findElement(By.xpath("//a[text()='Сбыт']")).click();
-        for(int i=0; i<driver.findElements(By.xpath("//table[@class='grid']//tr[@class]")).size(); i ++){
-            String selfCost="";
-            if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[5]//tr[td[contains(text(),'Себестоимость')]]/td[2]")).size()==0)
-                selfCost = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[4]//tr[td[contains(text(),'Себестоимость')]]/td[2]")).get(i).getText();
-            else
-                selfCost = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[5]//tr[td[contains(text(),'Себестоимость')]]/td[2]")).get(i).getText();
-            if(selfCost.equals("Не известна")||selfCost.equals("---"))
-                continue;
-            selfCost=selfCost.replaceAll(" ","").replaceAll("\\$","");
-            String priceToSell="";
-            if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).size()==0)
-                priceToSell = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).getAttribute("value");
-            else
-                priceToSell = driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).getAttribute("value");
-            Double sCost=Double.valueOf(selfCost);
-            if(isForOther)
-                sCost=sCost*1.3;
-            else
-                sCost=sCost*1.1;
-
-            Double pToSell=Double.valueOf(priceToSell);
-
-            if((sCost+sCost*0.13)>=pToSell && (pToSell+pToSell*0.13)>=sCost) {
-                logMe("prices not changed.");
-                continue;
-            }
-            if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).size()==0){
-                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
-                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).clear();
-                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[7]/input")).get(i).sendKeys(String.valueOf(sCost));
-            }
-            else {
-                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).clear();
-                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).clear();
-                driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/input")).get(i).sendKeys(String.valueOf(sCost));
-            }
-            Select s1 = null;
-            if(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[9]/select")).size()==0)
-                s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[8]/select")).get(i));
-            else
-                s1 = new Select(driver.findElements(By.xpath("//table[@class='grid']//tr[@class]/td[9]/select")).get(i));
-            if(!isForOther)
-                s1.selectByVisibleText("Только своей компании");
-        }
-        driver.findElement(By.xpath("//input[@value='Сохранить изменения']")).click();
-        driver.findElement(By.xpath("//a[text()='Завод']")).click();
-        return new PlantPage(driver);
-    }
-
-    public PlantPage setAutoQaSlave() throws InterruptedException {
+    public AnimalFermPage setAutoQaSlave() throws InterruptedException {
         //new SalaryPage(driver).autoSetSalaryAndQa();
         new SalaryPage(driver).autoSetSalaryAndQaFormula();
-        return new PlantPage(driver);
+        return new AnimalFermPage(driver);
     }
 
 
 
     private boolean isNeedtoEducate(){
-        String salarySlave = driver.findElement(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).getText().split("\\$")[0].replaceAll(" ","");
-        String salaryTown  = driver.findElement(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).getText().split("городу ")[1].replaceAll("\\$\\)","").replaceAll(" ", "");
+        String salarySlave = driver.findElement(By.xpath("//tr[td[text()='Зарплата работников']]/td[2]")).getText().split("\\$")[0].replaceAll(" ","");
+        String salaryTown  = driver.findElement(By.xpath("//tr[td[text()='Зарплата работников']]/td[2]")).getText().split("городу ")[1].replaceAll("\\$\\)","").replaceAll(" ", "");
         //logMe(salarySlave);
         //logMe(salaryTown);
         if (Double.valueOf(salarySlave) > Double.valueOf(salaryTown)*0.3)
@@ -350,7 +290,7 @@ public class PlantPage extends Page {
         else return false;
     }
 
-    public PlantPage getInfo(){
+    public AnimalFermPage getInfo(){
         logMe("INFO:");
         String qtyEq = driver.findElement(By.xpath("//tr[td[text()='Количество оборудования']]/td[2]")).getText().split(" ед. ")[0].replaceAll(" ","");
         String qaEq = driver.findElement(By.xpath("//tr[td[text()='Качество оборудования']]/td[2]")).getText().split(" ")[0];
@@ -372,7 +312,7 @@ public class PlantPage extends Page {
         logMe("Максимальная обученность рабов "+String.valueOf(calcQualTop1(Double.valueOf(playerSkill),Double.valueOf(qtySlave))));
         logMe("Максимальная количество рабов вообще "+String.valueOf(calcPersonalTop3(Double.valueOf(playerSkill))));
 
-        return new PlantPage(driver);
+        return new AnimalFermPage(driver);
     }
 
 }

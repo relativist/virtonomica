@@ -204,7 +204,7 @@ public class Page extends TestCase {
     ///////////////////////////////////////////////////////////////////////////
     private double getK(String type)
     {
-        //logMe("type: "+type);
+        logMe("type: "+type);
         if (type.equals("shop") || type.equals("restaurant") || type.equals("lab")) {
             return 5;
         } else if (type.equals("workshop") || type.equals("mill") || type.equals("sawmill")) {

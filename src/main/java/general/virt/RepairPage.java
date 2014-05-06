@@ -69,6 +69,28 @@ public class RepairPage extends Page {
             }
             fix=0.2;
         }
+        else if (driver.findElement(By.xpath("//div[@class='officePlace']")).getText().split(" ")[0].equals("Овцеферма")){
+            DepartmentType="Office";
+            EQ=Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Качество животных']]/td[2]")).getText());
+            eqNeed=EQ;
+            toRepair=Integer.valueOf(driver.findElement(By.xpath("//tr[td[text()='Здоровье животных']]/td[2]//td[2]")).getText().split(" % ")[1].split("\\+")[0].replaceAll("\\D+",""))+1;
+            if(toRepair<50){
+                logMe("No need repair! ");
+                return 0;
+            }
+            fix=0.2;
+        }
+        else if (driver.findElement(By.xpath("//div[@class='officePlace']")).getText().split(" ")[0].equals("Фруктовая")){
+            DepartmentType="Office";
+            EQ=Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Качество сельхозтехники']]/td[2]")).getText().split(" ")[0]);
+            eqNeed=EQ;
+            toRepair=Integer.valueOf(driver.findElement(By.xpath("//tr[td[text()='Износ техники']]/td[2]//td[2]")).getText().split(" % ")[1].split("\\+")[0].replaceAll("\\D+",""))+1;
+            if(toRepair<5){
+                logMe("No need repair! ");
+                return 0;
+            }
+            fix=0.2;
+        }
         else{
             String tempo1 = driver.findElement(By.xpath("//tr[td[text()='Качество оборудования']]/td[2]")).getText();
             fix=0.2;

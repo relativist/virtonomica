@@ -2,8 +2,8 @@ package help;
 
 
 import general.Page;
+import general.virt.AnimalFermPage;
 import general.virt.LoginPage;
-import general.virt.RestorunPage;
 import org.junit.Test;
 
 import java.io.File;
@@ -57,8 +57,8 @@ public class Tmp6 extends Page {
         new LoginPage(driver)
                 .openVirtUrl()
                 .login()
-                .selectPlantByUnitId("5493345");
-        new RestorunPage(driver).supply();
+                .selectPlantByUnitId("5185026");
+        new AnimalFermPage(driver).setAutoQaSlave().repairIt();
 
 
     }

@@ -19,7 +19,7 @@ import java.util.List;
     Simple Soap import product and verify them to correct import to MPO ( SP )
 */
 
-public class RestorunIT extends Page {
+public class FitnesIT extends Page {
 
 //    @Override
 //    protected void setUp() throws Exception {
@@ -48,7 +48,7 @@ public class RestorunIT extends Page {
             new CreateDB().createReport();
         }
         boolean processed=false;
-        List<String> list = new LoginPage(driver).openVirtUrl().login().selectRestrun().getListAllUnit();
+        List<String> list = new LoginPage(driver).openVirtUrl().login().selectFitnes().getListAllUnit();
         logMe("go");
 
 
@@ -66,18 +66,18 @@ public class RestorunIT extends Page {
 
             //top-3
             if(!processed){
-                new HelpPage(driver).recordReport("Restorun",new StorePage(driver).getTop3Report());
+                new HelpPage(driver).recordReport("Fitness",new StorePage(driver).getTop3Report());
                 processed=true;
             }
 
 
 
-            if(!new RestorunPage(driver).isSlaveOnVacation()) {
-                new RestorunPage(driver).repairIt();
-                new RestorunPage(driver).setAutoQaSlave().educate().supply().finans();
+            if(!new FitnesPage(driver).isSlaveOnVacation()) {
+                new FitnesPage(driver).repairIt();
+                new FitnesPage(driver).setAutoQaSlave().educate().finans();
             }
             else {
-                new HelpPage(driver).recordReport(currentUrl,"Ресторан в отпуске");
+                new HelpPage(driver).recordReport(currentUrl,"Ферма в отпуске");
             }
             new PlantPage(driver).recordDepartment(currentUrl);
 

@@ -48,7 +48,17 @@ public class MainPage extends Page {
     }
 
     public MainPage selectFerm(){
-        driver.findElement(By.xpath("//a[contains(@title,'Склад')]")).click();
+        driver.findElement(By.xpath("//a[contains(@title,'Животноводческая ферма')]")).click();
+        return new MainPage(driver);
+    }
+
+    public MainPage selectOrchard(){
+        driver.findElement(By.xpath("//a[contains(@title,'Плантация')]")).click();
+        return new MainPage(driver);
+    }
+
+    public MainPage selectFitnes(){
+        driver.findElement(By.xpath("//a[contains(@title,'Сфера услуг')]")).click();
         return new MainPage(driver);
     }
 
