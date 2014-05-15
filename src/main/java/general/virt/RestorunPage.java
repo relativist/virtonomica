@@ -5,6 +5,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -104,9 +105,16 @@ public class RestorunPage extends Page {
    public RestorunPage finans(){
        driver.findElement(By.xpath("//a[text()='Финансовый отчёт']")).click();
        double profit = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Прибыль']]/td[2]")).getText().replaceAll(" ","").replaceAll("\\$",""));
+       BigDecimal profit_2 = BigDecimal.valueOf(profit);
+       logMe(""+profit);
+       logMe(""+profit_2);
 
        if(profit>0){
-           new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Profit = "+profit);
+           new HelpPage(driver).recordReport(driver.getCurrentUrl(),"GOOD Profit = "+profit_2);
+           logMe("Profit = "+profit);
+       }
+       else {
+           new HelpPage(driver).recordReport(driver.getCurrentUrl(),"BAD Profit = "+profit_2);
            logMe("Profit = "+profit);
        }
        driver.findElement(By.xpath("//a[text()='Ресторан']")).click();
@@ -188,7 +196,7 @@ public class RestorunPage extends Page {
                     sklad="100000000";
                 if(Double.valueOf(sklad)<2*Double.valueOf(need)){
                     error += " Поставщик обосрётся.";
-                    new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Завод. поставщик имеет мало товара на складе: "+title);
+                    new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Ресторан. поставщик имеет мало товара на складе: "+title);
                 }
 
                 if(Double.valueOf(have)<2*Double.valueOf(need)){
@@ -204,7 +212,7 @@ public class RestorunPage extends Page {
             }
             else {
                 logMe("ERROR          Нет поставщика "+title);
-                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Завод. Нет поставщика :"+title);
+                new HelpPage(driver).recordReport(driver.getCurrentUrl(),"Ресторан. Нет поставщика :"+title);
             }
         }
 

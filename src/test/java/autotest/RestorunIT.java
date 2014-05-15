@@ -82,8 +82,6 @@ public class RestorunIT extends Page {
             new PlantPage(driver).recordDepartment(currentUrl);
 
         }
-
-
     }
 
 
