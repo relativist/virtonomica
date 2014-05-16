@@ -26,10 +26,10 @@ public class AnalyzemarketIT extends Page {
 //
 //    }
 //
-//    @Override
-//    protected void tearDown() throws Exception {
-//
-//    }
+    @Override
+    protected void tearDown() throws Exception {
+
+    }
 
     // ТОП-1
     // квала рабочих увеличивается пока максимальное количество рабов дозволеное на предприятии будет едва выше текущего.
