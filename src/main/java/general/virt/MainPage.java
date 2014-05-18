@@ -34,6 +34,7 @@ public class MainPage extends Page {
 
     public MainPage selectPlant(){
         driver.findElement(By.xpath("//a[contains(@title,'Завод')]")).click();
+        driver.findElement(By.xpath("//span[text()='400']")).click();
         return new MainPage(driver);
     }
 
