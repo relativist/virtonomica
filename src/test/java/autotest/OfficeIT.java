@@ -66,7 +66,7 @@ public class OfficeIT extends Page {
 
             //top-3
             if(!processed){
-                new HelpPage(driver).recordReport("Store",new StorePage(driver).getTop3Report());
+                new HelpPage(driver).recordReport("Office",new StorePage(driver).getTop3Report());
                 processed=true;
             }
 
