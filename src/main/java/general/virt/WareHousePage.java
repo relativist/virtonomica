@@ -140,7 +140,7 @@ public class WareHousePage extends Page {
                     //обновляем данные для парента!
                     productTitle = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//div/strong")).getText();
                     // на складе
-                    productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
+                    //productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
                     // отгрузки
                     if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).size()!=0)
                         productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).getText().replaceAll(" ", "");
@@ -257,7 +257,7 @@ public class WareHousePage extends Page {
                     //обновляем данные для парента!
                     productTitle = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//div/strong")).getText();
                     // на складе
-                    productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
+                    //productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
                     // отгрузки
                     //productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).getText().replaceAll(" ", "");
 
@@ -397,7 +397,7 @@ public class WareHousePage extends Page {
                     //обновляем данные для парента!
                     productTitle = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//div/strong")).getText();
                     // на складе
-                    productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
+                    //productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
                     // отгрузки
                     //productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).getText().replaceAll(" ", "");
                     // закупаем продукт наш. чтоб на заводах ничего не оставалось. все храним на складах.
@@ -529,10 +529,10 @@ public class WareHousePage extends Page {
                 //обновляем данные для парента!
                 productTitle = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//div/strong")).getText();
                 // на складе
-                if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).size()>0)
-                    productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
-                else
-                    productStore="0";
+//                if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).size()>0)
+//                    productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
+//                else
+//                    productStore="0";
                 // отгрузки
                 if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).size()!=0)
                     productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).getText().replaceAll(" ", "");
@@ -729,7 +729,7 @@ public class WareHousePage extends Page {
                         //обновляем данные для парента!
                         productTitle = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//div/strong")).getText();
                         // на складе
-                        productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
+                        //productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
                         // отгрузки
                         if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).size()!=0)
                             productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).getText().replaceAll(" ", "");
@@ -938,7 +938,7 @@ public class WareHousePage extends Page {
                 //обновляем данные для парента!
                 productTitle = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//div/strong")).getText();
                 // на складе
-                productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
+                //productStore = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//tr[1]/td[2]")).getText().replaceAll(" ", "");
                 // отгрузки
                 if(driver.findElements(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).size()!=0)
                     productOffer = driver.findElement(By.xpath("//table//tr[@class='p_title']["+i+"]//tbody//td[contains(text(),'Отгрузки')]/following-sibling::td")).getText().replaceAll(" ", "");
