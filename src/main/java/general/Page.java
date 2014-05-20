@@ -266,7 +266,7 @@ public class Page extends TestCase {
 
     @Before
     protected void setUp() throws Exception {
-        if(System.getProperty("user.dir").contains("hudson")){
+        if(System.getProperty("user.dir").contains("hudson") || System.getProperty("user.dir").contains("jenkins")){
             DesiredCapabilities capability = DesiredCapabilities.chrome();
             driver = new RemoteWebDriver(new URL("http://localhost:5555/wd/hub"), capability);
         }
