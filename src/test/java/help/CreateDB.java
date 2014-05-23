@@ -139,6 +139,30 @@ public class CreateDB
         System.out.println("Table created successfully");
     }
 
+    public void createGnome(){
+
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:gnome.db");
+            System.out.println("Opened database successfully");
+
+            stmt = c.createStatement();
+            String sql = "CREATE TABLE PLANT " +
+                    "(SESSION        INT     NOT NULL," +
+                    " DEPURL           TEXT    NOT NULL) " ;
+
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        System.out.println("Table created successfully");
+    }
+
     public void createReport(){
 
         Connection c = null;
