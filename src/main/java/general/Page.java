@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -233,6 +234,24 @@ public class Page extends TestCase {
             if(driver.findElements(By.xpath(xpath)).size()>0){
                 //logMe("FOUND!");
                 break;
+            }
+            //logMe("WAIT");
+            Thread.sleep(1000);
+        }
+    }
+
+    public void waitForElement(WebElement element) throws InterruptedException {
+        for(int i=0; i<TIMEOUT_IN_SECONDS+50; i++){
+            try{
+                if(element.isDisplayed() && element.isEnabled()){
+                    //logMe("Waited!");
+                    break;
+                }
+            }
+            catch (Exception e){
+                logMe("WAIT");
+                //logMe(driver.getPageSource());
+                Thread.sleep(1000);
             }
             //logMe("WAIT");
             Thread.sleep(1000);

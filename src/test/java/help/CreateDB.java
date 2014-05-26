@@ -87,6 +87,35 @@ public class CreateDB
         System.out.println("Table created successfully");
     }
 
+    public void createMarketAvg(){
+
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:marketAvg.db");
+            System.out.println("Opened database successfully");
+
+            stmt = c.createStatement();
+            String sql = "CREATE TABLE MARKET " +
+                    "(SESSION        INT     NOT NULL," +
+                    " PRODUCT           TEXT    NOT NULL, " +
+                    " PRICE            REAL     NOT NULL, " +
+                    " QA            REAL     NOT NULL, " +
+                    " KOEFF            REAL     NOT NULL " +
+                    " )";
+
+
+            stmt.executeUpdate(sql);
+            stmt.close();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        System.out.println("Table created successfully");
+    }
+
 
     public void createStore(){
 

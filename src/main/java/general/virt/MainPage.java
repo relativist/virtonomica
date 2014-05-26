@@ -138,6 +138,30 @@ public class MainPage extends Page {
     }
 
     //Сначала ставим товар потом перебираем по городам.
+    public MainPage getAnalyzeMarketAvg(int session) throws InterruptedException {
+
+        String mainUrl = driver.getCurrentUrl();
+        driver.get("http://virtonomica.ru/vera/main/globalreport/marketing/by_trade_at_cities");
+        String productName="";
+
+        Select s1 = new Select(driver.findElement(By.id("__product_category_list")));
+        for(int i=0; i<s1.getOptions().size(); i++){
+            s1.selectByIndex(i);
+            for(int j=0; j<driver.findElements(By.xpath("//*[@id='__products_list']/span")).size(); j++){
+                waitForElement("//*[@id='__products_list']/span["+(j+1)+"]//img");
+                driver.findElement(By.xpath("//*[@id='__products_list']/span["+(j+1)+"]//img")).click();
+                productName = driver.findElement(By.xpath("//*[@id='__products_list']/span["+(j+1)+"]//img")).getAttribute("title");
+                getMarketAvgData(session,productName);
+            }
+            s1 = new Select(driver.findElement(By.id("__product_category_list")));
+        }
+
+        driver.get(mainUrl);
+        logMe("Wait 11 minutes...");
+        return new MainPage(driver);
+    }
+
+    //Сначала ставим товар потом перебираем по городам.
     public MainPage getAnalyzeMarket(String productName, String typeProduct,int session) throws InterruptedException {
 
         logMe("-----------------------------------------------");
@@ -148,11 +172,12 @@ public class MainPage extends Page {
 //                "Азербайджан",
 //                "Армения",
                 "Болгария",
-                "Великобритания",
+//                "Великобритания",
                 "Венесуэла",
-//                "Германия",
+                "Германия",
                 "Греция",
                 "Казахстан",
+                "Канада",
                 "Куба",
                 "Латвия",
                 "Литва",
@@ -163,7 +188,7 @@ public class MainPage extends Page {
 //                "Узбекистан",
                 "Украина",
                 "Финляндия",
-//                "Франция",
+                "Франция",
                 "Эстония"
         };
 
@@ -206,6 +231,50 @@ public class MainPage extends Page {
         logMe("Wait 11 minutes...");
         Thread.sleep(5*60*1000);
         return new MainPage(driver);
+    }
+
+    protected void getMarketAvgData(int session,String productName){
+
+        //tr[th[text()='Цена']]/td[2]
+        String price = driver.findElement(By.xpath("//tr[th[text()='Цена']]/td[2]")).getText().replace("$","").replaceAll(" ", "");
+        //tr[th[text()='Качество']]/td[2]
+        String quality = driver.findElement(By.xpath("//tr[th[text()='Качество']]/td[2]")).getText();
+        //tr[th[text()='Бренд']]/td[2]
+        String koeff = String.valueOf(Double.valueOf(price)/Double.valueOf(quality));
+
+        logMe("----------------------------------------------");
+        logMe(productName);
+        logMe(price);
+        logMe(quality);
+        logMe(" ");
+
+        Connection c = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            c = DriverManager.getConnection("jdbc:sqlite:marketAvg.db");
+            c.setAutoCommit(false);
+            System.out.println("Opened database successfully");
+
+            stmt = c.createStatement();
+            String sql = "INSERT INTO MARKET (SESSION,PRODUCT,PRICE,QA,KOEFF) " +
+                    "VALUES (" +
+                    session +
+                    ",'"+productName +"'"+
+                    ","+ price +
+                    ","+ quality +
+                    ","+ koeff +
+                    ");";
+            stmt.executeUpdate(sql);
+
+            stmt.close();
+            c.commit();
+            c.close();
+        } catch ( Exception e ) {
+            System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+            System.exit(0);
+        }
+        System.out.println("Records created successfully");
     }
 
     protected void getMarketData(int session,String productName){
@@ -291,10 +360,6 @@ public class MainPage extends Page {
             System.exit(0);
         }
         System.out.println("Records created successfully");
-
-
-
-
     }
 
 }

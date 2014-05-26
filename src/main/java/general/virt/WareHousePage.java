@@ -599,7 +599,12 @@ public class WareHousePage extends Page {
         all = driver.findElements(By.xpath("//table//tr[@class='p_title' or @class='odd' or @class='even']"));
         boolean isNeedEraseOffer=false;
         ArrayList<String> myProducts= new ArrayList<String>();
-        for(WebElement el:all){
+        //for(WebElement el:all){
+
+        for(int fixCounter=0; fixCounter<driver.findElements(By.xpath("//table//tr[@class='p_title' or @class='odd' or @class='even']")).size(); fixCounter++){
+            WebElement el=null;
+            el = driver.findElements(By.xpath("//table//tr[@class='p_title' or @class='odd' or @class='even']")).get(fixCounter);
+            waitForElement(el);
             if(el.getAttribute("class").equals("p_title")){
 
                 //обновляем данные для парента!
