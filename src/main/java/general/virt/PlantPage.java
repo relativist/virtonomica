@@ -23,7 +23,7 @@ public class PlantPage extends Page {
     }
 
     public PlantPage educate(){
-        if(isStuding() && isNeedtoEducate()){
+        if(isStuding() && !isNeedtoEducate()){
             logMe("Обучаю персонал");
             String currentUrl = driver.getCurrentUrl();
             String UnitId = getUnitIdByUrl(currentUrl);

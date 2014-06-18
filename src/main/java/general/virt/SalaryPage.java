@@ -179,8 +179,10 @@ public class SalaryPage extends Page {
             pageQtySlave = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество сотрудников']]/td[2]")).getText().replaceAll(" ","").split("\\(")[0]);
         else if(driver.findElements(By.xpath("//tr[td[text()='Количество рабочих']]/td[2]")).size()>0)
             pageQtySlave = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество рабочих']]/td[2]")).getText().replaceAll(" ","").split("\\(")[0]);
-        else
+        else if(driver.findElements(By.xpath("//tr[td[text()='Количество работников']]/td[2]")).size()>0)
             pageQtySlave = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество работников']]/td[2]")).getText().replaceAll(" ","").split("\\(")[0].replaceAll("ед.",""));
+        else
+            pageQtySlave = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество учёных']]/td[2]")).getText().replaceAll(" ","").split("\\(")[0].replaceAll("ед.",""));
 
         if(pageQtySlave==0){
             logMe("No Slave - no Problem!");
@@ -196,8 +198,10 @@ public class SalaryPage extends Page {
         String qaSlave = "";
         if(driver.findElements(By.xpath("//tr[td[text()='Уровень квалификации работников']]/td[2]")).size()>0)
             qaSlave = driver.findElement(By.xpath("//tr[td[text()='Уровень квалификации работников']]/td[2]")).getText().split(" ")[0];
-        else
+        else if(driver.findElements(By.xpath("//tr[td[text()='Уровень квалификации сотрудников']]/td[2]")).size()>0)
             qaSlave = driver.findElement(By.xpath("//tr[td[text()='Уровень квалификации сотрудников']]/td[2]")).getText().split(" ")[0];
+        else
+            qaSlave = driver.findElement(By.xpath("//tr[td[text()='Уровень квалификации учёных']]/td[2]")).getText().split(" ")[0];
         Q=Double.valueOf(qaSlave);
         if(Double.valueOf(qaSlave) == brilliantQA){
             logMe("OK! Nothing to do here!");
@@ -211,6 +215,8 @@ public class SalaryPage extends Page {
             S = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).getText().split("\\$")[0].replaceAll(" ",""));
         else if(driver.findElements(By.xpath("//tr[td[text()='Зарплата работников']]/td[2]")).size()>0)
             S = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Зарплата работников']]/td[2]")).getText().split("\\$")[0].replaceAll(" ",""));
+        else if(driver.findElements(By.xpath("//tr[td[text()='Зарплата учёных']]/td[2]")).size()>0)
+            S = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Зарплата учёных']]/td[2]")).getText().split("\\$")[0].replaceAll(" ",""));
 
         // средняя зп по городу
         if(driver.findElements(By.xpath("//tr[td[text()='Зарплата одного сотрудника']]/td[2]")).size()>0)
@@ -219,15 +225,21 @@ public class SalaryPage extends Page {
             Savg=Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Зарплата рабочих']]/td[2]")).getText().replaceAll(":","").split("в среднем по городу ")[1].replaceAll("\\)","").replaceAll("\\$","").replaceAll(" ",""));
         else if(driver.findElements(By.xpath("//tr[td[text()='Зарплата работников']]/td[2]")).size()>0)
             Savg=Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Зарплата работников']]/td[2]")).getText().replaceAll(":","").split("в среднем по городу ")[1].replaceAll("\\)","").replaceAll("\\$","").replaceAll(" ",""));
+        else if(driver.findElements(By.xpath("//tr[td[text()='Зарплата учёных']]/td[2]")).size()>0)
+            Savg=Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Зарплата учёных']]/td[2]")).getText().replaceAll(":","").split("в среднем по городу ")[1].replaceAll("\\)","").replaceAll("\\$","").replaceAll(" ",""));
         else assertTrue(false);
 
         // Средняя квалификация по городу
         if(driver.findElements(By.xpath("//tr[td[text()='Уровень квалификации сотрудников']]/td[2]")).size()>0)
             Qavg=Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Уровень квалификации сотрудников']]/td[2]"))
                 .getText().split(",")[0].replaceAll(":","").split("по городу ")[1].replaceAll("\\)", "").replaceAll("\\$", "").replaceAll(" ", ""));
-        else
+        else if(driver.findElements(By.xpath("//tr[td[text()='Уровень квалификации работников']]/td[2]")).size()>0)
             Qavg=Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Уровень квалификации работников']]/td[2]"))
                     .getText().split(",")[0].replaceAll(":","").split("по городу ")[1].replaceAll("\\)", "").replaceAll("\\$", "").replaceAll(" ", ""));
+        else if(driver.findElements(By.xpath("//tr[td[text()='Уровень квалификации учёных']]/td[2]")).size()>0)
+            Qavg=Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Уровень квалификации учёных']]/td[2]"))
+                    .getText().split(",")[0].replaceAll(":","").split("по городу ")[1].replaceAll("\\)", "").replaceAll("\\$", "").replaceAll(" ", ""));
+        else assert(false);
 
         // АЛГОРИТМ
         Double b=0.0;

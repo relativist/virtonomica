@@ -17,7 +17,7 @@ public class OfficePage extends Page {
     }
 
     public OfficePage educate(){
-        if(isStuding() && isNeedtoEducate()){
+        if(isStuding() && !isNeedtoEducate()){
             logMe("Обучаю персонал");
             String currentUrl = driver.getCurrentUrl();
             String UnitId = getUnitIdByUrl(currentUrl);

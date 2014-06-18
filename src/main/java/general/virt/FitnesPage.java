@@ -22,7 +22,7 @@ public class FitnesPage extends Page {
     }
 
     public FitnesPage educate(){
-        if(isStuding() && isNeedtoEducate()){
+        if(isStuding() && !isNeedtoEducate()){
             logMe("Обучаю персонал");
             String currentUrl = driver.getCurrentUrl();
             String UnitId = getUnitIdByUrl(currentUrl);

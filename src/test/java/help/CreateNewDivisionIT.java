@@ -38,26 +38,24 @@ public class CreateNewDivisionIT extends Page {
     public void test() throws Throwable {
 
     new LoginPage(driver).openVirtUrl().login();
-        new HelpPage(driver).createRestorun("Роттердам");
-        new HelpPage(driver).createRestorun("Утрехт");
-        new HelpPage(driver).createRestorun("Рига");
-        new HelpPage(driver).createRestorun("Бремен");
-        new HelpPage(driver).createRestorun("Тампере");
-        new HelpPage(driver).createRestorun("Тампере");
-        new HelpPage(driver).createRestorun("Эспоо");
-        new HelpPage(driver).createRestorun("Эспоо");
-        new HelpPage(driver).createRestorun("Рованиеми");
-        new HelpPage(driver).createRestorun("Рованиеми");
-        new HelpPage(driver).createRestorun("Гронинген");
-        new HelpPage(driver).createRestorun("Гронинген");
-        new HelpPage(driver).createRestorun("Варна");
-        new HelpPage(driver).createRestorun("Варна");
-        new HelpPage(driver).createRestorun("Рига");
+        new HelpPage(driver).createFerm("Бобруйск","Птицеферма","Разведение кур","5 корпусов");
+        new HelpPage(driver).createFerm("Бобруйск","Птицеферма","Разведение кур","5 корпусов");
+        new HelpPage(driver).createFerm("Бобруйск","Птицеферма","Разведение кур","5 корпусов");
+        new HelpPage(driver).createFerm("Бобруйск","Птицеферма","Разведение кур","5 корпусов");
+        new HelpPage(driver).createFerm("Бобруйск","Птицеферма","Разведение кур","5 корпусов");
+        new HelpPage(driver).createFerm("Бобруйск","Птицеферма","Разведение кур","5 корпусов");
+        new HelpPage(driver).createFerm("Бобруйск","Птицеферма","Разведение кур","5 корпусов");
+        new HelpPage(driver).createFerm("Бобруйск","Птицеферма","Разведение кур","5 корпусов");
+        new HelpPage(driver).createFerm("Бобруйск","Птицеферма","Разведение кур","5 корпусов");
+        new HelpPage(driver).createFerm("Бобруйск","Птицеферма","Разведение кур","5 корпусов");
+        new HelpPage(driver).createFerm("Бобруйск","Птицеферма","Разведение кур","5 корпусов");
+        new HelpPage(driver).createFerm("Бобруйск","Птицеферма","Разведение кур","5 корпусов");
+
 
 
 //            .createPlant("Завод","Ликероводочный завод","Узбекистан","Нукус","1000 рабочих мест","Ликер")
 //            .createPlant("Завод","Ликероводочный завод","Узбекистан","Нукус","1000 рабочих мест","Ликер");
-
+//        new HelpPage(driver).createRestorun("Рига");
 
 
 
