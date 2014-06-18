@@ -23,7 +23,7 @@ public class RestorunPage extends Page {
     }
 
     public RestorunPage educate(){
-        if(isStuding() && isNeedtoEducate()){
+        if(isStuding() && !isNeedtoEducate()){
             logMe("Обучаю персонал");
             String currentUrl = driver.getCurrentUrl();
             String UnitId = getUnitIdByUrl(currentUrl);

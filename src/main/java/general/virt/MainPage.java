@@ -27,6 +27,12 @@ public class MainPage extends Page {
         return new MainPage(driver);
     }
 
+    public MainPage selectScience(){
+        driver.findElement(By.xpath("//a[contains(@title,'Лаборатория')]")).click();
+        return new MainPage(driver);
+    }
+
+
     public MainPage selectStore(){
         driver.findElement(By.xpath("//a[contains(@title,'Магазин')]")).click();
         return new MainPage(driver);

@@ -3,7 +3,7 @@ package help;
 
 import general.Page;
 import general.virt.LoginPage;
-import general.virt.WareHousePage;
+import general.virt.SciencePage;
 import org.junit.Test;
 
 /**
@@ -38,9 +38,11 @@ public class Tmp4 extends Page {
     public void test() throws Throwable {
         new LoginPage(driver)
                 .openVirtUrl()
-                .login().selectPlantByUnitId("5259270");
-        //new OfficePage(driver).createAdvertising();
-        new WareHousePage(driver).supply();
+                .login().selectPlantByUnitId("5492843");
+        //new SciencePage(driver).educate().setAutoQaSlave();
+        //new SciencePage(driver).repairIt();
+        new SciencePage(driver).educate();
+
 
     }
 

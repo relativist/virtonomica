@@ -201,6 +201,142 @@ public class HelpPage extends Page {
         return shopWithDep;
     }
 
+    public boolean createFerm(String cityName,String type,String type2,String DepSize) throws IOException, InterruptedException {
+        //открываем файл с городами
+        //ищем наш город, берем эту строку
+        //
+        //логинимся
+        //тыкаем создать подразделение
+        //строку сплитуем по ; и поехали создавать:
+
+        //если наткнулись на элемент который disabled:
+        //  пишем что не можем создать потому что в этой местности нет офиса
+
+        //размер максимальный
+
+        //в завимимости от размера - количество рабов.
+        //реклама.
+        File file = new File("city");
+        String followString = new String();
+        BufferedReader in = new BufferedReader(new FileReader( file.getAbsoluteFile()));
+        while ((followString = in.readLine()) != null) {
+            if(followString.contains(cityName))
+                break;
+
+        }
+        in.close();
+        logMe(followString);
+
+        driver.findElement(By.xpath("//a[contains(text(),'Создать подразделение')]")).click();
+        driver.findElement(By.xpath("//tr[td[contains(text(),'Животноводческая ферма')]]/td[1]/input")).click();
+        driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+        driver.findElement(By.xpath("//tr[td[contains(text(),'"+type+"')]]/td[1]/input")).click();
+        driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+        String prevValue = new String();
+
+        for(String item: followString.split(";")){
+            if(item.equals(prevValue))
+                continue;
+            if(driver.findElements(By.xpath("//tr[td[contains(text(),'"+item+"')]]/td[1]/input[@disabled]")).size()!=0){
+                logMe("Нужно создать офис в "+item);
+                return false;
+            }
+
+            // На случай Великобритания == Англия (Англия пропускается)
+            // если не нашли элемент continue
+            if(driver.findElements(By.xpath("//tr[td[contains(text(),'"+item+"')]]/td[1]/input")).size()==0){
+                logMe("Вероятно Великобритания==Англия, элемента не нашли перешли к следущему.");
+                continue;
+            }
+
+            driver.findElement(By.xpath("//tr[td[contains(text(),'"+item+"')]]/td[1]/input")).click();
+            driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+            prevValue=item;
+        }
+
+        driver.findElement(By.xpath("//tr[td[contains(text(),'"+type2+"')]]/td[1]/input")).click();
+        driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+
+        driver.findElement(By.xpath("//tr[td[contains(text(),'"+DepSize+"')]]/td[1]/input")).click();
+        driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+
+        driver.findElement(By.xpath("//tr[td[contains(text(),'Уровень 1')]]/td[1]/input")).click();
+        driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+
+
+        logMe("Done");
+        driver.findElement(By.xpath("//input[contains(@value,'Создать подразделение')]")).click();
+
+        String shopUrl = driver.getCurrentUrl();
+        String shopId = getUnitIdByUrl(shopUrl);
+
+//        driver.get("http://virtonomica.ru/vera/window/unit/employees/engage/"+shopId);
+//        driver.findElement(By.id("quantity")).clear();
+//        driver.findElement(By.id("quantity")).clear();
+//
+//        driver.findElement(By.id("quantity")).sendKeys(employee);
+//
+//
+//        driver.findElement(By.xpath("//input[contains(@value,'Сохранить изменения')]")).click();
+//        driver.switchTo().alert().accept();
+//        driver.get(shopUrl);
+//        new StorePage(driver).setAutoQaSlave().educate();
+//
+//        //Технология
+//        driver.findElement(By.xpath("//a[text()='Технологии']")).click();
+//        String currentPage = driver.getCurrentUrl();
+//        driver.get("http://virtonomica.ru/vera/window/technology_market/ask/by_unit/"+shopId+"/offer/set");
+//        Select techSelect = new Select(driver.findElement(By.name("data[level]")));
+//        techSelect.selectByVisibleText(technaLvl);
+//        driver.findElement(By.id("max_price")).clear();
+//        driver.findElement(By.id("max_price")).clear();
+//        driver.findElement(By.id("max_price")).sendKeys(technaPrice);
+//        driver.findElement(By.name("createit")).click();
+//        driver.get(currentPage);
+//
+//        driver.findElement(By.xpath("//a[text()='Снабжение']")).click();
+//
+//        //------
+//        String handle1 = driver.getWindowHandle();
+//        driver.findElement(By.xpath("//img[@title='Выбрать поставщика']")).click();
+//        Set<String> handles=driver.getWindowHandles();
+//        Iterator<String> it =handles.iterator();
+//        while (it.hasNext()) {
+//            String popupHandle = it.next().toString();
+//            if (!popupHandle.contains(handle1)) {
+//                driver.switchTo().window(popupHandle);
+//                //System.out.println("Pop Up Title: " + driver.switchTo().window(popupHandle).getTitle());
+//            }
+//        }
+//        //driver.findElement(By.xpath("//a[text()='Свои']")).click();
+//        //Задаем фильтр нашего поиска оборудования.
+//        driver.findElement(By.id("filterLegend")).click();
+//        driver.findElement(By.id("quality_isset")).click();
+//
+//        driver.findElement(By.name("quality[from]")).clear();
+//        driver.findElement(By.name("quality[from]")).sendKeys("3");
+//        driver.findElement(By.id("free_for_buy_isset")).click();
+//
+//
+//
+//
+//        driver.findElement(By.xpath("//input[@class='button160']")).click();
+//
+//        String goodId = driver.findElement(By.xpath("//table[@class='list main_table']/tbody/tr/td[11]/span")).getAttribute("id");
+//        ((JavascriptExecutor) driver).executeScript("document.getElementById(" + goodId + ").click();");
+//
+//        driver.findElement(By.id("amountInput")).sendKeys(kormNeed);
+//        ((JavascriptExecutor) driver).executeScript("document.getElementById('submitLink').click();");
+//        driver.findElement(By.xpath("//span[text()='Закрыть окно']")).click();
+//        driver.switchTo().window(handle1);
+//
+//        //------
+//        driver.findElement(By.xpath("//a[text()='Ферма']")).click();
+        logMe("Поздразделение создано в городе "+cityName);
+        new MainPage(driver).goToGeneralPlantList();
+        return true;
+    }
+
     public boolean createRestorun(String cityName) throws IOException, InterruptedException {
         //открываем файл с городами
         //ищем наш город, берем эту строку
