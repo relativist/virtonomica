@@ -630,6 +630,7 @@ public class StorePage extends Page {
         // ВТОРОЙ ЗАХОД. ибо с первого не проходит!
         action=false;
         for(int i=0; i<driver.findElements(By.xpath("//tr[@class='odd' or @class='even']")).size();i++){
+            Thread.sleep(1000);
             store = driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[6]")).get(i).getText().replaceAll(" ","");
             if(Double.valueOf(store)==0){
                 driver.findElements(By.xpath("//tr[@class='odd' or @class='even']/td[2]/input")).get(i).click();

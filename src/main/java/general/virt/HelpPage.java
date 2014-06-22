@@ -337,6 +337,72 @@ public class HelpPage extends Page {
         return true;
     }
 
+    public boolean createScienceLaboratory(String cityName) throws IOException, InterruptedException {
+        //открываем файл с городами
+        //ищем наш город, берем эту строку
+        //
+        //логинимся
+        //тыкаем создать подразделение
+        //строку сплитуем по ; и поехали создавать:
+
+        //если наткнулись на элемент который disabled:
+        //  пишем что не можем создать потому что в этой местности нет офиса
+
+        //размер максимальный
+
+        //в завимимости от размера - количество рабов.
+        //реклама.
+        File file = new File("city");
+        String followString = new String();
+        BufferedReader in = new BufferedReader(new FileReader( file.getAbsoluteFile()));
+        while ((followString = in.readLine()) != null) {
+            if(followString.contains(cityName))
+                break;
+
+        }
+        in.close();
+        logMe(followString);
+        Thread.sleep(1000);
+        driver.findElement(By.xpath("//a[contains(text(),'Создать подразделение')]")).click();
+        Thread.sleep(1000);
+        driver.findElement(By.xpath("//tr[td[contains(text(),'Лаборатория')]]/td[1]/input")).click();
+        driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+        Thread.sleep(1000);
+        String prevValue = new String();
+
+        for(String item: followString.split(";")){
+            if(item.equals(prevValue))
+                continue;
+            if(driver.findElements(By.xpath("//tr[td[contains(text(),'"+item+"')]]/td[1]/input[@disabled]")).size()!=0){
+                logMe("Нужно создать офис в "+item);
+                return false;
+            }
+
+            // На случай Великобритания == Англия (Англия пропускается)
+            // если не нашли элемент continue
+            if(driver.findElements(By.xpath("//tr[td[contains(text(),'"+item+"')]]/td[1]/input")).size()==0){
+                logMe("Вероятно Великобритания==Англия, элемента не нашли перешли к следущему.");
+                continue;
+            }
+
+            driver.findElement(By.xpath("//tr[td[contains(text(),'"+item+"')]]/td[1]/input")).click();
+            driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+            prevValue=item;
+        }
+
+        driver.findElement(By.xpath("//tr[td[contains(text(),'2-й уровень')]]/td[1]/input")).click();
+        driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
+
+        logMe("Done");
+        driver.findElement(By.xpath("//input[contains(@value,'Создать подразделение')]")).click();
+
+        String shopUrl = driver.getCurrentUrl();
+
+        logMe("Поздразделение создано в городе "+cityName);
+        new MainPage(driver).goToGeneralPlantList();
+        return true;
+    }
+
     public boolean createRestorun(String cityName) throws IOException, InterruptedException {
         //открываем файл с городами
         //ищем наш город, берем эту строку
