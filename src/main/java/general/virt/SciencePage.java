@@ -2,12 +2,15 @@ package general.virt;
 
 import general.Page;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Created by rest on 3/7/14.
@@ -139,6 +142,86 @@ public class SciencePage extends Page {
         return new SciencePage(driver);
     }
 
+    //закупаем максимум оборудования
+    public SciencePage autoBuyEq(String qaEq){
+        double eqHave = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество оборудования']]/td[2]")).getText().split(":")[0].replaceAll("\\D", ""));
+        double eqNeed = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество оборудования']]/td[2]")).getText().split(":")[1].replaceAll("\\D",""));
+        logMe(eqHave+" "+eqNeed);
+        if(eqHave == 0.0){
+            String handle1 = driver.getWindowHandle();
+            driver.findElement(By.xpath("//a[text()='Оборудование']")).click();
+            Set<String> handles=driver.getWindowHandles();
+            Iterator<String> it =handles.iterator();
+            while (it.hasNext()) {
+                String popupHandle = it.next().toString();
+                if (!popupHandle.contains(handle1)) {
+                    driver.switchTo().window(popupHandle);
+                    //System.out.println("Pop Up Title: " + driver.switchTo().window(popupHandle).getTitle());
+                }
+            }
 
+            if (driver.findElements(By.xpath("//a[contains(text(),'Отменить фильтр')]")).size() !=0)
+                if (driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).isDisplayed() )
+                    driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).click();
+
+            //Задаем фильтр нашего поиска продуктов.
+            driver.findElement(By.id("filterLegend")).click();
+            driver.findElement(By.id("quality_isset")).click();
+            driver.findElement(By.id("quantity_isset")).click();
+
+            driver.findElement(By.name("quality[from]")).clear();
+            driver.findElement(By.name("quality[from]")).clear();
+            driver.findElement(By.name("quality[from]")).sendKeys(qaEq);
+
+            driver.findElement(By.name("quantity[from]")).clear();
+            driver.findElement(By.name("quantity[from]")).clear();
+            driver.findElement(By.name("quantity[from]")).sendKeys(String.valueOf(eqNeed));
+
+            driver.findElement(By.xpath("//input[@class='button160']")).click();
+
+            String goodId = driver.findElement(By.xpath("//table[@class='list main_table']/tbody/tr/td[9]/span")).getAttribute("id");
+            ((JavascriptExecutor) driver).executeScript("document.getElementById(" + goodId + ").click();");
+
+            driver.findElement(By.id("amountInput")).sendKeys(String.valueOf(eqNeed));
+            ((JavascriptExecutor) driver).executeScript("document.getElementById('submitLink').click();");
+            driver.findElement(By.xpath("//span[text()='Закрыть окно']")).click();
+            driver.switchTo().window(handle1);
+        }
+        return new SciencePage(driver);
+    }
+
+    public int repairIt(){
+        return new RepairPage(driver).repairIt();
+    }
+
+    //нанимаем максимум людей
+    public SciencePage autoBuyEmployee() throws InterruptedException {
+        waitForElement("//tr[td[text()='Количество учёных']]/td[2]");
+        double eqHave = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество учёных']]/td[2]")).getText().split(":")[0].replaceAll("\\D", ""));
+        double eqNeed = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество учёных']]/td[2]")).getText().split(":")[1].replaceAll("\\D",""));
+        logMe(eqHave+" "+eqNeed);
+        if(eqHave == 0.0){
+            String handle1 = driver.getWindowHandle();
+            driver.findElement(By.xpath("//a[text()='Сотрудники и зарплата']")).click();
+            Set<String> handles=driver.getWindowHandles();
+            Iterator<String> it =handles.iterator();
+            while (it.hasNext()) {
+                String popupHandle = it.next().toString();
+                if (!popupHandle.contains(handle1)) {
+                    driver.switchTo().window(popupHandle);
+                    //System.out.println("Pop Up Title: " + driver.switchTo().window(popupHandle).getTitle());
+                }
+            }
+
+            driver.findElement(By.name("unitEmployeesData[quantity]")).sendKeys(String .valueOf(eqNeed));
+            waitForElement("//*[@class = 'invisible']");
+            driver.findElement(By.xpath("//input[@class='button160']")).click();
+            driver.switchTo().alert().accept();
+            driver.switchTo().window(handle1);
+        }
+
+
+        return new SciencePage(driver);
+    }
 
 }

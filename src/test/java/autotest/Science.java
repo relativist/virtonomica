@@ -4,6 +4,7 @@ package autotest;
 import general.Page;
 import general.virt.LoginPage;
 import general.virt.PlantPage;
+import general.virt.SciencePage;
 import general.virt.WareHousePage;
 import help.CreateDB;
 import org.junit.Test;
@@ -60,7 +61,7 @@ public class Science extends Page {
 
             logMe(currentUrl);
             driver.get(currentUrl);
-            new WareHousePage(driver).supply().sales();
+            new SciencePage(driver).autoBuyEq("25").autoBuyEmployee().repairIt();
 
             new PlantPage(driver).recordDepartment(currentUrl);
         }

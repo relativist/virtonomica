@@ -7,6 +7,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -271,9 +272,9 @@ public class Page extends TestCase {
             driver = new RemoteWebDriver(new URL("http://localhost:5555/wd/hub"), capability);
         }
         else{
-            //System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
-            //driver = new ChromeDriver();
-            driver = new FirefoxDriver();
+            System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
+            driver = new ChromeDriver();
+            //driver = new FirefoxDriver();
         }
     }
 

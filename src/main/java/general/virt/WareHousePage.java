@@ -603,7 +603,7 @@ public class WareHousePage extends Page {
 
         for(int fixCounter=0; fixCounter<driver.findElements(By.xpath("//table//tr[@class='p_title' or @class='odd' or @class='even']")).size(); fixCounter++){
             WebElement el=null;
-            //el = driver.findElements(By.xpath("//table//tr[@class='p_title' or @class='odd' or @class='even']")).get(fixCounter);
+            el = driver.findElements(By.xpath("//table//tr[@class='p_title' or @class='odd' or @class='even']")).get(fixCounter);
             //waitForElement(el);
             waitForElement("//table//tr[@class='p_title' or @class='odd' or @class='even']");
             if(el.getAttribute("class").equals("p_title")){
