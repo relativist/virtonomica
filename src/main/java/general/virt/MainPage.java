@@ -87,7 +87,7 @@ public class MainPage extends Page {
     public List getListAllUnit(){
         List<WebElement> assetList = new ArrayList();
         List<String> myList = new ArrayList();
-        Collections.addAll(assetList, driver.findElements(By.xpath("//table[@class='unit-list']//tr//td[3]/a")).toArray(new WebElement[]{}));
+        Collections.addAll(assetList, driver.findElements(By.xpath("//table[@class='unit-list-2014']//tr//td[3]/a")).toArray(new WebElement[]{}));
 
         for(int i=0; i<assetList.size(); i++){
             myList.add(assetList.get(i).getAttribute("href"));
