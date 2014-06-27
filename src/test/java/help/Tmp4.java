@@ -38,10 +38,11 @@ public class Tmp4 extends Page {
     public void test() throws Throwable {
         new LoginPage(driver)
                 .openVirtUrl()
-                .login().selectPlantByUnitId("5545550");
+                .login().selectPlantByUnitId("5545569");
         //new SciencePage(driver).educate().setAutoQaSlave();
-        //new SciencePage(driver).repairIt();
-        new SciencePage(driver).autoBuyEq("25").autoBuyEmployee();
+        new SciencePage(driver).research();
+        //new SciencePage(driver).autoBuyEq("25").autoBuyEmployee();
+        //new PlantPage(driver).supply();
 
 
     }

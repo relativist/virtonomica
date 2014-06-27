@@ -5,7 +5,6 @@ import general.Page;
 import general.virt.LoginPage;
 import general.virt.PlantPage;
 import general.virt.SciencePage;
-import general.virt.WareHousePage;
 import help.CreateDB;
 import org.junit.Test;
 
@@ -61,7 +60,8 @@ public class Science extends Page {
 
             logMe(currentUrl);
             driver.get(currentUrl);
-            new SciencePage(driver).autoBuyEq("25").autoBuyEmployee().repairIt();
+            //new SciencePage(driver).autoBuyEq("25").autoBuyEmployee().research().repairIt();
+            new SciencePage(driver).setAutoQaSlave().educate().research().repairIt();
 
             new PlantPage(driver).recordDepartment(currentUrl);
         }

@@ -101,6 +101,55 @@ public class AnimalFermPage extends Page {
         //System.out.println("Records created successfully");
     }
 
+    //закупаем максимум оборудования
+    public AnimalFermPage autoBuyEq(String qaEq){
+        double eqHave = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество животных']]/td[2]")).getText().split("максимум")[0].replaceAll("\\D", ""));
+        double eqNeed = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество животных']]/td[2]")).getText().split("максимум")[1].replaceAll("\\D",""));
+        logMe(eqHave+" "+eqNeed);
+        if(eqHave < eqNeed){
+            String handle1 = driver.getWindowHandle();
+            driver.findElement(By.xpath("//td/a[text()='Животные']")).click();
+            Set<String> handles=driver.getWindowHandles();
+            Iterator<String> it =handles.iterator();
+            while (it.hasNext()) {
+                String popupHandle = it.next().toString();
+                if (!popupHandle.contains(handle1)) {
+                    driver.switchTo().window(popupHandle);
+                    //System.out.println("Pop Up Title: " + driver.switchTo().window(popupHandle).getTitle());
+                }
+            }
+
+//            if (driver.findElements(By.xpath("//a[contains(text(),'Отменить фильтр')]")).size() !=0)
+//                if (driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).isDisplayed() )
+//                    driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).click();
+
+            //Задаем фильтр нашего поиска продуктов.
+            driver.findElement(By.id("filterLegend")).click();
+            driver.findElement(By.id("quality_isset")).click();
+            if(!driver.findElement(By.name("quantity[isset]")).isSelected())
+                driver.findElement(By.name("quantity[isset]")).click();
+
+            driver.findElement(By.name("quality[from]")).clear();
+            driver.findElement(By.name("quality[from]")).clear();
+            driver.findElement(By.name("quality[from]")).sendKeys(qaEq);
+
+            driver.findElement(By.name("quantity[from]")).clear();
+            driver.findElement(By.name("quantity[from]")).clear();
+            driver.findElement(By.name("quantity[from]")).sendKeys(String.valueOf(eqNeed));
+
+            driver.findElement(By.xpath("//input[@class='button160']")).click();
+
+            String goodId = driver.findElement(By.xpath("//table[@class='list main_table']/tbody/tr/td[9]/span")).getAttribute("id");
+            ((JavascriptExecutor) driver).executeScript("document.getElementById(" + goodId + ").click();");
+
+            driver.findElement(By.id("amountInput")).sendKeys(String.valueOf(eqNeed));
+            ((JavascriptExecutor) driver).executeScript("document.getElementById('submitLink').click();");
+            driver.findElement(By.xpath("//span[text()='Закрыть окно']")).click();
+            driver.switchTo().window(handle1);
+        }
+        return new AnimalFermPage(driver);
+    }
+
    public AnimalFermPage finans(){
        driver.findElement(By.xpath("//a[text()='Финансовый отчёт']")).click();
        double profit = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Прибыль']]/td[2]")).getText().replaceAll(" ","").replaceAll("\\$",""));
@@ -263,6 +312,54 @@ public class AnimalFermPage extends Page {
     public AnimalFermPage setAutoQaSlave() throws InterruptedException {
         //new SalaryPage(driver).autoSetSalaryAndQa();
         new SalaryPage(driver).autoSetSalaryAndQaFormula();
+        return new AnimalFermPage(driver);
+    }
+
+    //закупаем максимум оборудования
+    public AnimalFermPage autoBuyAnimal(String qaEq){
+        double eqHave = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество животных']]/td[2]")).getText().split("максимум")[0].replaceAll("\\D", ""));
+        double eqNeed = Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Количество животных']]/td[2]")).getText().split("максимум")[1].replaceAll("\\D",""));
+        logMe(eqHave+" "+eqNeed);
+        if(eqHave == 0.0){
+            String handle1 = driver.getWindowHandle();
+            driver.findElement(By.xpath("//a[text()='Животные']")).click();
+            Set<String> handles=driver.getWindowHandles();
+            Iterator<String> it =handles.iterator();
+            while (it.hasNext()) {
+                String popupHandle = it.next().toString();
+                if (!popupHandle.contains(handle1)) {
+                    driver.switchTo().window(popupHandle);
+                    //System.out.println("Pop Up Title: " + driver.switchTo().window(popupHandle).getTitle());
+                }
+            }
+
+            if (driver.findElements(By.xpath("//a[contains(text(),'Отменить фильтр')]")).size() !=0)
+                if (driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).isDisplayed() )
+                    driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).click();
+
+            //Задаем фильтр нашего поиска продуктов.
+            driver.findElement(By.id("filterLegend")).click();
+            driver.findElement(By.id("quality_isset")).click();
+            driver.findElement(By.id("quantity_isset")).click();
+
+            driver.findElement(By.name("quality[from]")).clear();
+            driver.findElement(By.name("quality[from]")).clear();
+            driver.findElement(By.name("quality[from]")).sendKeys(qaEq);
+
+            driver.findElement(By.name("quantity[from]")).clear();
+            driver.findElement(By.name("quantity[from]")).clear();
+            driver.findElement(By.name("quantity[from]")).sendKeys(String.valueOf(eqNeed-eqHave));
+
+            driver.findElement(By.xpath("//input[@class='button160']")).click();
+
+            String goodId = driver.findElement(By.xpath("//table[@class='list main_table']/tbody/tr/td[9]/span")).getAttribute("id");
+            ((JavascriptExecutor) driver).executeScript("document.getElementById(" + goodId + ").click();");
+
+            driver.findElement(By.id("amountInput")).sendKeys(String.valueOf(eqNeed-eqHave+1));
+            ((JavascriptExecutor) driver).executeScript("document.getElementById('submitLink').click();");
+            driver.findElement(By.xpath("//span[text()='Закрыть окно']")).click();
+            driver.switchTo().window(handle1);
+        }
         return new AnimalFermPage(driver);
     }
 

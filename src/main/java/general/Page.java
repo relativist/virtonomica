@@ -257,7 +257,7 @@ public class Page extends TestCase {
         return formattedDate;
     }
 
-    public int repairIt(){
+    public int repairIt() throws InterruptedException {
         return new RepairPage(driver).repairIt();
     }
 

@@ -226,8 +226,20 @@ public class PlantPage extends Page {
                         //System.out.println("Pop Up Title: " + driver.switchTo().window(popupHandle).getTitle());
                     }
                 }
+
+                if(driver.findElements(By.xpath("//*[@id='FilterClear']")).size()>0)
+                    driver.findElement(By.xpath("//*[@id='FilterClear']")).click();
+
                 driver.findElement(By.xpath("//a[text()='Свои']")).click();
-                if(driver.findElements(By.xpath("//table[@class='list main_table']/tbody/tr/td[11]/span")).size()==0){
+
+                driver.findElement(By.id("FilterFadeIn")).click();
+                driver.findElement(By.name("free_for_buy[from]")).clear();
+                driver.findElement(By.name("free_for_buy[from]")).sendKeys(need);
+                driver.findElement(By.xpath("//input[@value='Фильтровать']")).click();
+
+
+
+                if(driver.findElements(By.xpath("//table[@class='unit-list-2014']/tbody/tr/td[8]/span")).size()==0){
                     logMe("У нас нет подходящего саплаера для продукта "+title);
                     new HelpPage(driver).recordReport(driver.getCurrentUrl(),"У нас нет подходящего саплаера для продукта "+title);
                     driver.findElement(By.xpath("//span[text()='Закрыть окно']")).click();
@@ -235,9 +247,10 @@ public class PlantPage extends Page {
                     continue;
                 }
 
-                String goodId = driver.findElement(By.xpath("//table[@class='list main_table']/tbody/tr/td[11]/span")).getAttribute("id");
-                ((JavascriptExecutor) driver).executeScript("document.getElementById(" + goodId + ").click();");
+                String goodId = driver.findElement(By.xpath("//table[@class='unit-list-2014']/tbody/tr/td[8]/span")).getAttribute("id");
+                //((JavascriptExecutor) driver).executeScript("document.getElementsByClassName('choose').click();");
 
+                driver.findElement(By.xpath("//td[@class='choose']/span")).click();
                 driver.findElement(By.id("amountInput")).sendKeys(String.valueOf(need));
                 ((JavascriptExecutor) driver).executeScript("document.getElementById('submitLink').click();");
                 driver.findElement(By.xpath("//span[text()='Закрыть окно']")).click();

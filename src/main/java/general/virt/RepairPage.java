@@ -39,7 +39,7 @@ public class RepairPage extends Page {
 
 
 
-    public int repairIt(){
+    public int repairIt() throws InterruptedException {
         String DepartmentType="";
         //logMe("repair verion: " + version);
         Double EQ=0.0;
@@ -79,7 +79,7 @@ public class RepairPage extends Page {
             }
             fix=0.2;
         }
-        else if (driver.findElement(By.xpath("//div[@class='officePlace']")).getText().split(" ")[0].equals("Овцеферма")){
+        else if (driver.findElement(By.xpath("//div[@class='officePlace']")).getText().split(" ")[0].contains("ферма")){
             DepartmentType="Office";
             EQ=Double.valueOf(driver.findElement(By.xpath("//tr[td[text()='Качество животных']]/td[2]")).getText());
             eqNeed=EQ;
@@ -133,19 +133,24 @@ public class RepairPage extends Page {
         //logMe(" " + page);
         driver.get("http://virtonomica.ru/vera/window/unit/equipment/"+page);
 
-        if (driver.findElements(By.xpath("//a[contains(text(),'Отменить фильтр')]")).size() !=0)
-            driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).click();
+//        if (driver.findElements(By.xpath("//a[contains(text(),'Отменить фильтр')]")).size() !=0)
+//            driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).click();
 
 // THE NEW WAY
         //Задаем фильтр нашего поиска оборудования.
-        driver.findElement(By.id("filterLegend")).click();
-        driver.findElement(By.id("quality_isset")).click();
+        if(!driver.findElement(By.id("filterLegend")).isSelected())
+            driver.findElement(By.id("filterLegend")).click();
+
+        if(!driver.findElement(By.id("quality_isset")).isSelected())
+            driver.findElement(By.id("quality_isset")).click();
+
+        Thread.sleep(500);
 
         driver.findElement(By.name("quality[from]")).clear();
         driver.findElement(By.name("quality[from]")).sendKeys(String.valueOf(eqNeed-0.5));
         driver.findElement(By.name("quality[to]")).clear();
 
-        driver.findElement(By.name("quantity[isset]")).click();
+        //driver.findElement(By.name("quantity[isset]")).click();
         driver.findElement(By.name("quantity[from]")).clear();
         driver.findElement(By.name("quantity[from]")).sendKeys(String.valueOf(toRepair));
 
@@ -552,6 +557,8 @@ public class RepairPage extends Page {
 
         return 0;
     }
+
+
 }
 
 

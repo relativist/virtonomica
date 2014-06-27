@@ -26,10 +26,10 @@ public class AnimalFermIT extends Page {
 //
 //    }
 //
-//    @Override
-//    protected void tearDown() throws Exception {
-//
-//    }
+    @Override
+    protected void tearDown() throws Exception {
+
+    }
 
 
 
@@ -72,12 +72,13 @@ public class AnimalFermIT extends Page {
 
             if(!new AnimalFermPage(driver).isSlaveOnVacation()) {
                 new AnimalFermPage(driver).repairIt();
-                new AnimalFermPage(driver).setAutoQaSlave().educate().supply().finans();
+                //new AnimalFermPage(driver).autoBuyEq("15");
+                new AnimalFermPage(driver).setAutoQaSlave().educate().autoBuyAnimal("10").supply().finans();
             }
             else {
                 new HelpPage(driver).recordReport(currentUrl,"AnimalFerm в отпуске");
             }
-            new PlantPage(driver).recordDepartment(currentUrl);
+            //new PlantPage(driver).recordDepartment(currentUrl);
 
         }
 

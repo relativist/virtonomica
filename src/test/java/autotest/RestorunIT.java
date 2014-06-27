@@ -26,10 +26,10 @@ public class RestorunIT extends Page {
 //
 //    }
 //
-//    @Override
-//    protected void tearDown() throws Exception {
-//
-//    }
+    @Override
+    protected void tearDown() throws Exception {
+
+    }
 
 
 

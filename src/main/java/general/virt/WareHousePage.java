@@ -66,9 +66,9 @@ public class WareHousePage extends Page {
         ArrayList<String> koff = new ArrayList<String>();
         String price = "";
         String quality = "";
-        for(int i=0; i<driver.findElements(By.xpath("//table[@class='list main_table']//tr[@class='odd' or @class='even']")).size(); i++){
-            price = driver.findElements(By.xpath("//table[@class='list main_table']//tr[@class='odd' or @class='even']/td[9]")).get(i).getText().replaceAll("\\$","").replaceAll(" ","");
-            quality = driver.findElements(By.xpath("//table[@class='list main_table']//tr[@class='odd' or @class='even']/td[10]")).get(i).getText().replaceAll("\\$","").replaceAll(" ","");
+        for(int i=0; i<driver.findElements(By.xpath("//table[@class='unit-list-2014']//tr[contains(@class,'wborder')]")).size(); i++){
+            price = driver.findElements(By.xpath("//table[@class='unit-list-2014']//tr[contains(@class,'wborder')]/td[9]")).get(i).getText().replaceAll("\\$","").replaceAll(" ","");
+            quality = driver.findElements(By.xpath("//table[@class='unit-list-2014']//tr[contains(@class,'wborder')]/td[10]")).get(i).getText().replaceAll("\\$","").replaceAll(" ","");
             koff.add(String.valueOf(Double.valueOf(price) / Double.valueOf(quality) + ";" + i));
         }
         return getMinValue(koff);
@@ -80,23 +80,23 @@ public class WareHousePage extends Page {
         String price = "";
         String quality = "";
         String qty = "";
-        driver.findElement(By.xpath("//a[text()='Все']")).click();
-        for(int i=0; i<driver.findElements(By.xpath("//table[@class='list main_table']//tr[@class='odd' or @class='even']")).size(); i++){
+        driver.findElement(By.xpath("//a[text()='Все']")).click();   
+        for(int i=0; i<driver.findElements(By.xpath("//table[@class='unit-list-2014']//tr[contains(@class,'wborder')]")).size(); i++){
 
             //ограничение на красные ограничители
-            if (driver.findElements(By.xpath("//table[@class='list main_table']//tr[@class='odd' or @class='even']["+(i+1)+"]/td[4]/span")).size()>0){
-                qty = driver.findElement(By.xpath("//table[@class='list main_table']//tr[@class='odd' or @class='even']["+(i+1)+"]/td[4]/span")).getText().replaceAll(" ","").split(":")[1];
+            if (driver.findElements(By.xpath("//table[@class='unit-list-2014']//tr[contains(@class,'wborder')]["+(i+1)+"]/td[4]/span")).size()>0){
+                qty = driver.findElement(By.xpath("//table[@class='unit-list-2014']//tr[contains(@class,'wborder')]["+(i+1)+"]/td[4]/u")).getText().replaceAll(" ","");//split(":")[1];
             }
             else qty = productOffer;
 
 
-            price = driver.findElements(By.xpath("//table[@class='list main_table']//tr[@class='odd' or @class='even']/td[9]")).get(i).getText().replaceAll("\\$","").replaceAll(" ","");
+            price = driver.findElements(By.xpath("//table[@class='unit-list-2014']//tr[contains(@class,'wborder')]/td[6]")).get(i).getText().replaceAll("\\$","").replaceAll(" ","");
 
             //если кнасное ограничение меньше оффера то ставим качество = 1
             if(Double.valueOf(qty)<Double.valueOf(productOffer))
                 quality = "1";
             else
-                quality = driver.findElements(By.xpath("//table[@class='list main_table']//tr[@class='odd' or @class='even']/td[10]")).get(i).getText().replaceAll("\\$","").replaceAll(" ","");
+                quality = driver.findElements(By.xpath("//table[@class='unit-list-2014']//tr[contains(@class,'wborder')]/td[7]")).get(i).getText().replaceAll("\\$","").replaceAll(" ","");
 
             koff.add(String.valueOf(Double.valueOf(price) / Double.valueOf(quality) + ";" + i));
             logMe("getBestLineAndKoeffFromSupplyWindow:");
@@ -278,16 +278,16 @@ public class WareHousePage extends Page {
                             }
                         }
 
-                        driver.findElement(By.xpath("//a[text()='Все']")).click();
-                        if (driver.findElements(By.xpath("//a[contains(text(),'Отменить фильтр')]")).size() !=0)
-                            if (driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).isDisplayed() )
-                                driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).click();
+
+                        //ФИЛЬТРУЕМ
+
+                        if(driver.findElements(By.xpath("//*[@id='FilterClear']")).size()>0)
+                            driver.findElement(By.xpath("//*[@id='FilterClear']")).click();
+
+
+                        driver.findElement(By.id("FilterFadeIn")).click();
 
                         //Задаем фильтр нашего поиска продуктов.
-                        driver.findElement(By.id("filterLegend")).click();
-                        driver.findElement(By.id("total_price_isset")).click();
-                        driver.findElement(By.id("free_for_buy_isset")).click();
-                        driver.findElement(By.id("quality_isset")).click();
 
                         driver.findElement(By.name("total_price[to]")).clear();
                         driver.findElement(By.name("total_price[to]")).clear();
@@ -302,15 +302,15 @@ public class WareHousePage extends Page {
                         driver.findElement(By.name("free_for_buy[from]")).sendKeys(productOffer);
 
 
-
-                        driver.findElement(By.xpath("//input[@class='button160']")).click();
+                        driver.findElement(By.xpath("//input[@value='Фильтровать']")).click();
+                        //driver.findElement(By.xpath("//input[@class='button160']")).click();
                         //getBestLineFromSupplyWindow();
                         String goodId ="0";
 
-                        if(driver.findElements(By.xpath("//*[@id='mainTable']//tr[@class='odd' or @class='even']/td[@class='choose']/span")).size()!=0) {
+                        if(driver.findElements(By.xpath("//table[@class='unit-list-2014']//tr[contains(@class,'wborder')]//td[@class='choose']/span")).size()!=0) {
                             //goodId = driver.findElements(By.xpath("//*[@id='mainTable']//tr[@class='odd' or @class='even']/td[@class='choose']/span")).get(getBestLineFromSupplyWindow()).getAttribute("id");
                             String selectedNumber = String.valueOf(Integer.valueOf(getBestLineAndKoeffFromSupplyWindow(productOffer).split(";")[0])+1);
-                            goodId = driver.findElement(By.xpath("//*[@id='mainTable']//tr[@class='odd' or @class='even']["+selectedNumber+"]/td[@class='choose']/span")).getAttribute("id");
+                            goodId = driver.findElement(By.xpath("//table[@class='unit-list-2014']//tr[contains(@class,'wborder')]["+selectedNumber+"]")).getAttribute("id");
                             //goodId = getBestLineAndKoeffFromSupplyWindow(productOffer).split(";")[0];
                             logMe("goodId = "+goodId);
                         }
@@ -325,7 +325,9 @@ public class WareHousePage extends Page {
 
 
 
-                        ((JavascriptExecutor) driver).executeScript("document.getElementById(" + goodId + ").click();");
+                        //((JavascriptExecutor) driver).executeScript("document.getElementById(" + goodId + ").click();");
+
+                        driver.findElement(By.xpath("//table[@class='unit-list-2014']//tr[contains(@class,'wborder')and @id='"+goodId+"']/td[9]/span")).click();
                         //logMe("кликнули закупить");
                         driver.findElement(By.id("amountInput")).clear();
                         driver.findElement(By.id("amountInput")).clear();
@@ -772,17 +774,14 @@ public class WareHousePage extends Page {
                                     //System.out.println("Pop Up Title: " + driver.switchTo().window(popupHandle).getTitle());
                                 }
                             }
-                            //logMe("у продукта "+productTitle+"кликаем СВОИ");
-                            //driver.findElement(By.xpath("//a[text()='Свои']")).click();
-                            if (driver.findElements(By.xpath("//a[contains(text(),'Отменить фильтр')]")).size() !=0)
-                                if (driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).isDisplayed() )
-                                    driver.findElement(By.xpath("//a[contains(text(),'Отменить фильтр')]")).click();
+
+                            if(driver.findElements(By.xpath("//*[@id='FilterClear']")).size()>0)
+                                driver.findElement(By.xpath("//*[@id='FilterClear']")).click();
+
+
+                            driver.findElement(By.id("FilterFadeIn")).click();
 
                             //Задаем фильтр нашего поиска продуктов.
-                            driver.findElement(By.id("filterLegend")).click();
-                            driver.findElement(By.id("total_price_isset")).click();
-                            driver.findElement(By.id("free_for_buy_isset")).click();
-                            driver.findElement(By.id("quality_isset")).click();
 
                             driver.findElement(By.name("total_price[to]")).clear();
                             driver.findElement(By.name("total_price[to]")).clear();
@@ -792,7 +791,8 @@ public class WareHousePage extends Page {
                             driver.findElement(By.name("quality[from]")).clear();
                             driver.findElement(By.name("quality[from]")).sendKeys(getQaFromConfFileByName(wProducts,productTitle));
 
-                            driver.findElement(By.xpath("//input[@class='button160']")).click();
+                            //driver.findElement(By.xpath("//input[@class='button160']")).click();
+                            driver.findElement(By.xpath("//input[@value='Фильтровать']")).click();
                             String bestOtherValue = getBestLineAndKoeffFromSupplyWindow(productOffer);
 
 

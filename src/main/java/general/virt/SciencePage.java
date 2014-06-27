@@ -133,8 +133,46 @@ public class SciencePage extends Page {
         driver.findElement(By.xpath("//a[text()='Исследования']")).click();
 
 
-        //идут ли исследования:
-        if(driver.findElements(By.xpath("//a[text()='Остановить проект']")).size()>0){
+        //идут ли исследования: не идут, иначе идут.
+        if(driver.findElements(By.xpath("//div[contains(text(),'В настоящий момент лаборатория не ведёт исследований')]")).size()>0){
+            String handle1 = driver.getWindowHandle();
+            driver.findElement(By.xpath("//input[@value='Новый проект']")).click();
+            Set<String> handles=driver.getWindowHandles();
+            Iterator<String> it =handles.iterator();
+            while (it.hasNext()) {
+                String popupHandle = it.next().toString();
+                if (!popupHandle.contains(handle1)) {
+                    driver.switchTo().window(popupHandle);
+                    //System.out.println("Pop Up Title: " + driver.switchTo().window(popupHandle).getTitle());
+                }
+            }
+
+
+            driver.findElement(By.xpath("//input[@class='button160']")).click();
+            try {
+                if(driver.findElements(By.xpath("//div[@class='resultMessage']")).size()>0){
+                    if(driver.findElement(By.xpath("//div[@class='resultMessage']")).getText().contains("Ошибка")){
+                        logMe("НУЖНО ПРОСТАВИТЬ ИССЛЕДОВАНИЕ!");
+                        new HelpPage(driver).recordReport(driver.getCurrentUrl(),"НУЖНО ПРОСТАВИТЬ ИССЛЕДОВАНИЕ!");
+                        driver.findElement(By.xpath("//input[@class='button145']")).click();
+                    }
+                }
+            }
+            catch (NullPointerException e){
+                logMe("good");
+            }
+
+
+            driver.switchTo().window(handle1);
+        }
+        // идут исследования
+        else{
+            if(driver.findElements(By.xpath("//p[contains(text(),'Завершена первая стадия разработки')]")).size()>0){
+                int sizeOfhep =  driver.findElements(By.xpath("//tr[@class='even' or @class='odd']/td/input")).size();
+                driver.findElements(By.xpath("//tr[@class='even' or @class='odd']/td/input")).get(sizeOfhep-1).click();
+                driver.findElement(By.id("selectIt")).click();
+
+            }
 
         }
 
@@ -190,7 +228,7 @@ public class SciencePage extends Page {
         return new SciencePage(driver);
     }
 
-    public int repairIt(){
+    public int repairIt() throws InterruptedException {
         return new RepairPage(driver).repairIt();
     }
 

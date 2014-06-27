@@ -29,10 +29,10 @@ public class PlantIT extends Page {
 //
 //    }
 //
-//    @Override
-//    protected void tearDown() throws Exception {
-//
-//    }
+    @Override
+    protected void tearDown() throws Exception {
+
+    }
 
 
 
@@ -58,7 +58,7 @@ public class PlantIT extends Page {
         String currentUrl = new String();
         for(int i=0; i< list.size(); i++){
             currentUrl = list.get(i);
-            logMe(i+" of "+list.size()+" )"+currentUrl);
+            logMe((i+1)+" of "+list.size()+" )"+currentUrl);
 
             if(new PlantPage(driver).isDepProcessed(currentUrl)){
                 logMe("Already processed");
