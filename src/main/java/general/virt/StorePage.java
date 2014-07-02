@@ -666,6 +666,10 @@ public class StorePage extends Page {
 //          if рынок забит > 30%
 //              price=price*1.3
 
+        // Новое дополнение:
+        // если проддажа продукта превышает процент рынка - увеличиваем цену.
+        // или если количество проданного продукта больше указанной.
+
         //сейчас мы в тоговом зале
         for(int i=0; i<driver.findElements(By.xpath("//tr[@class='odd' or @class='even']")).size();i++){
             result="";

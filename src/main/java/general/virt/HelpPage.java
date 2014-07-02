@@ -3,6 +3,7 @@ package general.virt;
 import general.Page;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.Select;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -199,6 +200,39 @@ public class HelpPage extends Page {
 
 
         return shopWithDep;
+    }
+
+    public void buyNewTechnology(String technologyLvl, String sum){
+
+        driver.findElement(By.xpath("//a[text()='Технологии']")).click();
+        if(driver.findElements(By.xpath("//input[@value='Купить лицензию']")).size()>0){
+            String handle1 = driver.getWindowHandle();
+
+            driver.findElement(By.xpath("//input[@value='Купить лицензию']")).click();
+
+
+            Set<String> handles=driver.getWindowHandles();
+            Iterator<String> it =handles.iterator();
+            while (it.hasNext()) {
+                String popupHandle = it.next().toString();
+                if (!popupHandle.contains(handle1)) {
+                    driver.switchTo().window(popupHandle);
+                    //System.out.println("Pop Up Title: " + driver.switchTo().window(popupHandle).getTitle());
+                }
+            }
+
+            Select s = new Select(driver.findElement(By.xpath("//select[@name='data[level]']")));
+            s.selectByValue(technologyLvl);
+
+            driver.findElement(By.id("max_price")).clear();
+            driver.findElement(By.id("max_price")).clear();
+            driver.findElement(By.id("max_price")).sendKeys(sum);
+
+            driver.findElement(By.name("createit")).click();
+            driver.close();
+            driver.switchTo().window(handle1);
+            driver.findElement(By.xpath("//ul[@class='tabu']/li[2]/a")).click();
+        }
     }
 
     public boolean createFerm(String cityName,String type,String type2,String DepSize) throws IOException, InterruptedException {
@@ -457,7 +491,9 @@ public class HelpPage extends Page {
         driver.findElement(By.xpath("//tr[td[contains(text(),'Центр города')]]/td[1]/input")).click();
         driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
 
-        driver.findElement(By.xpath("//tr[td[contains(text(),'Кофейня')]]/td[1]/input")).click();
+        //driver.findElement(By.xpath("//tr[td[contains(text(),'Кофейня')]]/td[1]/input")).click();
+        driver.findElement(By.xpath("//tr[td[contains(text(),'Ресторан греческой кухни')]]/td[1]/input")).click();
+
         driver.findElement(By.xpath("//input[contains(@value,'Продолжить')]")).click();
 
         driver.findElements(By.xpath("//tr//tr[@class='odd' or @class='even']")).get(driver.findElements(By.xpath("//tr//tr[@class='odd' or @class='even']")).size()-1).click();

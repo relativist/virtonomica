@@ -136,6 +136,10 @@ public class SciencePage extends Page {
         //идут ли исследования: не идут, иначе идут.
         if(driver.findElements(By.xpath("//div[contains(text(),'В настоящий момент лаборатория не ведёт исследований')]")).size()>0){
             String handle1 = driver.getWindowHandle();
+            if(driver.findElements(By.xpath("//input[@value='Новый проект']")).size()==0){
+                driver.findElement(By.xpath("//a[text()='Лаборатория']")).click();
+                return new SciencePage(driver);
+            }
             driver.findElement(By.xpath("//input[@value='Новый проект']")).click();
             Set<String> handles=driver.getWindowHandles();
             Iterator<String> it =handles.iterator();

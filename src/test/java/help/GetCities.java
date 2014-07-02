@@ -87,6 +87,5 @@ public class GetCities extends Page {
             s1 = new Select(driver.findElement(By.xpath("//fieldset/table[2]//td[1]/select")));
         }
     }
-
 }
 

@@ -74,6 +74,7 @@ public class AnimalFermIT extends Page {
                 new AnimalFermPage(driver).repairIt();
                 //new AnimalFermPage(driver).autoBuyEq("15");
                 new AnimalFermPage(driver).setAutoQaSlave().educate().autoBuyAnimal("10").supply().finans();
+                new HelpPage(driver).buyNewTechnology("15","5000000");
             }
             else {
                 new HelpPage(driver).recordReport(currentUrl,"AnimalFerm в отпуске");

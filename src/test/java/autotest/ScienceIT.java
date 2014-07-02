@@ -21,7 +21,7 @@ import java.util.List;
     Simple Soap import product and verify them to correct import to MPO ( SP )
 */
 
-public class Science extends Page {
+public class ScienceIT extends Page {
 
 //    @Override
 //    protected void setUp() throws Exception {
@@ -61,7 +61,7 @@ public class Science extends Page {
             logMe(currentUrl);
             driver.get(currentUrl);
             //new SciencePage(driver).autoBuyEq("25").autoBuyEmployee().research().repairIt();
-            new SciencePage(driver).setAutoQaSlave().educate().research().repairIt();
+            new SciencePage(driver).autoBuyEq("25").autoBuyEmployee().setAutoQaSlave().educate().research().repairIt();
 
             new PlantPage(driver).recordDepartment(currentUrl);
         }

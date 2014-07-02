@@ -50,11 +50,16 @@ public class CreateNewDivisionIT extends Page {
 //        new HelpPage(driver).createFerm("Бобруйск","Птицеферма","Разведение кур","5 корпусов");
 //        new HelpPage(driver).createFerm("Бобруйск","Птицеферма","Разведение кур","5 корпусов");
 //        new HelpPage(driver).createFerm("Бобруйск","Птицеферма","Разведение кур","5 корпусов");
-        for(int i=0; i<16; i++) {
-            logMe(""+i);
-            new HelpPage(driver).createScienceLaboratory("Рига");
-        }
-
+//        for(int i=0; i<16; i++) {
+//            logMe(""+i);
+//            new HelpPage(driver).createScienceLaboratory("Рига");
+//        }
+        new HelpPage(driver).createRestorun("Хельсинки");
+        new HelpPage(driver).createRestorun("Турку");
+        new HelpPage(driver).createRestorun("Салоники");
+        new HelpPage(driver).createRestorun("Реймс");
+        new HelpPage(driver).createRestorun("Дрезден");
+        new HelpPage(driver).createRestorun("Маракайбо");
 
 //            .createPlant("Завод","Ликероводочный завод","Узбекистан","Нукус","1000 рабочих мест","Ликер")
 //            .createPlant("Завод","Ликероводочный завод","Узбекистан","Нукус","1000 рабочих мест","Ликер");

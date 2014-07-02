@@ -44,6 +44,7 @@ public class RepairPage extends Page {
         //logMe("repair verion: " + version);
         Double EQ=0.0;
         double toRepair=0.0;
+        Thread.sleep(1000); //failed with  element is not attached to the page document
 
         if(driver.findElement(By.xpath("//div[@class='officePlace']")).getText().split(" ")[0].equals("Ресторан")){
             DepartmentType="Restaurant";
